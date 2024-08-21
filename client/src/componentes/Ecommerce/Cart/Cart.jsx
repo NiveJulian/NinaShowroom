@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import {
   createSale,
   decrementQuantity,
@@ -78,7 +79,7 @@ const StepShipping = ({
   setSelectedDeliveryMethod,
   prevStep,
   nextStep,
-  }) => (
+}) => (
   <div>
     <h2>Información de Envío</h2>
     {/* Aquí va el componente o campos para la información de envío */}
@@ -99,7 +100,10 @@ const StepShipping = ({
       />
     </div>
     <div className="mt-2 flex justify-center items-center">
-      <label className="border border-primary bg-secondary text-white p-2 text-center" htmlFor="cp">
+      <label
+        className="border border-primary bg-secondary text-white p-2 text-center"
+        htmlFor="cp"
+      >
         CP
       </label>
       <input
@@ -172,6 +176,7 @@ const Cart = ({ product, calcularTotal, usuario }) => {
   const [step, setStep] = useState(1);
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [formaPago, setFormaPago] = useState("");
   const [formCliente, setFormCliente] = useState({
     nombre: usuario.name || "",
@@ -251,6 +256,28 @@ const Cart = ({ product, calcularTotal, usuario }) => {
   return (
     <div className="flex items-center justify-center bg-gray-200">
       <div className="bg-gray-50 h-screen text-center shadow-md p-6 rounded-xl w-2/3 flex flex-col">
+        <div className="flex justify-start">
+          <button
+            className="flex gap-2 border border-gray-400 p-2 active:translate-y-[1px] hover:shadow-lg rounded-md"
+            onClick={() => navigate("/")}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth="1.5"
+              stroke="currentColor"
+              className="size-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"
+              />
+            </svg>
+            <span>Volver</span>
+          </button>
+        </div>
         {step === 1 && (
           <StepContact
             formCliente={formCliente}
@@ -342,15 +369,8 @@ const Cart = ({ product, calcularTotal, usuario }) => {
           )}
         </div>
 
-        <div className="p-2 mt-4">Total: ${calcularTotal()}</div>
-        <div className="p-2 mt-4">
-          <button
-            onClick={handleCreateVenta}
-            className="border p-2 text-white bg-gray-800 w-full hover:bg-gray-700"
-          >
-            Empezar el pago
-          </button>
-        </div>
+        <div className="p-2 mt-4 text-3xl font-bold font-mono text-secondary">Total: ${calcularTotal()}</div>
+        
       </div>
     </div>
   );
