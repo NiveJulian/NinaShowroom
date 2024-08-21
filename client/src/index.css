@@ -1,0 +1,51 @@
+/* Tailwind CSS imports */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px; /* Ancho de la barra de desplazamiento vertical */
+  height: 8px; /* Altura de la barra de desplazamiento horizontal */
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Color del fondo de la barra de desplazamiento */
+  border-radius: 10px; /* Radio de borde para redondear las esquinas */
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888; /* Color de la barra de desplazamiento */
+  border-radius: 10px; /* Radio de borde para redondear las esquinas */
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555; /* Color de la barra de desplazamiento cuando se pasa el cursor sobre ella */
+}
+
+/* Estilos para la tabla */
+table.basic {
+  @apply w-full bg-white rounded-sm shadow-md;
+}
+
+table.basic thead tr td,
+table.basic thead tr th {
+  @apply text-sm text-gray-600 uppercase p-2 border-b border-gray-200 px-4 py-2;
+}
+
+table.basic tr td {
+  @apply px-4 py-1;
+}
+
+table.basic a {
+  @apply px-4 py-1 rounded-sm inline-flex mx-1 items-center gap-2 text-sm;
+}
+
+@media (max-width: 640px) {
+  .w-screen {
+    @apply w-full;
+  }
+}

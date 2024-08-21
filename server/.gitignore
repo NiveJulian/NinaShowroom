@@ -1,0 +1,6 @@
+.env
+node_modules/
+credentials.json
+token.json
+servicesKeyAccount.json
+config/servicesKeyAccount.json

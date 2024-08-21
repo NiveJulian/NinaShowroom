@@ -1,0 +1,457 @@
+.brand {
+    font-size: 1em;
+    color: rgb(150, 150, 150);
+}
+
+.buy-button {
+    display: inline-block;
+    background-color: rgb(255, 130, 0);
+    color: #ffffff;
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-right: 10px;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  .fav-button {
+    display: inline-block;
+    background-color: white;
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 10px;
+    padding: 10px 10px;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .buy-button:hover {
+    background-color: #ff6400;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  .fav-button:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  }
+  
+  .buy-button:active {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+  
+  .buy-button:focus {
+    outline: none;
+  }
+  
+  .detail-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    font-family: Arial, sans-serif;
+  }
+
+  .detail-container-dark{
+    background-color: #212121
+  }
+  
+  .detail-cont {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+
+  .detail-cont-dark{
+    background-color: #212121
+  }
+
+  .image-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  
+  .image-container img {
+    width: 500px;
+    height: 500px;
+    border-radius: 5px;
+    object-fit: cover;
+  }
+  
+  .image-container button {
+    background-color: transparent;
+    border: none;
+    border-radius: 100px;
+    font-size: 1em;
+    cursor: pointer;
+  }
+
+  .image-container button:focus {
+    outline: none;
+  }
+
+  .image-container button:hover {
+    background-color: rgb(200, 200, 200);
+
+
+  }
+  
+  .info-container {
+    max-width: 400px;
+    flex: 1;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    text-align: left;   
+    align-items: flex-start;
+  }
+  
+  .product-name {
+    font-size: 2em;
+  }
+  
+  .content-flex {
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+  }
+  
+  .product-average-mark, .product-status, .product-availability, .product-quantity {
+    font-size: 1.1em;
+    margin-bottom: 10px;
+  }
+
+  .product-quantity select {
+    background-color: #fff;
+    color: #333;
+    font-size: 1em;
+    padding: 10px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+    transition: border-color 0.3s ease;
+  }
+  
+  .product-quantity select:hover,
+  .product-quantity select:focus {
+    border-color: rgb(255, 130, 0);
+  }
+  
+  .product-quantity select option {
+    background-color: #fff;
+    color: #333;
+  }
+
+  .product-quantity-custom {
+    margin-left: 85px;
+    margin-bottom: 20px;
+    background-color: #fff;
+    color: #333;
+    font-size: 1em;
+    padding: 10px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+    transition: border-color 0.3s ease;
+  }
+
+  .product-quantity-custom:hover,
+  .product-quantity-custom:focus {
+    border-color: rgb(255, 130, 0);
+  }
+
+  .product-price {
+    font-size: 2em;
+  }
+  
+  .product-availability.available {
+    color: green;
+  }
+  
+  .product-availability.not-available {
+    color: red;
+  }
+  
+  .product-quantity {
+    display: flex;
+    align-items: center;
+    justify-content: left;
+  }
+  
+  .product-quantity label {
+    margin-right: 10px;
+  }
+  
+  .description-container {
+    padding-top: 20px;
+  }
+  
+  .product-description {
+    font-size: 1.2em;
+    margin-bottom: 20px;
+  }
+  
+  .product-date {
+    font-size: 1em;
+    color: rgb(150, 150, 150);
+  }
+
+  .thumbnail-container {
+    display: flex;
+    gap: 10px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #ddd;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    justify-content: center;
+  }
+
+  .review-container {
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+    transition: opacity 0.5s ease-in-out;
+  }
+  
+  .review-text {
+    font-size: 1.2em;
+    text-align: center;
+  }
+  
+  .seller-cont {
+    flex: 1;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    text-align: left;   
+    align-items: flex-start;
+  }
+
+  .sellers-name {
+    font-size: 1.5em;
+  }
+
+  .seller-image {
+    width: 300px;
+    border-radius: 10px;
+  }
+
+  .sellers-stats {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+  }
+  .sellers-stats-text {
+    font-size: 1em;
+    color: rgb(150, 150, 150);
+  }
+
+  .seller-button {
+    display: inline-block;
+    background-color: rgb(255, 235, 235);
+    width: 300px;
+    color: rgb(255, 130, 0);
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  .seller-button-dark{
+    background-color: #ff8200;
+    color: rgb(255, 255, 255);
+  }
+
+  .seller-button-dark:hover{
+    background-color: #ff6400;
+    color: rgb(255, 255, 255);
+  }
+
+  .seller-button:hover {
+    background-color: rgb(255, 220, 220);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  }
+  
+  .seller-button:active {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+  
+  .seller-button:focus {
+    outline: none;
+  }
+
+  .specifications-list {
+    list-style-type: none;
+    padding: 20px;
+    margin: 0;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+  }
+  
+  .specifications-list li {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.1em;
+    padding: 5px 0;
+  }
+  
+  .spec-name {
+    font-weight: bold;
+    margin-left: 20px;
+  }
+  
+  .spec-value {
+    margin-left: 10px;
+    margin-right: 20px;
+  }
+
+  .spec-title {
+    font-size: 1.5em;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+  }
+
+  .thumbnail {
+    width: 50px;
+    height: 50px;
+    border: 2px solid transparent;
+    border-radius: 5px;
+    cursor: pointer;
+    object-fit: cover;
+    transition: border 0.3s ease;
+  }
+  
+  .thumbnail.selected {
+    border: 2px solid #ff8200;
+  }
+  
+  .thumbnail:hover {
+    border: 2px solid rgb(255, 100, 0);
+  }
+  
+  .total-available {
+    margin-left: 10px;
+    font-size: 1em;
+    color: rgb(150, 150, 150);
+  }
+
+  .review-container {
+    max-height: 450px;
+    margin-top: 1em;
+    border: 1px solid #ccc;
+    padding: 1em;
+  }
+  
+  .review-overflow {
+    overflow-y: auto;
+    max-height: 350px;
+    padding: 0;
+    border: none;
+  }
+  
+  .write-review-box {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin-top: 1em;
+    border-radius: 5px;
+  }
+  
+  .review-textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    resize: none;
+    min-height: 50px;
+  }
+  
+  .star-rating-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .star-rating-title {
+    margin-right: 10px;
+  }
+  
+  .star-rating-input {
+    display: flex;
+  }
+  
+  .star {
+    font-size: 1.5rem;
+    color: #ccc;
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+  
+  .star.selected {
+    color: #ffc107;
+  }
+  
+  .submit-review-button {
+    background-color: rgb(255, 130, 0);
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .submit-review-button:hover {
+    background-color: rgb(219, 113, 0);
+  }
+  
+  .reviews-users {
+    margin-top: 1em;
+  }
+  
+  .review-item {
+    margin-bottom: 1em;
+  }
+  
+  .review-item-top {
+    display: flex;
+    align-items: center;
+  }
+  
+  .review-author {
+    font-weight: bold;
+    margin-right: 5px;
+  }
+  
+  .review-text {
+    margin-bottom: 0.5em;
+    color: #333;
+    text-align: left;
+  }
+  
