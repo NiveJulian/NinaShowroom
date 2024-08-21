@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import { addToCart } from "../../../redux/actions/actions";
 import ProductCard from "./ProductCard";
 import Paginate from "../Paginate/Paginate";
+import Layout from "../Layout/Layout";
 
 export default function ProductList({ allProducts }) {
   const [currentPage, setCurrentPage] = useState(1);
@@ -22,8 +23,8 @@ export default function ProductList({ allProducts }) {
   const page = (pageNumber) => setCurrentPage(pageNumber);
 
   const handleAddToCart = (product) => {
-      toast.success("Producto añadido al carrito");
-      dispatch(addToCart(product));
+    toast.success("Producto añadido al carrito");
+    dispatch(addToCart(product));
   };
 
   useEffect(() => {
@@ -31,32 +32,34 @@ export default function ProductList({ allProducts }) {
   }, [allProducts]);
 
   return (
-    <div className="h-full mb-16 flex justify-center items-center flex-col border-t border-l border-gray-200 p-2 rounded-md">
-      {currentProducts.length === 0 ? (
-        <div className="text-center text-gray-600 font-bold text-2xl mt-16">
-          No se encontraron resultados
-        </div>
-      ) : (
-        <div className="max-w-screen grid grid-cols-1 mb-8 sm:grid-cols-2 lg:grid-cols-4 gap-12">
-          {currentProducts.map((product) => (
-            <ProductCard
-              key={product.id}
-              id={product.id}
-              name={product.name}
-              url={product.url}
-              price={product.precio}
-              onAddToCart={() => handleAddToCart(product)}
-              isNew={false}
-            />
-          ))}
-        </div>
-      )}
-      <Paginate
-        productsPerPage={productsPerPage}
-        totalProducts={allProducts.length}
-        page={page}
-        currentPage={currentPage}
-      />
-    </div>
+    <Layout items={currentProducts.length}>
+      <div className="h-full mb-16 flex justify-center items-center flex-col p-2 rounded-md">
+        {currentProducts.length === 0 ? (
+          <div className="text-center text-gray-600 font-bold text-2xl mt-16">
+            No se encontraron resultados
+          </div>
+        ) : (
+          <div className="max-w-screen grid grid-cols-2 my-8 sm:grid-cols-2 lg:grid-cols-4 gap-12">
+            {currentProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                id={product.id}
+                name={product.name}
+                url={product.url}
+                price={product.precio}
+                onAddToCart={() => handleAddToCart(product)}
+                isNew={false}
+              />
+            ))}
+          </div>
+        )}
+        <Paginate
+          productsPerPage={productsPerPage}
+          totalProducts={allProducts.length}
+          page={page}
+          currentPage={currentPage}
+        />
+      </div>
+    </Layout>
   );
 }

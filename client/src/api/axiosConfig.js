@@ -9,4 +9,4 @@ const instance = axios.create({
 export default instance;
 
 
-  //https://server-ninashowroom.vercel.app
+  //server-ninashowroom.vercel.app

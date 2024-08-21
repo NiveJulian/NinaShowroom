@@ -75,14 +75,15 @@ const ProductCard = ({ id, name, url, sku, price, onAddToCart, isNew }) => {
       </div>
     ),
   };
-  console.log(url);
   return (
     <article className="w-56 h-full rounded-xl bg-white p-3 shadow-lg hover:shadow-xl hover:transform hover:scale-105 duration-300 mb-6 border border-gray-300">
       <div>
         <div className="relative flex items-end overflow-hidden rounded-xl">
           <Link to={`/product/${id}`}>
             {url.includes(",") ? (
-              <ImageComponent imageUrls={url} />
+              <Slider {...settings} className="w-64 h-64">
+                <ImageComponent imageUrls={url} />
+              </Slider>
             ) : (
               <LazyLoadImage
                 src={url}

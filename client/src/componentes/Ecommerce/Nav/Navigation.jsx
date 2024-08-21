@@ -7,6 +7,7 @@ import UserLogged from "../User/UserLogged";
 const Navigation = () => {
   const [showCart, setShowCart] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const cartItems = useSelector((state) => state.cart.cartItems);
   const user = useSelector((state) => state.auth.user);
@@ -47,7 +48,7 @@ const Navigation = () => {
       <div className="relative z-30 bg-gray-100 shadow-lg">
         <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
           <div className="relative flex items-center justify-between h-16">
-            <div className="flex justify-center items-center px-2 lg:px-0">
+            <div className="flex gap-2 justify-center items-center px-2 lg:px-0">
               <Link to="/" className="flex-shrink-0">
                 <img
                   className="h-12 w-12 object-cover rounded-full"
@@ -58,16 +59,16 @@ const Navigation = () => {
               <div className="hidden lg:block lg:ml-2">
                 <div className="flex">
                   <Link
+                    to="/"
+                    className="ml-4 px-3 py-2 rounded-md text-sm leading-5 text-gray-800 hover:bg-tertiary hover:text-white transition duration-150 ease-in-out cursor-pointer focus:outline-none focus:text-white focus:bg-gray-700 "
+                  >
+                    Inicio
+                  </Link>
+                  <Link
                     to="/product"
                     className="ml-4 px-3 py-2 rounded-md text-sm leading-5 text-gray-800 hover:bg-tertiary hover:text-white transition duration-150 ease-in-out cursor-pointer focus:outline-none focus:text-white focus:bg-gray-700 "
                   >
                     Products
-                  </Link>
-                  <Link
-                    to="#"
-                    className="ml-4 px-3 py-2 rounded-md text-sm leading-5 text-gray-800 hover:bg-tertiary hover:text-white transition duration-150 ease-in-out cursor-pointer focus:outline-none focus:text-white focus:bg-gray-700 "
-                  >
-                    Article
                   </Link>
                   <Link
                     to="#"
@@ -82,6 +83,27 @@ const Navigation = () => {
                     Promo
                   </Link>
                 </div>
+              </div>
+              <div className="flex lg:hidden border border-gray-300 rounded-md p-2">
+                <button
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  className="text-gray-800 hover:text-gray-600 focus:outline-none focus:text-gray-600"
+                >
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M4 6h16M4 12h16m-7 6h7"
+                    ></path>
+                  </svg>
+                </button>
               </div>
             </div>
             <div className="flex-1 flex justify-center gap-2 px-2 lg:ml-6 lg:justify-end">
@@ -179,38 +201,39 @@ const Navigation = () => {
             </div>
           </div>
         </div>
-        <div className="lg:hidden">
-          <div className="px-2 pt-2 pb-3">
-            <Link
-              to="#"
-              className="block px-3 py-2 rounded-md text-base font-medium text-gray-800 hover:bg-secondary hover:text-white focus:outline-none focus:text-white focus:bg-gray-700 transition duration-150 ease-in-out cursor-pointer"
-            >
-              Location
-            </Link>
-            <Link
-              to="#"
-              className="mt-1 block px-3 py-2 rounded-md text-base font-medium text-gray-800 hover:bg-secondary hover:text-white focus:outline-none focus:text-white focus:bg-gray-700 transition duration-150 ease-in-out cursor-pointer"
-            >
-              Article
-            </Link>
-            <Link
-              to="#"
-              className="mt-1 block px-3 py-2 rounded-md text-base font-medium text-gray-800 hover:bg-secondary hover:text-white focus:outline-none focus:text-white focus:bg-gray-700 transition duration-150 ease-in-out cursor-pointer"
-            >
-              Recipe
-            </Link>
-            <Link
-              to="#"
-              className="mt-1 block px-3 py-2 rounded-md text-base font-medium text-gray-800 hover:bg-secondary hover:text-white focus:outline-none focus:text-white focus:bg-gray-700 transition duration-150 ease-in-out cursor-pointer"
-            >
-              Promo
-            </Link>
+        {isMenuOpen && (
+          <div className="lg:hidden absolute bg-gray-100 w-full">
+            <div className="px-2 pt-2 pb-3">
+              <Link
+                to="/"
+                className="mt-1 block px-3 py-2 rounded-md text-base font-medium text-gray-800 hover:bg-secondary hover:text-white focus:outline-none focus:text-white focus:bg-gray-700 transition duration-150 ease-in-out cursor-pointer"
+              >
+                Inicio
+              </Link>
+              <Link
+                to="/product"
+                className="block px-3 py-2 rounded-md text-base font-medium text-gray-800 hover:bg-secondary hover:text-white focus:outline-none focus:text-white focus:bg-gray-700 transition duration-150 ease-in-out cursor-pointer"
+              >
+                Products
+              </Link>
+              <Link
+                to="#"
+                className="mt-1 block px-3 py-2 rounded-md text-base font-medium text-gray-800 hover:bg-secondary hover:text-white focus:outline-none focus:text-white focus:bg-gray-700 transition duration-150 ease-in-out cursor-pointer"
+              >
+                Recipe
+              </Link>
+              <Link
+                to="#"
+                className="mt-1 block px-3 py-2 rounded-md text-base font-medium text-gray-800 hover:bg-secondary hover:text-white focus:outline-none focus:text-white focus:bg-gray-700 transition duration-150 ease-in-out cursor-pointer"
+              >
+                Promo
+              </Link>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </nav>
   );
 };
 
 export default Navigation;
-  

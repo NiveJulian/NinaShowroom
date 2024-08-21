@@ -1,12 +1,177 @@
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
-import { createSale, removeFromCart } from "../../../redux/actions/actions";
-import { useNavigate } from "react-router-dom";
+import {
+  createSale,
+  decrementQuantity,
+  incrementQuantity,
+  removeFromCart,
+} from "../../../redux/actions/actions";
+import { LazyLoadImage } from "react-lazy-load-image-component";
+import Delivery from "../Delivery/Delivery";
+
+const StepContact = ({ formCliente, handleFormClienteChange, nextStep }) => (
+  <div>
+    <h2>Información de Contacto</h2>
+    <div className="mt-2 flex justify-center items-center">
+      <label
+        className="border border-primary bg-secondary text-white p-2 text-center"
+        htmlFor="nombre"
+      >
+        Nombre
+      </label>
+      <input
+        type="text"
+        name="nombre"
+        value={formCliente.nombre}
+        onChange={handleFormClienteChange}
+        className="border p-2 w-full border-gray-500"
+        placeholder="Nombre completo"
+      />
+    </div>
+    <div className="mt-2 flex justify-center items-center">
+      <label
+        className="border border-primary bg-secondary text-white p-2 text-center"
+        htmlFor="correo"
+      >
+        Correo
+      </label>
+      <input
+        type="email"
+        name="correo"
+        value={formCliente.correo}
+        onChange={handleFormClienteChange}
+        className="border p-2 w-full"
+        placeholder="Email"
+      />
+    </div>
+    <div className="mt-2 flex justify-center items-center">
+      <label
+        className="border border-primary bg-secondary text-white p-2 text-center"
+        htmlFor="celular"
+      >
+        Celular
+      </label>
+      <input
+        type="text"
+        name="celular"
+        value={formCliente.celular}
+        onChange={handleFormClienteChange}
+        className="border p-2 w-full"
+        placeholder="Número de celular"
+      />
+    </div>
+    {/* Resto de los campos */}
+    <button
+      onClick={nextStep}
+      className="border p-2 text-white bg-gray-800 w-full hover:bg-gray-700 mt-4"
+    >
+      Siguiente
+    </button>
+  </div>
+);
+
+const StepShipping = ({
+  formCliente,
+  handleFormClienteChange,
+  selectedDeliveryMethod,
+  setSelectedDeliveryMethod,
+  prevStep,
+  nextStep,
+  }) => (
+  <div>
+    <h2>Información de Envío</h2>
+    {/* Aquí va el componente o campos para la información de envío */}
+    <div className="mt-2 flex justify-center items-center">
+      <label
+        className="border border-primary bg-secondary text-white p-2 text-center"
+        htmlFor="provincia"
+      >
+        Provincia
+      </label>
+      <input
+        type="text"
+        name="provincia"
+        value={formCliente.provincia}
+        onChange={handleFormClienteChange}
+        className="border p-2 w-full"
+        placeholder="Provincia"
+      />
+    </div>
+    <div className="mt-2 flex justify-center items-center">
+      <label className="border border-primary bg-secondary text-white p-2 text-center" htmlFor="cp">
+        CP
+      </label>
+      <input
+        type="text"
+        name="cp"
+        value={formCliente.cp}
+        onChange={handleFormClienteChange}
+        className="border p-2 w-full"
+        placeholder="Código Postal"
+      />
+    </div>
+    <Delivery
+      selectedOption={selectedDeliveryMethod}
+      setSelectedOption={setSelectedDeliveryMethod}
+    />
+    <div className="flex justify-between mt-4">
+      <button
+        onClick={prevStep}
+        className="border p-2 text-white bg-gray-800 hover:bg-gray-700"
+      >
+        Anterior
+      </button>
+      <button
+        onClick={nextStep}
+        className="border p-2 text-white bg-gray-800 hover:bg-gray-700"
+      >
+        Siguiente
+      </button>
+    </div>
+  </div>
+);
+
+const StepPayment = ({
+  formaPago,
+  handleFormaPagoChange,
+  prevStep,
+  handleCreateVenta,
+}) => (
+  <div>
+    <h2>Forma de Pago</h2>
+    <div className="flex gap-2 mt-2 justify-center items-center">
+      <button
+        onClick={() => handleFormaPagoChange("Efectivo")}
+        className={`border p-2 text-gray-500 w-40 hover:bg-gray-100 shadow-md active:translate-y-[2px] ${
+          formaPago === "Efectivo" ? "border-primary" : "border-gray-400"
+        }`}
+      >
+        Efectivo
+      </button>
+      {/* Resto de los botones de forma de pago */}
+    </div>
+    <div className="flex justify-between mt-4">
+      <button
+        onClick={prevStep}
+        className="border p-2 text-white bg-gray-800 hover:bg-gray-700"
+      >
+        Anterior
+      </button>
+      <button
+        onClick={handleCreateVenta}
+        className="border p-2 text-white bg-gray-800 w-full hover:bg-gray-700"
+      >
+        Finalizar Compra
+      </button>
+    </div>
+  </div>
+);
 
 const Cart = ({ product, calcularTotal, usuario }) => {
+  const [step, setStep] = useState(1);
+
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const [formaPago, setFormaPago] = useState("");
   const [formCliente, setFormCliente] = useState({
     nombre: usuario.name || "",
@@ -16,8 +181,19 @@ const Cart = ({ product, calcularTotal, usuario }) => {
     cp: usuario.cp || "",
     celular: "",
   });
+
+  const [selectedDeliveryMethod, setSelectedDeliveryMethod] = useState(""); // Estado para el tipo de envío
+
   const handleFormaPagoChange = (forma) => {
     setFormaPago(forma);
+  };
+
+  const nextStep = () => {
+    setStep(step + 1);
+  };
+
+  const prevStep = () => {
+    setStep(step - 1);
   };
 
   const handleFormClienteChange = (e) => {
@@ -42,6 +218,7 @@ const Cart = ({ product, calcularTotal, usuario }) => {
       total: calcularTotal(),
       formaPago,
       cliente: formCliente,
+      tipoEnvio: selectedDeliveryMethod, // Pasa el método de envío seleccionado
     };
 
     if (venta.formaPago === "") {
@@ -52,43 +229,58 @@ const Cart = ({ product, calcularTotal, usuario }) => {
       toast.error("Falta nombre del cliente");
     } else {
       toast.success("Venta creada exitosamente...");
-      dispatch(createSale(venta));
+      console.log(venta);
+      // dispatch(createSale(venta));
     }
   };
 
-  const handleRemove = (id) => {
-    dispatch(removeFromCart(id));
+  const handleRemoveFromCart = (index) => {
+    const productId = product[index].id;
+    dispatch(removeFromCart(productId));
+  };
+
+  const handleQuantityChange = (index, action) => {
+    const productId = product[index].id;
+    if (action === "increase") {
+      dispatch(incrementQuantity(productId));
+    } else if (action === "decrease") {
+      dispatch(decrementQuantity(productId));
+    }
   };
 
   return (
     <div className="flex items-center justify-center bg-gray-200">
       <div className="bg-gray-50 h-screen text-center shadow-md p-6 rounded-xl w-2/3 flex flex-col">
-        <div className="flex justify-start">
-          <button
-            className="flex gap-2 border border-gray-400 p-2 active:translate-y-[1px] hover:shadow-lg rounded-md"
-            onClick={() => navigate("/")}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-              className="size-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"
-              />
-            </svg>
-            <span>Volver</span>
-          </button>
-          <h1 className="text-xl font-bold flex-1">Carrito</h1>
-        </div>
-
+        {step === 1 && (
+          <StepContact
+            formCliente={formCliente}
+            handleFormClienteChange={handleFormClienteChange}
+            nextStep={nextStep}
+          />
+        )}
+        {step === 2 && (
+          <StepShipping
+            handleFormClienteChange={handleFormClienteChange}
+            formCliente={formCliente}
+            selectedDeliveryMethod={selectedDeliveryMethod}
+            setSelectedDeliveryMethod={setSelectedDeliveryMethod}
+            prevStep={prevStep}
+            nextStep={nextStep}
+          />
+        )}
+        {step === 3 && (
+          <StepPayment
+            formaPago={formaPago}
+            handleFormaPagoChange={handleFormaPagoChange}
+            prevStep={prevStep}
+            handleCreateVenta={handleCreateVenta}
+          />
+        )}
+      </div>
+      <div className="bg-gray-50 opacity-95 text-center shadow-md p-6 rounded-xl w-1/3 m-2 h-screen flex flex-col justify-between">
+        <h1 className="text-xl font-bold flex-1">Carrito</h1>
         <div
-          className={`border border-gray-500 p-2 mt-4 ${
+          className={`border border-gray-400 rounded-md p-2 mt-4 ${
             product.length > 0
               ? "overflow-y-scroll"
               : "h-full flex justify-center items-center"
@@ -96,66 +288,49 @@ const Cart = ({ product, calcularTotal, usuario }) => {
         >
           {product?.length > 0 ? (
             product?.map((prod, i) => {
-              const imagenes = prod?.url?.split(",")[0];
+              const imgUrl = prod?.url?.split(",")[0];
               return (
                 <div
                   key={i}
-                  className="md:flex items-center py-2 md:py-2 lg:py-2 border-t border-gray-500"
+                  className="flex flex-row justify-between border border-gray-500 bg-gray-300 p-2 rounded-md items-center mb-4"
                 >
-                  <div className="md:w-4/12 2xl:w-1/4 w-full gap-2 p-1 flex">
-                    <img
-                      key={i}
-                      src={imagenes}
-                      alt="Black Leather Purse"
-                      className="h-48 w-48 border border-gray-400 object-center p-2 rounded-md object-cover md:block hidden"
+                  <div className="flex flex-row items-center w-2/5">
+                    <LazyLoadImage
+                      src={imgUrl}
+                      className="w-16 h-16 object-cover rounded-full border border-gray-500 bg-gray-300"
+                      alt={`${prod?.nombre}-${i}`}
                     />
+                    <span className="ml-4 font-semibold text-sm text-primary text-center">
+                      {prod?.nombre}
+                    </span>
                   </div>
-                  <div className="md:pl-3 md:w-8/12 2xl:w-3/4 flex flex-col justify-center p-4">
-                    <p className="text-base mt-4 leading-3 text-gray-800">
-                      <span className="font-bold">SKU:</span> {prod.sku}
-                    </p>
-                    <div className="flex items-center justify-between w-full">
-                      <p className="text-base font-bold leading-none text-gray-800">
-                        {prod.nombre}
-                      </p>
-                    </div>
-                    {prod.talle && (
-                      <p className="text-base leading-3 text-gray-600 pt-2">
-                        <span className="font-bold">Talle:</span> {prod.talle}
-                      </p>
-                    )}
-                    <p className="text-base leading-3 text-gray-800 py-4">
-                      <span className="font-bold">Color:</span> {prod.color}
-                    </p>
-                    <p className="text-base leading-3 text-gray-800 py-4">
-                      <span className="font-bold">Cantidad:</span>{" "}
-                      {prod.cantidad}
-                    </p>
-
-                    <div className="flex items-center justify-between pt-5">
-                      <p className="text-xl text-gray-800">
-                        ${prod.precio * prod.cantidad},00
-                      </p>
-                      <button
-                        onClick={() => handleRemove(prod.id)}
-                        className="text-xs leading-3 p-2 hover:shadow-md border hover:border-red-500  active:translate-y-[2px] rounded-full text-red-500 cursor-pointer"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth="1.5"
-                          stroke="currentColor"
-                          className="size-6"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-                          />
-                        </svg>
-                      </button>
-                    </div>
+                  <div className="w-24 flex justify-between items-center">
+                    <button
+                      onClick={() => handleQuantityChange(i, "decrease")}
+                      className="px-3 py-1 rounded-md bg-gray-300"
+                    >
+                      -
+                    </button>
+                    <span className="font-semibold mx-4">
+                      {prod?.cantidad || 1}
+                    </span>
+                    <button
+                      onClick={() => handleQuantityChange(i, "increase")}
+                      className="px-3 py-1 rounded-md bg-gray-300"
+                    >
+                      +
+                    </button>
+                  </div>
+                  <div className="w-1/5 flex flex-col justify-between items-center">
+                    <span className="font-semibold text-primary text-center">
+                      ${parseInt(prod?.precio) * prod?.cantidad || 1}
+                    </span>
+                    <button
+                      onClick={() => handleRemoveFromCart(i)}
+                      className="mt-2 font-semibold text-xs text-red-500 hover:text-pink-600"
+                    >
+                      Borrar
+                    </button>
                   </div>
                 </div>
               );
@@ -166,153 +341,15 @@ const Cart = ({ product, calcularTotal, usuario }) => {
             </p>
           )}
         </div>
-      </div>
 
-      <div className="bg-gray-50 opacity-95 text-center shadow-md p-6 rounded-xl w-1/3 m-2 h-screen flex flex-col justify-between">
-        <h1 className="text-xl text-black">Resumen</h1>
-        <div className="p-2">
-          <div className="mt-2 flex justify-center items-center">
-            <label
-              className="border border-gray-300 p-2 text-center"
-              htmlFor="nombre"
-            >
-              Nombre
-            </label>
-            <input
-              type="text"
-              name="nombre"
-              value={formCliente.nombre}
-              onChange={handleFormClienteChange}
-              className="border p-2 w-full border-gray-300"
-              placeholder="Nombre completo"
-            />
-          </div>
-          <div className="mt-2 flex justify-center items-center">
-            <label
-              className="border border-gray-300 p-2 text-center"
-              htmlFor="correo"
-            >
-              Correo
-            </label>
-            <input
-              type="email"
-              name="correo"
-              value={formCliente.correo}
-              onChange={handleFormClienteChange}
-              className="border p-2 w-full"
-              placeholder="Email"
-            />
-          </div>
-          <div className="mt-2 flex flex-row justify-center items-center">
-            <div className="flex">
-              <label
-                className="border border-gray-300 p-2 text-center"
-                htmlFor="provincia"
-              >
-                Provincia
-              </label>
-              <input
-                type="text"
-                name="provincia"
-                value={formCliente.provincia}
-                onChange={handleFormClienteChange}
-                className="border p-2 w-full"
-                placeholder="Provincia"
-              />
-            </div>
-            <div className="ml-2 flex">
-              <label
-                className="border border-gray-300 p-2 text-center"
-                htmlFor="cp"
-              >
-                CP
-              </label>
-              <input
-                type="text"
-                name="cp"
-                value={formCliente.cp}
-                onChange={handleFormClienteChange}
-                className="border p-2 w-full"
-                placeholder="Código Postal"
-              />
-            </div>
-          </div>
-          <div className="mt-2 flex flex-row justify-center items-center">
-            <div className="flex">
-              <label
-                className="border border-gray-300 p-2 text-center"
-                htmlFor="direccion"
-              >
-                Dirección
-              </label>
-              <input
-                type="text"
-                name="direccion"
-                value={formCliente.direccion}
-                onChange={handleFormClienteChange}
-                className="border p-2 w-full"
-                placeholder="Dirección"
-              />
-            </div>
-            <div className="ml-2 flex">
-              <label
-                className="border border-gray-300 p-2 text-center"
-                htmlFor="celular"
-              >
-                Celular
-              </label>
-              <input
-                type="text"
-                name="celular"
-                value={formCliente.celular}
-                onChange={handleFormClienteChange}
-                className="border p-2 w-full"
-                placeholder="Número de celular"
-              />
-            </div>
-          </div>
-        </div>
-        <div className="p-2 mt-2">
-          Forma de pago
-          <div className="flex gap-2 mt-2 justify-center items-center">
-            <button
-              onClick={() => handleFormaPagoChange("Efectivo")}
-              className={`border p-2 text-gray-500 w-40 hover:bg-gray-100 shadow-md active:translate-y-[2px] ${
-                formaPago === "Efectivo" ? "border-teal-300" : "border-gray-400"
-              }`}
-            >
-              Efectivo
-            </button>
-            <button
-              onClick={() => handleFormaPagoChange("Mercado Pago")}
-              className={`border p-2 text-gray-500 w-40 hover:bg-gray-100 shadow-md active:translate-y-[2px] ${
-                formaPago === "Mercado Pago"
-                  ? "border-teal-300"
-                  : "border-gray-400"
-              }`}
-            >
-              Mercado Pago
-            </button>
-            <button
-              onClick={() => handleFormaPagoChange("Transferencia")}
-              className={`border p-2 text-gray-500 w-40 hover:bg-gray-100 shadow-md active:translate-y-[2px] ${
-                formaPago === "Transferencia"
-                  ? "border-teal-300"
-                  : "border-gray-400"
-              }`}
-            >
-              Transferencia
-            </button>
-          </div>
-        </div>
         <div className="p-2 mt-4">Total: ${calcularTotal()}</div>
         <div className="p-2 mt-4">
-          {/* <button
+          <button
             onClick={handleCreateVenta}
             className="border p-2 text-white bg-gray-800 w-full hover:bg-gray-700"
           >
             Empezar el pago
-          </button> */}
+          </button>
         </div>
       </div>
     </div>

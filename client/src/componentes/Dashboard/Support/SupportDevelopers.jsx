@@ -2,9 +2,9 @@
 
 import React from 'react';
 import ButtonWhatsapp from './ButtonWhatsapp';
-import matiLogo from '../../../assets/matiLogo.jpg'
-import juliLogo from '../../../assets/juliLogo.png'
-import nahuelLogo from '../../../assets/nahuelLogo.jpg'
+import matiLogo from '../../../assets/matiLogo.webp'
+import juliLogo from '../../../assets/juliLogo.webp'
+import nahuelLogo from '../../../assets/nahuelLogo.webp'
 const developers = [
   {
     name: 'Julian',

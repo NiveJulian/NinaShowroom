@@ -20,6 +20,8 @@ export const SET_CONDITION = "SET_CONDITION";
 export const GET_CATEGORIES = "GET_CATEGORIES";
 export const FILTER_CATEGORY = "FILTER_CATEGOTY";
 export const CLEAR_FILTER = "CLEAR_FILTER";
+export const GET_COLORS = "GET_COLORS";
+export const FILTER_COLOR = "FILTER_COLOR";
 
 export const ADD_TO_CART = "ADD_TO_CART";
 export const REMOVE_FROM_CART = "REMOVE_FROM_CART";
@@ -295,8 +297,6 @@ export const fetchSheets = () => async (dispatch) => {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log(res.data.products);
-    
     dispatch({
       type: FETCH_SHEETS,
       payload: res.data.products,
@@ -394,6 +394,7 @@ export const filterByCategory = (category) => async (dispatch) => {
         Authorization: `Bearer ${token}`,
       },
     });
+    
 
     dispatch({
       type: FILTER_CATEGORY,
@@ -412,11 +413,44 @@ export const getCategories = () => async (dispatch) => {
   try {
     const response = await intance.get("/api/sheets/categories");
     const categories = response.data;
+    
     dispatch({ type: GET_CATEGORIES, payload: categories });
   } catch (error) {
     console.error("Error fetching categories:", error);
   }
 };
+
+export const getColors = () => async (dispatch) => {
+  try {
+    const response = await intance.get("/api/sheets/colors");
+    const colors = response.data;
+
+    // Transformar el array de colores en un array de colores individuales
+    const separatedColors = colors.flatMap(color =>
+      color.split(',').map(c => c.trim())
+    );
+
+    // Eliminar duplicados usando un Set
+    const uniqueColors = [...new Set(separatedColors)];
+    dispatch({ type: GET_COLORS, payload: uniqueColors });
+  } catch (error) {
+    console.error("Error fetching colors:", error);
+  }
+};
+
+
+export const getProductsByColor = (color) => async (dispatch) => {
+  try {
+    const response = await intance.get(`/api/sheets/filter/color/${color}`);
+    const products = response.data.products;
+
+    dispatch({ type: FILTER_COLOR, payload: products });
+  } catch (error) {
+    console.error("Error fetching products by color:", error);
+  }
+};
+
+
 
 export const deleteSaleRow = (rowIndex) => async (dispatch) => {
   const token = localStorage.getItem("authToken");

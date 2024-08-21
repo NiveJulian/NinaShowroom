@@ -1,4 +1,3 @@
-// Paginate.js
 import { useSelector } from "react-redux";
 
 export default function Paginate({
@@ -13,8 +12,31 @@ export default function Paginate({
     pageNumbers.push(i);
   }
 
+  const totalPages = pageNumbers.length;
+  let startPage, endPage;
+
+  if (totalPages <= 5) {
+    // Si hay 5 o menos páginas, mostramos todas
+    startPage = 1;
+    endPage = totalPages;
+  } else {
+    if (currentPage <= 3) {
+      // Si la página actual es una de las primeras 3, mostramos del 1 al 5
+      startPage = 1;
+      endPage = 5;
+    } else if (currentPage + 2 >= totalPages) {
+      // Si la página actual es una de las últimas 3, mostramos las últimas 5
+      startPage = totalPages - 4;
+      endPage = totalPages;
+    } else {
+      // De lo contrario, centramos la página actual
+      startPage = currentPage - 2;
+      endPage = currentPage + 2;
+    }
+  }
+
   const handleNextPage = () => {
-    if (currentPage < pageNumbers.length) {
+    if (currentPage < totalPages) {
       page(currentPage + 1);
     }
   };
@@ -27,14 +49,7 @@ export default function Paginate({
 
   return (
     <nav className="pagination mt-10 mb-10">
-      <div
-        className="
-            inline-flex
-            p-4
-            rounded-xl
-            "
-            
-      >
+      <div className="inline-flex p-4 rounded-xl">
         <ul className="flex items-center -mx-[6px]">
           <li className="px-1">
             <a
@@ -43,17 +58,7 @@ export default function Paginate({
                 e.preventDefault();
                 handlePrevPage();
               }}
-              className="
-            w-9
-            h-9
-            flex
-            items-center
-            justify-center
-            rounded-md
-            border border-[#EDEFF1]
-            text-[#838995] text-base
-            hover:bg-primary hover:border-primary hover:text-white
-            "
+              className="w-9 h-9 flex items-center justify-center rounded-md border border-[#EDEFF1] text-[#838995] text-base hover:bg-primary hover:border-primary hover:text-white"
             >
               <span>
                 <svg
@@ -70,18 +75,15 @@ export default function Paginate({
               </span>
             </a>
           </li>
-          {pageNumbers.map((number) => (
-            <li
-              key={number}
-              className={'px-2'}
-            >
+          {pageNumbers.slice(startPage - 1, endPage).map((number) => (
+            <li key={number} className="px-2">
               <a
                 onClick={(e) => {
                   e.preventDefault();
                   page(number);
                 }}
                 href={`#${number}`}
-                className={`w-9 h-9 flex items-center justify-center rounded-md border border-[#EDEFF1] text-gray-400 text-base  hover:bg-primary hover:border-primary hover:text-white ${currentPage === number ? 'bg-primary text-white' : ''}`}
+                className={`w-9 h-9 flex items-center justify-center rounded-md border border-[#EDEFF1] text-gray-400 text-base hover:bg-primary hover:border-primary hover:text-white ${currentPage === number ? 'bg-primary text-white' : ''}`}
               >
                 {number}
               </a>
@@ -94,17 +96,7 @@ export default function Paginate({
                 e.preventDefault();
                 handleNextPage();
               }}
-              className="
-            w-9
-            h-9
-            flex
-            items-center
-            justify-center
-            rounded-md
-            border border-[#EDEFF1]
-            text-[#838995] text-base
-            hover:bg-primary hover:border-primary hover:text-white
-            "
+              className="w-9 h-9 flex items-center justify-center rounded-md border border-[#EDEFF1] text-[#838995] text-base hover:bg-primary hover:border-primary hover:text-white"
             >
               <span>
                 <svg
