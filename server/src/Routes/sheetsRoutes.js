@@ -124,12 +124,9 @@ sheetsRouter.delete("/delete/sale/:id", async (req, res) => {
   try {
     const auth = await authorize();
     const id = req.params.id;
-    console.log("ID: ", id);
     const result = await deleteSalesById(auth, id);
-    console.log("result: ", result);
     res.status(200).json(result);
   } catch (error) {
-    console.log({ error: error.message });
     res.status(500).json({ error: error.message });
   }
 });
