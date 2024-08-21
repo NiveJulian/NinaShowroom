@@ -2,11 +2,11 @@
 import axios from 'axios';
 
 const instance = axios.create({
-  baseURL: 'https://servertech3sw.onrender.com', // URL del backend
+  baseURL: 'https://server-ninashowroom.vercel.app', // URL del backend
   withCredentials: true, // Para enviar cookies con cada solicitud si es necesario
 });
 
 export default instance;
 
 
-  //https://servertech3sw.onrender.com
+  //https://server-ninashowroom.vercel.app
