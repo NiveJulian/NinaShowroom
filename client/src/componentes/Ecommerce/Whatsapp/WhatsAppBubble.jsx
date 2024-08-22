@@ -40,23 +40,6 @@ const WhatsAppBubble = () => {
 
   return (
     <div className="fixed bottom-6 right-6 flex flex-col items-center z-50">
-      {isVisible && !isChatOpen && (
-        <div className="bg-white p-2 rounded shadow-lg mb-2 flex items-center transition-opacity duration-300">
-          <span className="absolute top-0 left-0 flex h-3 w-3">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span>
-          </span>
-          <span className="text-black mr-2">
-            ¡Hola! 👋 Un asesor ya está listo para ayudarte.
-          </span>
-          <button
-            onClick={handleClose}
-            className="text-gray-500 hover:text-gray-700"
-          >
-            <AiOutlineClose size={18} />
-          </button>
-        </div>
-      )}
       {isChatOpen && (
         <div className="bg-white p-4 rounded shadow-lg mb-2 flex flex-col items-center transition-opacity duration-300 w-64">
           <div className="flex items-center justify-between w-full mb-2">

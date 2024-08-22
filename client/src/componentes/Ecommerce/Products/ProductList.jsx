@@ -31,6 +31,14 @@ export default function ProductList({ allProducts }) {
     setCurrentPage(1);
   }, [allProducts]);
 
+  // Función para procesar los colores
+  const processColors = (colorString) => {
+    return colorString
+      .split(",") // Divide la cadena por comas
+      .map(color => color.trim().toLowerCase()) // Elimina espacios y convierte a minúsculas
+      .filter(color => color); // Elimina entradas vacías
+  };
+
   return (
     <Layout items={currentProducts.length}>
       <div className="h-full mb-16 flex justify-center items-center flex-col p-2 rounded-md">
@@ -39,14 +47,15 @@ export default function ProductList({ allProducts }) {
             No se encontraron resultados
           </div>
         ) : (
-          <div className="max-w-screen grid grid-cols-2 my-8 sm:grid-cols-2 lg:grid-cols-4 gap-12">
+          <div className="max-w-screen grid grid-cols-1 my-8 sm:grid-cols-2 lg:grid-cols-4 gap-12">
             {currentProducts.map((product) => (
               <ProductCard
                 key={product.id}
                 id={product.id}
-                name={product.name}
+                name={product.nombre}
                 url={product.url}
                 price={product.precio}
+                colors={processColors(product.color)} // Procesa los colores antes de pasarlos
                 onAddToCart={() => handleAddToCart(product)}
                 isNew={false}
               />

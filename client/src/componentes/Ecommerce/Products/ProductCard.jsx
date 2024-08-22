@@ -5,7 +5,7 @@ import Slider from "react-slick";
 import { Link } from "react-router-dom";
 import ImageComponent from "../Images/ImageComponent";
 import { LazyLoadImage } from "react-lazy-load-image-component";
-
+import colorMap from "../../Colors/colorsMap";
 const NextArrow = (props) => {
   const { className, style, onClick } = props;
   return (
@@ -38,7 +38,16 @@ const PrevArrow = (props) => {
   );
 };
 
-const ProductCard = ({ id, name, url, sku, price, onAddToCart, isNew }) => {
+const ProductCard = ({
+  id,
+  name,
+  url,
+  sku,
+  price,
+  onAddToCart,
+  colors,
+  isNew,
+}) => {
   const settings = {
     dots: true,
     infinite: true,
@@ -75,6 +84,7 @@ const ProductCard = ({ id, name, url, sku, price, onAddToCart, isNew }) => {
       </div>
     ),
   };
+
   return (
     <article className="w-56 h-full rounded-xl bg-white p-3 shadow-lg hover:shadow-xl hover:transform hover:scale-105 duration-300 mb-6 border border-gray-300">
       <div>
@@ -103,27 +113,6 @@ const ProductCard = ({ id, name, url, sku, price, onAddToCart, isNew }) => {
             </svg>
             <span className="ml-2 text-sm text-slate-400">4.9</span>
           </div>
-
-          <button
-            className="absolute bottom-3 left-2 inline-flex items-center rounded-lg bg-white p-2 shadow-lg hover:shadow-lg transition-transform duration-300 transform hover:scale-110"
-            // onClick={onAddToFav}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-              className={`h-5 w-5`}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
-              />
-            </svg>
-            <span className="ml-1 text-sm text-slate-400">{}</span>
-          </button>
         </div>
       </div>
       {isNew && (
@@ -138,6 +127,18 @@ const ProductCard = ({ id, name, url, sku, price, onAddToCart, isNew }) => {
       <div className="mt-1 p-2">
         <h2 className="text-slate-700">{name}</h2>
         <p className="mt-1 text-sm text-slate-400">{sku}</p>
+        <div className="mt-3 flex space-x-2">
+          {colors?.map((color, index) => (
+            <button
+              key={index}
+              style={{
+                backgroundColor: colorMap[color.toLowerCase()] || "#CCCCCC",
+              }} // Default color if not found
+              className="w-6 h-6 rounded-full border border-gray-300"
+              aria-label={`Seleccionar color ${color}`}
+            />
+          ))}
+        </div>
 
         <div className="mt-3 flex items-end justify-between">
           <p className="text-lg font-bold text-secondary">${price}</p>
@@ -163,6 +164,8 @@ const ProductCard = ({ id, name, url, sku, price, onAddToCart, isNew }) => {
             <button className="text-sm text-slate-700">Agregar</button>
           </div>
         </div>
+
+        {/* Sección para mostrar botones de colores */}
       </div>
     </article>
   );

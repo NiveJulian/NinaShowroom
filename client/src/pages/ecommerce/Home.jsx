@@ -27,7 +27,7 @@ const Home = () => {
 
   return (
     <div className="w-full">
-      <Navigation />
+      <Navigation isCart={false} />
       <WhatsAppBubble />
       <div
         ref={refCarrousel}
