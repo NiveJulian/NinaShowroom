@@ -3,177 +3,28 @@ import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
+  cleanCart,
   createSale,
   decrementQuantity,
   incrementQuantity,
   removeFromCart,
 } from "../../../redux/actions/actions";
 import { LazyLoadImage } from "react-lazy-load-image-component";
-import Delivery from "../Delivery/Delivery";
+import StepContact from "../StepsOrders/StepContact";
+import StepShipping from "../StepsOrders/StepShipping";
+import StepPayment from "../StepsOrders/StepPayment";
+import ProgressSteps from "../StepsOrders/ProgressSteps";
+import colorMap from "../../Colors/colorsMap";
 
-const StepContact = ({ formCliente, handleFormClienteChange, nextStep }) => (
-  <div>
-    <h2>Información de Contacto</h2>
-    <div className="mt-2 flex justify-center items-center">
-      <label
-        className="border border-primary bg-secondary text-white p-2 text-center"
-        htmlFor="nombre"
-      >
-        Nombre
-      </label>
-      <input
-        type="text"
-        name="nombre"
-        value={formCliente.nombre}
-        onChange={handleFormClienteChange}
-        className="border p-2 w-full border-gray-500"
-        placeholder="Nombre completo"
-      />
-    </div>
-    <div className="mt-2 flex justify-center items-center">
-      <label
-        className="border border-primary bg-secondary text-white p-2 text-center"
-        htmlFor="correo"
-      >
-        Correo
-      </label>
-      <input
-        type="email"
-        name="correo"
-        value={formCliente.correo}
-        onChange={handleFormClienteChange}
-        className="border p-2 w-full"
-        placeholder="Email"
-      />
-    </div>
-    <div className="mt-2 flex justify-center items-center">
-      <label
-        className="border border-primary bg-secondary text-white p-2 text-center"
-        htmlFor="celular"
-      >
-        Celular
-      </label>
-      <input
-        type="text"
-        name="celular"
-        value={formCliente.celular}
-        onChange={handleFormClienteChange}
-        className="border p-2 w-full"
-        placeholder="Número de celular"
-      />
-    </div>
-    {/* Resto de los campos */}
-    <button
-      onClick={nextStep}
-      className="border p-2 text-white bg-gray-800 w-full hover:bg-gray-700 mt-4"
-    >
-      Siguiente
-    </button>
-  </div>
-);
-
-const StepShipping = ({
-  formCliente,
-  handleFormClienteChange,
-  selectedDeliveryMethod,
-  setSelectedDeliveryMethod,
-  prevStep,
-  nextStep,
-}) => (
-  <div>
-    <h2>Información de Envío</h2>
-    {/* Aquí va el componente o campos para la información de envío */}
-    <div className="mt-2 flex justify-center items-center">
-      <label
-        className="border border-primary bg-secondary text-white p-2 text-center"
-        htmlFor="provincia"
-      >
-        Provincia
-      </label>
-      <input
-        type="text"
-        name="provincia"
-        value={formCliente.provincia}
-        onChange={handleFormClienteChange}
-        className="border p-2 w-full"
-        placeholder="Provincia"
-      />
-    </div>
-    <div className="mt-2 flex justify-center items-center">
-      <label
-        className="border border-primary bg-secondary text-white p-2 text-center"
-        htmlFor="cp"
-      >
-        CP
-      </label>
-      <input
-        type="text"
-        name="cp"
-        value={formCliente.cp}
-        onChange={handleFormClienteChange}
-        className="border p-2 w-full"
-        placeholder="Código Postal"
-      />
-    </div>
-    <Delivery
-      selectedOption={selectedDeliveryMethod}
-      setSelectedOption={setSelectedDeliveryMethod}
-    />
-    <div className="flex justify-between mt-4">
-      <button
-        onClick={prevStep}
-        className="border p-2 text-white bg-gray-800 hover:bg-gray-700"
-      >
-        Anterior
-      </button>
-      <button
-        onClick={nextStep}
-        className="border p-2 text-white bg-gray-800 hover:bg-gray-700"
-      >
-        Siguiente
-      </button>
-    </div>
-  </div>
-);
-
-const StepPayment = ({
-  formaPago,
-  handleFormaPagoChange,
-  prevStep,
-  handleCreateVenta,
-}) => (
-  <div>
-    <h2>Forma de Pago</h2>
-    <div className="flex gap-2 mt-2 justify-center items-center">
-      <button
-        onClick={() => handleFormaPagoChange("Efectivo")}
-        className={`border p-2 text-gray-500 w-40 hover:bg-gray-100 shadow-md active:translate-y-[2px] ${
-          formaPago === "Efectivo" ? "border-primary" : "border-gray-400"
-        }`}
-      >
-        Efectivo
-      </button>
-      {/* Resto de los botones de forma de pago */}
-    </div>
-    <div className="flex justify-between mt-4">
-      <button
-        onClick={prevStep}
-        className="border p-2 text-white bg-gray-800 hover:bg-gray-700"
-      >
-        Anterior
-      </button>
-      <button
-        onClick={handleCreateVenta}
-        className="border p-2 text-white bg-gray-800 w-full hover:bg-gray-700"
-      >
-        Finalizar Compra
-      </button>
-    </div>
-  </div>
-);
+const processColors = (colors) => {
+  return colors
+    ? colors.split(",").map((color) => color.trim().toLowerCase())
+    : [];
+};
 
 const Cart = ({ product, calcularTotal, usuario }) => {
   const [step, setStep] = useState(1);
+  const [selectedColors, setSelectedColors] = useState({});
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -187,7 +38,18 @@ const Cart = ({ product, calcularTotal, usuario }) => {
     celular: "",
   });
 
-  const [selectedDeliveryMethod, setSelectedDeliveryMethod] = useState(""); // Estado para el tipo de envío
+  const handleColorSelection = (productId, color) => {
+    setSelectedColors((prevState) => ({
+      ...prevState,
+      [productId]: color,
+    }));
+  };
+
+  const validateColorSelection = () => {
+    return product.every((prod) => selectedColors[prod.id]);
+  };
+
+  const [selectedDeliveryMethod, setSelectedDeliveryMethod] = useState("");
 
   const handleFormaPagoChange = (forma) => {
     setFormaPago(forma);
@@ -209,21 +71,43 @@ const Cart = ({ product, calcularTotal, usuario }) => {
     });
   };
 
+  const generarMensajeWhatsApp = (venta) => {
+    const productos = venta.productos
+      .map(
+        (prod) =>
+          `Producto: ${prod.nombre} - Cantidad: ${prod.cantidad} - SKU: ${prod.sku} - Color: ${prod.color} -  Precio: $${prod.precio}`
+      )
+      .join("\n");
+    const mensaje = `*Ticket de Venta*\n\nCliente: ${venta.cliente.nombre}\nDirección: ${venta.cliente.direccion}, ${venta.cliente.provincia}, CP: ${venta.cliente.cp}\nMétodo de Envío: ${venta.tipoEnvio}\nForma de Pago: ${venta.formaPago}\n\n${productos}\n\nTotal: $${venta.total}`;
+
+    // Generar enlace para WhatsApp
+    const numeroWhatsapp = "3772430213"; // Cambia este número por el número del vendedor
+    const enlace = `https://wa.me/${numeroWhatsapp}?text=${encodeURIComponent(
+      mensaje
+    )}`;
+    return enlace;
+  };
+
   const handleCreateVenta = () => {
+    if (!validateColorSelection()) {
+      toast.error("Debes seleccionar un color para cada producto.");
+      return;
+    }
+
     const venta = {
       productos: product.map((prod) => ({
         id: prod.id,
         sku: prod.sku,
         nombre: prod.nombre,
         talle: prod.talle,
-        color: prod.color,
+        color: selectedColors[prod.id], // Usar el color seleccionado
         precio: prod.precio,
         cantidad: prod.cantidad,
       })),
       total: calcularTotal(),
       formaPago,
       cliente: formCliente,
-      tipoEnvio: selectedDeliveryMethod, // Pasa el método de envío seleccionado
+      tipoEnvio: selectedDeliveryMethod,
     };
 
     if (venta.formaPago === "") {
@@ -231,11 +115,17 @@ const Cart = ({ product, calcularTotal, usuario }) => {
     } else if (venta.productos.length === 0) {
       toast.error("El carrito está vacío");
     } else if (venta.cliente.nombre.trim() === "") {
-      toast.error("Falta nombre del cliente");
+      toast.error("Falta tu nombre :(");
     } else {
       toast.success("Venta creada exitosamente...");
-      console.log(venta);
       // dispatch(createSale(venta));
+
+      setStep(4);
+      if (venta.formaPago === "Efectivo") {
+        dispatch(cleanCart());
+        const enlaceWhatsApp = generarMensajeWhatsApp(venta);
+        window.open(enlaceWhatsApp, "_blank", "noopener,noreferrer");
+      }
     }
   };
 
@@ -254,123 +144,159 @@ const Cart = ({ product, calcularTotal, usuario }) => {
   };
 
   return (
-    <div className="flex items-center justify-center bg-gray-200">
-      <div className="bg-gray-50 h-screen text-center shadow-md p-6 rounded-xl w-2/3 flex flex-col">
-        <div className="flex justify-start">
-          <button
-            className="flex gap-2 border border-gray-400 p-2 active:translate-y-[1px] hover:shadow-lg rounded-md"
-            onClick={() => navigate("/")}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-              className="size-6"
+    <div className="bg-pink-200 border border-gray-300 shadow-lg">
+      <div className="flex lg:flex-row flex-col shadow-lg">
+        <div className="lg:w-2/3 bg-gray-50 h-screen m-1 text-center shadow-md p-6 rounded-xl flex flex-col">
+          <div className="flex justify-between">
+            <button
+              className="relative flex gap-2 p-2 active:translate-y-[1px]"
+              onClick={() => navigate("/")}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="1.5"
+                stroke="currentColor"
+                className="size-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"
+                />
+              </svg>
+              <span>Volver</span>
+            </button>
+            <div className="relative">
+              <LazyLoadImage
+                src="Protegido-MercadoPago.webp"
+                className="w-24 h-24"
               />
-            </svg>
-            <span>Volver</span>
-          </button>
-        </div>
-        {step === 1 && (
-          <StepContact
-            formCliente={formCliente}
-            handleFormClienteChange={handleFormClienteChange}
-            nextStep={nextStep}
-          />
-        )}
-        {step === 2 && (
-          <StepShipping
-            handleFormClienteChange={handleFormClienteChange}
-            formCliente={formCliente}
-            selectedDeliveryMethod={selectedDeliveryMethod}
-            setSelectedDeliveryMethod={setSelectedDeliveryMethod}
-            prevStep={prevStep}
-            nextStep={nextStep}
-          />
-        )}
-        {step === 3 && (
-          <StepPayment
-            formaPago={formaPago}
-            handleFormaPagoChange={handleFormaPagoChange}
-            prevStep={prevStep}
-            handleCreateVenta={handleCreateVenta}
-          />
-        )}
-      </div>
-      <div className="bg-gray-50 opacity-95 text-center shadow-md p-6 rounded-xl w-1/3 m-2 h-screen flex flex-col justify-between">
-        <h1 className="text-xl font-bold flex-1">Carrito</h1>
-        <div
-          className={`border border-gray-400 rounded-md p-2 mt-4 ${
-            product.length > 0
-              ? "overflow-y-scroll"
-              : "h-full flex justify-center items-center"
-          }`}
-        >
-          {product?.length > 0 ? (
-            product?.map((prod, i) => {
-              const imgUrl = prod?.url?.split(",")[0];
-              return (
-                <div
-                  key={i}
-                  className="flex flex-row justify-between border border-gray-500 bg-gray-300 p-2 rounded-md items-center mb-4"
-                >
-                  <div className="flex flex-row items-center w-2/5">
-                    <LazyLoadImage
-                      src={imgUrl}
-                      className="w-16 h-16 object-cover rounded-full border border-gray-500 bg-gray-300"
-                      alt={`${prod?.nombre}-${i}`}
-                    />
-                    <span className="ml-4 font-semibold text-sm text-primary text-center">
-                      {prod?.nombre}
-                    </span>
-                  </div>
-                  <div className="w-24 flex justify-between items-center">
-                    <button
-                      onClick={() => handleQuantityChange(i, "decrease")}
-                      className="px-3 py-1 rounded-md bg-gray-300"
-                    >
-                      -
-                    </button>
-                    <span className="font-semibold mx-4">
-                      {prod?.cantidad || 1}
-                    </span>
-                    <button
-                      onClick={() => handleQuantityChange(i, "increase")}
-                      className="px-3 py-1 rounded-md bg-gray-300"
-                    >
-                      +
-                    </button>
-                  </div>
-                  <div className="w-1/5 flex flex-col justify-between items-center">
-                    <span className="font-semibold text-primary text-center">
-                      ${parseInt(prod?.precio) * prod?.cantidad || 1}
-                    </span>
-                    <button
-                      onClick={() => handleRemoveFromCart(i)}
-                      className="mt-2 font-semibold text-xs text-red-500 hover:text-pink-600"
-                    >
-                      Borrar
-                    </button>
-                  </div>
-                </div>
-              );
-            })
-          ) : (
-            <p className="text-gray-500 text-center">
-              Carrito vacío, llénalo y podrás concretar una venta
-            </p>
+            </div>
+          </div>
+          <div className="my-8">
+            <ProgressSteps currentStep={step - 1} />
+          </div>
+          {step === 1 && (
+            <StepContact
+              formCliente={formCliente}
+              handleFormClienteChange={handleFormClienteChange}
+              nextStep={nextStep}
+            />
+          )}
+          {step === 2 && (
+            <StepShipping
+              handleFormClienteChange={handleFormClienteChange}
+              formCliente={formCliente}
+              selectedDeliveryMethod={selectedDeliveryMethod}
+              setSelectedDeliveryMethod={setSelectedDeliveryMethod}
+              prevStep={prevStep}
+              nextStep={nextStep}
+            />
+          )}
+          {step === 3 && (
+            <StepPayment
+              formaPago={formaPago}
+              handleFormaPagoChange={handleFormaPagoChange}
+              prevStep={prevStep}
+              handleCreateVenta={handleCreateVenta}
+            />
           )}
         </div>
+        <div className="lg:w-1/3 bg-gray-50 opacity-95 text-center shadow-md p-6 rounded-xl m-1 h-screen flex flex-col justify-between">
+          <h1 className="text-xl font-bold flex-1">Carrito</h1>
+          <div
+            className={`border border-gray-400 rounded-md p-2 mt-4 flex h-full flex-col justify-center items-center w-full ${
+              product.length > 1
+                ? "overflow-y-scroll"
+                : "flex justify-center items-center"
+            }`}
+          >
+            {product?.length > 0 ? (
+              product?.map((prod, i) => {
+                const imgUrl = prod?.url?.split(",")[0];
+                const colorsArray = processColors(prod?.color);
 
-        <div className="p-2 mt-4 text-3xl font-bold font-mono text-secondary">Total: ${calcularTotal()}</div>
-        
+                return (
+                  <div
+                    key={i}
+                    className="flex flex-row w-full justify-between border border-gray-500 bg-gray-100 p-2 rounded-md items-center mb-4"
+                  >
+                    <div className="flex justify-between items-center w-2/5">
+                      <LazyLoadImage
+                        src={imgUrl}
+                        className="w-16 h-16 object-cover rounded-full border border-gray-500 bg-gray-100"
+                        alt={`${prod?.nombre}-${i}`}
+                      />
+                      <div className="flex flex-col justify-center items-center">
+                        <span className="ml-4 font-semibold text-sm text-primary text-center">
+                          {prod?.nombre}
+                        </span>
+                        <div className="mt-3 grid grid-cols-2 gap-2">
+                          {colorsArray.map((color, index) => (
+                            <button
+                              key={index}
+                              style={{
+                                backgroundColor:
+                                  colorMap[color.toLowerCase()] || "#CCCCCC",
+                              }}
+                              className={`w-6 h-6 rounded-full border border-gray-300 ${
+                                selectedColors[prod.id] === color
+                                  ? "ring-2 ring-primary"
+                                  : ""
+                              }`}
+                              aria-label={`Seleccionar color ${color}`}
+                              onClick={() =>
+                                handleColorSelection(prod.id, color)
+                              }
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="w-24 flex justify-between items-center">
+                      <button
+                        onClick={() => handleQuantityChange(i, "decrease")}
+                        className="px-3 py-1 rounded-md bg-gray-300"
+                      >
+                        -
+                      </button>
+                      <span className="font-semibold mx-4">
+                        {prod?.cantidad || 1}
+                      </span>
+                      <button
+                        onClick={() => handleQuantityChange(i, "increase")}
+                        className="px-3 py-1 rounded-md bg-gray-300"
+                      >
+                        +
+                      </button>
+                    </div>
+                    <div className="w-1/5 flex flex-col justify-between items-center">
+                      <span className="font-semibold text-primary text-center">
+                        ${parseInt(prod?.precio) * prod?.cantidad || 1}
+                      </span>
+                      <button
+                        onClick={() => handleRemoveFromCart(i)}
+                        className="mt-2 font-semibold text-xs text-red-500 hover:text-pink-600"
+                      >
+                        Borrar
+                      </button>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="flex flex-col justify-center items-center text-primary">
+                <p className="font-semibold text-xl">Tu carrito está vacío.</p>
+                <p className="text-md mt-2">Agrega productos para comenzar.</p>
+              </div>
+            )}
+          </div>
+          <div className="mt-4">
+            <h2 className="text-xl font-bold">Total: ${calcularTotal()}</h2>
+          </div>
+        </div>
       </div>
     </div>
   );

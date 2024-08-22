@@ -8,6 +8,7 @@ import {
   getColors,
 } from "../../redux/actions/actions";
 import Layout from "../../componentes/Ecommerce/Layout/Layout";
+import WhatsAppBubble from "../../componentes/Ecommerce/Whatsapp/WhatsAppBubble";
 
 const AllProducts = () => {
   const dispatch = useDispatch();
@@ -36,7 +37,9 @@ const AllProducts = () => {
   };
   return (
     <div>
-      <Navigation />
+      <Navigation isCart={false} />
+      <WhatsAppBubble />
+
       {renderProducts()}
     </div>
   );

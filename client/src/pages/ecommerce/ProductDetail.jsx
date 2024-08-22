@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import Navigation from "../../componentes/Ecommerce/Nav/Navigation";
 import { addToCart, getProductById } from "../../redux/actions/actions";
 import "./ProductDetail.css";
+import WhatsAppBubble from "../../componentes/Ecommerce/Whatsapp/WhatsAppBubble";
 
 const ProductDetail = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -45,7 +46,9 @@ const ProductDetail = () => {
 
   return (
     <div>
-      <Navigation />
+      <Navigation isCart={false}/>
+      <WhatsAppBubble />
+
       <div className="detail-container my-4">
         <div className="detail-cont p-4 border">
           <div className="p-2 flex justify-between">

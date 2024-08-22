@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useInView } from "react-intersection-observer";
 import ProductCard from "./ProductCard";
 import { useDispatch } from "react-redux";
@@ -27,6 +27,12 @@ const ProdustHome = ({ allProducts }) => {
 const FloatingProductCard = ({ product, dispatch }) => {
   const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 });
 
+  const processColors = (colorString) => {
+    return colorString
+      .split(",") // Divide la cadena por comas
+      .map(color => color.trim().toLowerCase()) // Elimina espacios y convierte a minúsculas
+      .filter(color => color); // Elimina entradas vacías
+  };
   return (
     <div
       ref={ref}
@@ -40,6 +46,7 @@ const FloatingProductCard = ({ product, dispatch }) => {
         url={product.url}
         sku={product.sku}
         price={product.precio}
+        colors={processColors(product.color)}
         onAddToCart={() => handleAddToCart(product, dispatch)}
         isNew={true}
       />

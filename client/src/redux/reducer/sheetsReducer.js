@@ -13,7 +13,7 @@ import {
   SET_CONDITION,
   GET_CASH_FLOW,
   ADD_CASH_FLOW_ENTRY,
-  FETCH_PRODUCT_SHEET_BY_ID, 
+  FETCH_PRODUCT_SHEET_BY_ID,
   GET_COLORS,
   FILTER_COLOR,
 } from "../actions/actions";
@@ -29,7 +29,7 @@ const initialState = {
   categories: [],
   cashFlow: [],
   colors: [],
-  filterColors:[]
+  filterColors: [],
 };
 
 const sheetsReducer = (state = initialState, action) => {
@@ -41,10 +41,10 @@ const sheetsReducer = (state = initialState, action) => {
         loading: false,
       };
     case FETCH_PRODUCT_SHEET_BY_ID:
-      return{
+      return {
         ...state,
         product: action.payload,
-      }
+      };
     case ADD_SHEET_ROW:
       return {
         ...state,
@@ -82,47 +82,45 @@ const sheetsReducer = (state = initialState, action) => {
       };
 
     case SET_CONDITION:
-        return { ...state, rCondition: action.payload };  
+      return { ...state, rCondition: action.payload };
 
-    case FILTER_CATEGORY: // Productos filtrados por categoria  
+    case FILTER_CATEGORY: // Productos filtrados por categoria
       return {
         ...state,
         filterProducts: action.payload,
-      }
+      };
 
     case CLEAR_FILTER:
-      return {...state, 
-        filterProducts: []}  
+      return { ...state, filterProducts: [] };
 
     case GET_CATEGORIES: // Obtener todas las categorias
       return {
         ...state,
         categories: action.payload,
       };
-      
+
     case GET_COLORS:
       return {
         ...state,
         colors: action.payload,
       };
-      
     case FILTER_COLOR:
       return {
         ...state,
         filterColors: action.payload,
-      };  
+      };
 
     case GET_CASH_FLOW:
-        return {
-          ...state,
-          cashFlow: action.payload,
-        };
-        
+      return {
+        ...state,
+        cashFlow: action.payload,
+      };
+
     case ADD_CASH_FLOW_ENTRY:
       return {
         ...state,
         cashFlow: [...state.cashFlow, action.payload],
-      };    
+      };
     default:
       return state;
   }

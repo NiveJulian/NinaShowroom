@@ -663,11 +663,6 @@ async function addCashFlowEntry(auth, data) {
   }
 }
 
-
-
-
-
-
 module.exports = {
   authorize,
   getSheetData,

@@ -1,5 +1,7 @@
 import { useSelector } from "react-redux";
 import Cart from "../../componentes/Ecommerce/Cart/Cart";
+import Navigation from "../../componentes/Ecommerce/Nav/Navigation";
+import { useState } from "react";
 
 const CartPage = () => {
   const products = useSelector((state) => state.cart.cartItems);
@@ -16,6 +18,7 @@ const CartPage = () => {
   };
   return (
     <div className="w-full">
+      <Navigation isCart={true} />
       <Cart product={products} calcularTotal={calculateTotal} usuario={usuario}/>
     </div>
   );
