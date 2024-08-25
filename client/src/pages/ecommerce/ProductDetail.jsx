@@ -51,8 +51,8 @@ const ProductDetail = () => {
 
       <div className="detail-container my-4">
         <div className="detail-cont p-4 border">
-          <div className="p-2 flex justify-between">
-            <div className="thumbnail-container flex-col">
+          <div className="p-2 flex justify-between border border-gray-300 rounded-lg">
+            <div className="flex-col gap-2 mr-1">
               {imgUrl?.length > 1 ? (
                 imgUrl?.map((image, index) => (
                   <img

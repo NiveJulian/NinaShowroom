@@ -1,21 +1,36 @@
-import React, { useState, useEffect } from "react";
-
-const colors = ["bg-pink-500", "bg-secondary", "bg-tertiary"];
+import { useRef, useEffect } from "react";
 
 const Carrousel = () => {
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const videoRef = useRef(null);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % colors.length);
-    }, 3000); // Cambia cada 3 segundos
-    return () => clearInterval(interval);
+    const video = videoRef.current;
+    video.play();
+    video.loop = true;
   }, []);
 
   return (
-    <div className="w-full h-[500px]">
-      <div className={`w-full h-full ${colors[currentIndex]} flex justify-center items-center transition duration-500`}>
-        <h1 className="text-7xl text-gray-50 italic text-center">Ninashowrrom</h1>
+    <div className="relative w-full h-100 overflow-hidden">
+      <video
+        ref={videoRef}
+        className="w-full h-full object-cover z-10"
+        src="landingvideo.mp4"
+        autoPlay
+        muted
+        loop
+        style={{
+          objectFit: "cover",
+          objectPosition: "top left", // Desplaza la posición del video para ocultar la marca de agua
+          width: "100%",
+          height: "100%",
+        }}
+      />
+      <div className="absolute top-52 left-52 italic z-20 text-5xl text-white">
+        {["N", "i", "n", "a", " ", "S", "h", "o", "w", "r", "o", "o", "m"].map((letter, index) => (
+          <span key={index} className="letter-span" style={{ animationDelay: `${index * 0.1}s` }}>
+            {letter}
+          </span>
+        ))}
       </div>
     </div>
   );
