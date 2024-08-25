@@ -9,7 +9,7 @@ const Layout = ({ children, items }) => {
 
   return (
     <section className="bg-gray-100">
-      <div className="container px-6 py-8 mx-auto">
+      <div className="container px-3 py-6 mx-auto">
         <div className="lg:flex lg:-mx-2">
           {/* Sidebar responsive toggle button */}
           <button
@@ -36,14 +36,14 @@ const Layout = ({ children, items }) => {
 
           {/* Sidebar */}
           <div
-            className={`space-y-3 lg:w-1/5 lg:px-2 lg:space-y-4 ${
+            className={`space-y-3 lg:w-1/6 lg:px-2 lg:space-y-4 ${
               isSidebarOpen ? "block" : "hidden lg:block"
             }`}
           >
             {/* Categorías */}
             <div className="mt-8">
               <h1
-                className="text-black text-2xl cursor-pointer"
+                className="text-black text-xl cursor-pointer"
                 onClick={() => setIsCategoriesOpen(!isCategoriesOpen)}
               >
                 Filtrar por categoría
@@ -59,7 +59,7 @@ const Layout = ({ children, items }) => {
             {/* Color */}
             <div className="mt-8">
               <h1
-                className="text-black text-2xl cursor-pointer"
+                className="text-black text-xl cursor-pointer"
                 onClick={() => setIsColorOpen(!isColorOpen)}
               >
                 Filtrar por color
@@ -77,17 +77,9 @@ const Layout = ({ children, items }) => {
           <div className="mt-6 lg:mt-0 lg:px-2 lg:w-4/5">
             <div className="flex items-center justify-between text-sm tracking-widest uppercase">
               <p className="text-black">{items} Items</p>
-              <div className="flex items-center">
-                <p className="text-black">Sort</p>
-                <select className="font-medium text-gray-700 bg-transparent dark:text-black focus:outline-none">
-                  <option value="#">Recommended</option>
-                  <option value="#">Size</option>
-                  <option value="#">Price</option>
-                </select>
-              </div>
             </div>
 
-            <div className="mt-4 border-l border-t rounded-md border-gray-800">
+            <div className="mt-4 lg:border-l border-t lg:rounded-md border-gray-800">
               {children}
             </div>
           </div>

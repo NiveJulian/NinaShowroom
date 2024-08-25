@@ -41,7 +41,8 @@ const Home = () => {
         <Carrousel />
       </div>
       <div
-        className={`relative -top-28 flex w-full justify-center items-center transition-transform duration-1000 bg-pink-100`}
+        ref={refProducts}
+        className={`relative md:-top-28 flex w-full justify-center items-center transition-transform duration-1000 bg-pink-100`}
       >
         <div
           ref={refProducts}
@@ -59,7 +60,7 @@ const Home = () => {
         className={`flex w-full justify-center items-center transition-transform duration-1000 bg-pink-100 `}
       >
         <Link
-          className="flex flex-col justify-center items-center shadow-lg hover:bg-pink-50 hover:animate-pulse bg-gray-100 p-8 w-full"
+          className="flex flex-col justify-center items-center shadow-lg hover:bg-pink-50 hover:animate-pulse bg-gray-100 p-4 w-full rounded-lg mx-4"
           to={"https://www.instagram.com/ninashowroomza/"}
         >
           <svg
@@ -75,8 +76,10 @@ const Home = () => {
           <p className="font-bold text-3xl">
             @<span className="text-primary">nina</span>showroomza
           </p>
-          <h2 className="text-sm font-bold mt-2
-           tracking-[1px] text-gray-700">
+          <h2
+            className="text-sm font-bold mt-2
+           tracking-[1px] text-gray-700"
+          >
             ⭐<span className="text-gray-500">+40mil</span> seguidores
           </h2>
           <span className="p-2 border mt-4 border-gray-400 rounded-lg shadow-md">

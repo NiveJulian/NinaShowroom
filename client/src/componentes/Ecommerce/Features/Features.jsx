@@ -7,7 +7,7 @@ const Features = () => {
         ¿Por qué elegir a Nina?
       </h2>
       <div className="flex flex-wrap justify-center gap-6">
-        <div className="bg-gray-100 border border-secondary rounded-lg p-6 max-w-sm shadow-lg">
+        <div className="bg-gray-100 border border-secondary rounded-lg p-6 max-w-sm shadow-lg hover:animate-pulse">
           <h3 className="text-xl font-bold flex gap-2 mb-4">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -27,7 +27,7 @@ const Features = () => {
           </h3>
           <p>Ofrecemos productos personalizados según tus necesidades, garantizando la mejor calidad y diseño exclusivo para cada cliente.</p>
         </div>
-        <div className="bg-gray-100 border border-secondary rounded-lg p-6 max-w-sm shadow-lg">
+        <div className="bg-gray-100 border border-secondary rounded-lg p-6 max-w-sm shadow-lg hover:animate-pulse">
           <h3 className="text-xl flex gap-2 font-bold mb-4">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -47,7 +47,7 @@ const Features = () => {
           </h3>
           <p>Envío seguro y garantizado en 24 horas, con seguimiento en tiempo real para que siempre sepas dónde está tu pedido.</p>
         </div>
-        <div className="bg-gray-100 border border-secondary rounded-lg p-6 max-w-sm shadow-lg">
+        <div className="bg-gray-100 border border-secondary rounded-lg p-6 max-w-sm shadow-lg hover:animate-pulse">
           <h3 className="text-xl flex gap-2 font-bold mb-4">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -67,7 +67,7 @@ const Features = () => {
           </h3>
           <p>Compra fácil y rápida con nuestra plataforma intuitiva y amigable para el usuario. ¡Encuentra lo que necesitas en minutos!</p>
         </div>
-        <div className="bg-gray-100 border border-secondary rounded-lg p-6 max-w-sm shadow-lg">
+        <div className="bg-gray-100 border border-secondary rounded-lg p-6 max-w-sm shadow-lg hover:animate-pulse">
           <h3 className="text-xl flex gap-2 font-bold mb-4">
             <svg
               xmlns="http://www.w3.org/2000/svg"

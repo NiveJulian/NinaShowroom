@@ -47,7 +47,7 @@ export default function ProductList({ allProducts }) {
             No se encontraron resultados
           </div>
         ) : (
-          <div className="max-w-screen grid grid-cols-1 my-8 sm:grid-cols-2 lg:grid-cols-4 gap-12">
+          <div className="max-w-screen grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2">
             {currentProducts.map((product) => (
               <ProductCard
                 key={product.id}

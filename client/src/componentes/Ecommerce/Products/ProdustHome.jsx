@@ -12,7 +12,7 @@ const ProdustHome = ({ allProducts }) => {
   const latestProducts = allProducts?.slice(-8);
 
   return (
-    <div className="max-w-screen grid grid-cols-1 mt-8 mb-8 sm:grid-cols-2 lg:grid-cols-4 gap-12">
+    <div className="max-w-screen grid grid-cols-2 mt-8 mb-8 sm:grid-cols-2 lg:grid-cols-4 gap-12 mx-2">
       {latestProducts?.map((product) => (
         <FloatingProductCard
           key={product.id}
