@@ -13,7 +13,7 @@ const Carrousel = () => {
     <div className="relative w-full h-100 overflow-hidden">
       <video
         ref={videoRef}
-        className="w-full h-full object-cover z-10"
+        className="w-full h-full object-fill z-10"
         src="landingvideo.mp4"
         autoPlay
         muted
@@ -25,7 +25,7 @@ const Carrousel = () => {
           height: "100%",
         }}
       />
-      <div className="absolute top-52 left-52 italic z-20 text-5xl text-white">
+      <div className="lg:absolute lg:top-52 lg:left-52 text-center text-gray-800 italic z-20 text-5xl lg:text-white">
         {["N", "I", "N", "A", " ", "S", "h", "o", "w", "r", "o", "o", "m"].map(
           (letter, index) => (
             <span
