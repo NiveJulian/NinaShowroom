@@ -81,7 +81,7 @@ const Cart = ({ product, calcularTotal, usuario }) => {
     const mensaje = `*Ticket de Venta*\n\nCliente: ${venta.cliente.nombre}\nDirección: ${venta.cliente.direccion}, ${venta.cliente.provincia}, CP: ${venta.cliente.cp}\nMétodo de Envío: ${venta.tipoEnvio}\nForma de Pago: ${venta.formaPago}\n\n${productos}\n\nTotal: $${venta.total}`;
 
     // Generar enlace para WhatsApp
-    const numeroWhatsapp = "3772430213"; // Cambia este número por el número del vendedor
+    const numeroWhatsapp = "2614161558"; // Cambia este número por el número del vendedor
     const enlace = `https://wa.me/${numeroWhatsapp}?text=${encodeURIComponent(
       mensaje
     )}`;
