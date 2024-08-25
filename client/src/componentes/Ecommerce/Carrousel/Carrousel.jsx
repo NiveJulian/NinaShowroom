@@ -26,11 +26,20 @@ const Carrousel = () => {
         }}
       />
       <div className="absolute top-52 left-52 italic z-20 text-5xl text-white">
-        {["N", "i", "n", "a", " ", "S", "h", "o", "w", "r", "o", "o", "m"].map((letter, index) => (
-          <span key={index} className="letter-span" style={{ animationDelay: `${index * 0.1}s` }}>
-            {letter}
-          </span>
-        ))}
+        {["N", "I", "N", "A", " ", "S", "h", "o", "w", "r", "o", "o", "m"].map(
+          (letter, index) => (
+            <span
+              key={index}
+              className={`letter-span ${
+                index < 4 ? "text-primary font-bold" : ""
+              }`}
+              style={{ animationDelay: `${index * 0.1}s` }}
+            >
+              {letter}
+            </span>
+          )
+        )}
+        <p className="text-sm mt-2 animate-pulse">Tu tienda de confianza</p>
       </div>
     </div>
   );
