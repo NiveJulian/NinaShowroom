@@ -1,7 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
-import { authenticateUserFromSession } from "./redux/actions/actions";
+import { authenticateUserFromSession, getCategories } from "./redux/actions/actions";
 import { useEffect } from "react";
 import Login from "./pages/dashboard/Login";
 import Dashboard from "./pages/dashboard/Dashboard";
@@ -22,6 +22,7 @@ function App() {
   const isAuth = useSelector((state) => state.auth.isAuth);
 
   useEffect(() => {
+    dispatch(getCategories());
     dispatch(authenticateUserFromSession());
   }, [dispatch]);
   return (

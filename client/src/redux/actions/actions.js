@@ -8,7 +8,7 @@ export const AUTHENTICATE_USER_FROM_SESSION = "AUTHENTICATE_USER_FROM_SESSION";
 export const FETCH_SHEETS = "FETCH_SHEETS";
 export const AUTH_SHEETS = "AUTH_SHEETS";
 export const ADD_SHEET_ROW = "ADD_SHEET_ROW";
-export const FETCH_PRODUCT_SHEET_BY_ID = "FETCH_PRODUCT_SHEET_BY_ID"
+export const FETCH_PRODUCT_SHEET_BY_ID = "FETCH_PRODUCT_SHEET_BY_ID";
 export const UPDATE_SHEET_ROW = "UPDATE_SHEET_ROW";
 export const DELETE_SHEET_ROW = "DELETE_SHEET_ROW";
 
@@ -303,7 +303,6 @@ export const fetchSheets = () => async (dispatch) => {
   } catch (error) {
     console.log(error);
   }
-  
 };
 
 export const getProductById = (id) => async (dispatch) => {
@@ -311,8 +310,8 @@ export const getProductById = (id) => async (dispatch) => {
     const res = await intance.get(`/api/sheets/data/${id}`);
     dispatch({
       type: FETCH_PRODUCT_SHEET_BY_ID,
-      payload: res.data
-    })
+      payload: res.data,
+    });
   } catch (error) {
     console.log({ error: error.message });
   }
@@ -393,7 +392,6 @@ export const filterByCategory = (category) => async (dispatch) => {
         Authorization: `Bearer ${token}`,
       },
     });
-    
 
     dispatch({
       type: FILTER_CATEGORY,
@@ -412,7 +410,7 @@ export const getCategories = () => async (dispatch) => {
   try {
     const response = await intance.get("/api/sheets/categories");
     const categories = response.data;
-    
+
     dispatch({ type: GET_CATEGORIES, payload: categories });
   } catch (error) {
     console.error("Error fetching categories:", error);
@@ -425,8 +423,8 @@ export const getColors = () => async (dispatch) => {
     const colors = response.data;
 
     // Transformar el array de colores en un array de colores individuales
-    const separatedColors = colors.flatMap(color =>
-      color.split(',').map(c => c.trim())
+    const separatedColors = colors.flatMap((color) =>
+      color.split(",").map((c) => c.trim())
     );
 
     // Eliminar duplicados usando un Set
@@ -436,7 +434,6 @@ export const getColors = () => async (dispatch) => {
     console.error("Error fetching colors:", error);
   }
 };
-
 
 export const getProductsByColor = (color) => async (dispatch) => {
   try {
@@ -448,8 +445,6 @@ export const getProductsByColor = (color) => async (dispatch) => {
     console.error("Error fetching products by color:", error);
   }
 };
-
-
 
 export const deleteSaleRow = (rowIndex) => async (dispatch) => {
   const token = localStorage.getItem("authToken");

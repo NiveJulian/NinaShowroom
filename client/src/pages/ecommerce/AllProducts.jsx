@@ -7,7 +7,6 @@ import {
   getCategories,
   getColors,
 } from "../../redux/actions/actions";
-import Layout from "../../componentes/Ecommerce/Layout/Layout";
 import WhatsAppBubble from "../../componentes/Ecommerce/Whatsapp/WhatsAppBubble";
 
 const AllProducts = () => {

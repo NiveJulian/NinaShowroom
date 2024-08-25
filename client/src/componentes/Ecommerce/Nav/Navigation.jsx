@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import CartList from "../Cart/CartList";
@@ -8,9 +8,50 @@ const Navigation = ({ isCart }) => {
   const [showCart, setShowCart] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showCategories, setShowCategories] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [animationCompleted, setAnimationCompleted] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setAnimationCompleted(true);
+    }, 1500); // Debe coincidir con la duración de la animación
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 0) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  const hideTimeoutRef = useRef(null);
+
+  const handleMouseEnter = () => {
+    if (hideTimeoutRef.current) {
+      clearTimeout(hideTimeoutRef.current);
+    }
+    setShowCategories(true);
+  };
+
+  const handleMouseLeave = () => {
+    hideTimeoutRef.current = setTimeout(() => {
+      setShowCategories(false);
+    }, 250); // 1.5 segundos de retardo antes de ocultar
+  };
 
   const cartItems = useSelector((state) => state.cart.cartItems);
   const user = useSelector((state) => state.auth.user);
+  const categories = useSelector((state) => state.sheets.categories);
   const navigate = useNavigate();
 
   const isEmpty = (obj) => {
@@ -44,8 +85,12 @@ const Navigation = ({ isCart }) => {
   };
 
   return (
-    <nav className="relative">
-      <div className="relative z-30 bg-gray-100 shadow-lg">
+    <nav
+      className={`w-full ${
+        isScrolled ? "fixed top-0 z-50" : "relative"
+      } bg-white`}
+    >
+      <div className="relative z-30 bg-transparent shadow-lg">
         <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
           <div className="relative flex items-center justify-between h-16">
             <div className="flex gap-2 justify-center items-center px-2 lg:px-0">
@@ -70,13 +115,20 @@ const Navigation = ({ isCart }) => {
                   </svg>
                 </button>
               </div>
-              <Link to="/" className="flex-shrink-0">
-                <img
-                  className="h-12 w-12 object-cover rounded-full"
-                  src="../ninalogo.webp"
-                  alt="Logo"
-                />
-              </Link>
+              <div className="logo-container">
+                <Link to="/" className="flex-shrink-0">
+                  <div className={`flex gap-1 items-center ${animationCompleted ? 'completed' : ''}`}>
+                    {["N", "I", "N", "A"].map((letter, index) => (
+                      <span
+                        key={index}
+                        className="logo-text text-primary"
+                      >
+                        {letter}
+                      </span>
+                    ))}
+                  </div>
+                </Link>
+              </div>
               <div className="hidden lg:block lg:ml-2">
                 <div className="flex">
                   <Link
@@ -85,12 +137,36 @@ const Navigation = ({ isCart }) => {
                   >
                     Inicio
                   </Link>
-                  <Link
-                    to="/product"
-                    className="ml-4 px-3 py-2 rounded-md text-sm leading-5 text-gray-800 hover:bg-tertiary hover:text-white transition duration-150 ease-in-out cursor-pointer focus:outline-none focus:text-white focus:bg-gray-700 "
+                  <ul
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                    className="flex justify-between items-center ml-4"
                   >
-                    Products
-                  </Link>
+                    <Link
+                      to="/product"
+                      className="text-sm px-3 py-2 rounded-md text-gray-800 hover:bg-tertiary hover:text-white transition duration-150 ease-in-out cursor-pointer focus:outline-none focus:text-white focus:bg-gray-700"
+                    >
+                      Products
+                    </Link>
+                    {showCategories && (
+                      <ul className="bg-white border transition duration-150 ease-in-out border-gray-800 rounded-md h-auto absolute p-8 left-0 grid grid-cols-6 top-16 w-full gap-2">
+                        {categories.map((category, index) => {
+                          if (category !== "") {
+                            return (
+                              <li
+                                key={index}
+                                className="border border-gray-400 flex justify-center items-center text-center p-1 hover:text-gray-50 hover:bg-tertiary rounded-md"
+                              >
+                                <Link to={`/products/${category}`}>
+                                  {category}
+                                </Link>
+                              </li>
+                            );
+                          }
+                        })}
+                      </ul>
+                    )}
+                  </ul>
                   <Link
                     to="#"
                     className="ml-4 px-3 py-2 rounded-md text-sm leading-5 text-gray-800 hover:bg-tertiary hover:text-white transition duration-150 ease-in-out cursor-pointer focus:outline-none focus:text-white focus:bg-gray-700 "
@@ -163,13 +239,13 @@ const Navigation = ({ isCart }) => {
               </div>
             </div>
             <div className="relative mt-4">
-                {showCart && (
-                  <CartList
-                    cartItems={cartItems}
-                    calculateTotal={calculateTotal}
-                  />
-                )}
-              </div>
+              {showCart && (
+                <CartList
+                  cartItems={cartItems}
+                  calculateTotal={calculateTotal}
+                />
+              )}
+            </div>
           </div>
         </div>
         {isMenuOpen && (

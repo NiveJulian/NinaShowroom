@@ -26,7 +26,7 @@ const Home = () => {
   }, [dispatch]);
 
   return (
-    <div className="w-full">
+    <div className="w-full bg-pink-100">
       <Navigation isCart={false} />
       <WhatsAppBubble />
       <div
@@ -40,14 +40,18 @@ const Home = () => {
         <Carrousel />
       </div>
       <div
-        ref={refProducts}
-        className={`flex w-full justify-center items-center transition-transform duration-1000 bg-pink-100 ${
-          inViewProducts
-            ? "translate-y-0 opacity-100"
-            : "translate-y-20 opacity-0"
-        }`}
+        className={`relative -top-28 flex w-full justify-center items-center transition-transform duration-1000 bg-pink-100`}
       >
-        <ProdustHome allProducts={sheetsData} />
+        <div
+          ref={refProducts}
+          className={`${
+            inViewProducts
+              ? "translate-y-0 opacity-100"
+              : "translate-y-20 opacity-0"
+          }`}
+        >
+          <ProdustHome allProducts={sheetsData} />
+        </div>
       </div>
       <div
         className={`flex w-full justify-center items-center transition-transform duration-1000 bg-pink-100 `}
