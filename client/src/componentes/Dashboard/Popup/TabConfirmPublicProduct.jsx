@@ -29,7 +29,7 @@ const TabConfirmPublicProduct = ({ id, onClose }) => {
             className="border p-2 rounded-md bg-blue-600 text-white border-blue-400 hover:shadow-md hover:border-blue-500 hover:bg-blue-200 hover:text-gray-500"
             onClick={() => handleActiveProduct()}
           >
-            Publicar
+            Confirmar
           </button>
         </div>
       </div>

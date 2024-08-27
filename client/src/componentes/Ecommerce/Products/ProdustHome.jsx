@@ -8,8 +8,11 @@ import toast from "react-hot-toast";
 const ProdustHome = ({ allProducts }) => {
   const dispatch = useDispatch();
 
+  const publishedProducts = allProducts.filter(
+    (product) => product.publicado === "si"
+  );
   // Obtener los últimos 8 productos
-  const latestProducts = allProducts?.slice(-8);
+  const latestProducts = publishedProducts?.slice(-8);
 
   return (
     <div className="max-w-screen grid grid-cols-2 mt-8 mb-8 sm:grid-cols-2 lg:grid-cols-4 gap-12 mx-2">
