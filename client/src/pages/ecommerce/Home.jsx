@@ -41,26 +41,16 @@ const Home = () => {
         <Carrousel />
       </div>
       <div
-        ref={refProducts}
         className={`relative md:-top-28 flex w-full justify-center items-center transition-transform duration-1000 bg-pink-100`}
       >
-        <div
-          ref={refProducts}
-          className={`${
-            inViewProducts
-              ? "translate-y-0 opacity-100"
-              : "translate-y-20 opacity-0"
-          }`}
-        >
           <ProdustHome allProducts={sheetsData} />
-        </div>
       </div>
       <div
         ref={refProducts}
-        className={`flex w-full justify-center items-center transition-transform duration-1000 bg-pink-100 `}
+        className={`flex w-full justify-center items-center transition-transform duration-1000 bg-pink-100`}
       >
         <Link
-          className="flex flex-col justify-center items-center shadow-lg hover:bg-pink-50 hover:animate-pulse bg-gray-100 p-4 w-full rounded-lg mx-4"
+          className="flex flex-col justify-center items-center shadow-lg hover:bg-pink-50 hover:animate-pulse bg-gray-100 border border-gray-500 p-4 w-full rounded-lg mx-4"
           to={"https://www.instagram.com/ninashowroomza/"}
         >
           <svg

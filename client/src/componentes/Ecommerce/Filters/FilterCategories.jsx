@@ -25,24 +25,28 @@ const FilterCategories = () => {
   return (
     <div className="flex items-center mt-5 px-1">
       <div className="p-4 rounded-md">
-        <div className="grid grid-cols-2 flex-col gap-2">
+        <div className="grid grid-cols-2 gap-4">
           <button
             value={"Todos"}
             onClick={handleFilter}
-            className="px-4 py-2 bg-primary rounded-md text-white text-xs whitespace-nowrap"
+            className="px-4 py-2 bg-secondary rounded-md text-white text-xs whitespace-nowrap"
           >
             Todos
           </button>
-          {categories.map((category, index) => (
-            <button
-              key={index}
-              value={category}
-              onClick={handleFilter}
-              className="px-3 py-1 bg-primary rounded-md text-white text-xs p-4" // Ajusta padding y font-size
-            >
-              {category}
-            </button>
-          ))}
+          {categories.map((category, index) => {
+            if (category !== "") {
+              return (
+                <button
+                  key={index}
+                  value={category}
+                  onClick={handleFilter}
+                  className="px-3 flex justify-center items-center py-3 w-auto bg-secondary rounded-md text-white text-xs p-4" // Ajusta padding y font-size
+                >
+                  {category}
+                </button>
+              );
+            }
+          })}
         </div>
       </div>
     </div>

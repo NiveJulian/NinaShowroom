@@ -19,6 +19,7 @@ const {
   getSheetDataById,
   getAllColors,
   getProductsByColor,
+  activeProductById,
 } = require("../Controllers/sheets/sheetsController.js");
 const uploadToS3 = require("../Controllers/sheets/uploadImages.js");
 
@@ -78,6 +79,21 @@ sheetsRouter.delete("/delete/:rowIndex", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+//PUBLICAR O NO EL PRODUCTO EN LA PAGINA
+sheetsRouter.put("/product/:id", async (req, res) => {
+  try {
+    const auth = await authorize();
+    const rowIndex = parseInt(req.params.id, 10);
+    const result = await activeProductById(auth, rowIndex);
+    res.status(200).json(result);
+  } catch (error) {
+    console.log({ error: error.message });
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+
 
 sheetsRouter.post("/images", (req, res) => {
   uploadToS3(req, res);
@@ -163,7 +179,6 @@ sheetsRouter.get("/filter/:category", async (req, res) => {
     res.status(404).send("Producto no encontrado");
   }
 });
-
 
 sheetsRouter.get("/categories", async (req, res) => {
   try {
