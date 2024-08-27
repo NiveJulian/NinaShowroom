@@ -6,9 +6,11 @@ import TabFormCreateProduct from "../../componentes/Dashboard/Popup/TabFormCreat
 import { useDispatch, useSelector } from "react-redux";
 import { fetchSheets } from "../../redux/actions/actions";
 import TabDeleteRowButton from "../../componentes/Dashboard/Popup/TabDeleteRowButton";
+import TabConfirmPublicProduct from "../../componentes/Dashboard/Popup/TabConfirmPublicProduct";
 
 const Products = () => {
   const [activeForm, setActiveForm] = useState(false);
+  const [activePublicProd, setActivePublicProd] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [deleteRowIndex, setDeleteRowIndex] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -36,6 +38,10 @@ const Products = () => {
 
   const toggleDeleteModal = (index) => {
     setDeleteRowIndex(index);
+  };
+
+  const toggleActiveModal = (id) => {
+    setActivePublicProd(id);
   };
 
   const handleSearch = (event) => {
@@ -106,6 +112,12 @@ const Products = () => {
           onClose={() => toggleDeleteModal(null)}
         />
       )}
+      {activePublicProd !== null && (
+        <TabConfirmPublicProduct 
+          id={activePublicProd}
+          onClose={() => toggleActiveModal(null)}
+        />
+      )}
       <div className="flex justify-between">
         <h1 className="text-xl text-gray-500">Productos</h1>
         <button
@@ -129,6 +141,7 @@ const Products = () => {
           data={currentItems}
           toggleModal={toggleModal}
           toggleDeleteModal={toggleDeleteModal}
+          toggleActiveModal={toggleActiveModal}
         />
         <div className="flex justify-center mt-4">
           <button

@@ -4,7 +4,6 @@ import { deleteSheetRow } from "../../../redux/actions/actions";
 
 const TabDeleteRowButton = ({ rowIndex, onClose }) => {
   const dispatch = useDispatch();
-  console.log(rowIndex);
   const handleDelete = () => {
     dispatch(deleteSheetRow(rowIndex));
     onClose();

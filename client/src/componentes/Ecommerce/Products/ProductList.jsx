@@ -11,8 +11,11 @@ export default function ProductList({ allProducts }) {
   const [visibleProducts, setVisibleProducts] = useState(8); // Mostrar 8 productos inicialmente
   const dispatch = useDispatch();
 
+  const publishedProducts = allProducts.filter(
+    (product) => product.publicado === "si"
+  );
   // Productos a mostrar basado en el número de productos visibles
-  const currentProducts = allProducts.slice(0, visibleProducts);
+  const currentProducts = publishedProducts.slice(0, visibleProducts);
 
   const handleAddToCart = (product) => {
     toast.success("Producto añadido al carrito");
@@ -27,12 +30,12 @@ export default function ProductList({ allProducts }) {
   const processColors = (colorString) => {
     return colorString
       .split(",") // Divide la cadena por comas
-      .map(color => color.trim().toLowerCase()) // Elimina espacios y convierte a minúsculas
-      .filter(color => color); // Elimina entradas vacías
+      .map((color) => color.trim().toLowerCase()) // Elimina espacios y convierte a minúsculas
+      .filter((color) => color); // Elimina entradas vacías
   };
 
   const handleLoadMore = () => {
-    setVisibleProducts(prevVisible => prevVisible + 8); // Incrementa los productos visibles en 8 cada vez que se presiona el botón
+    setVisibleProducts((prevVisible) => prevVisible + 8); // Incrementa los productos visibles en 8 cada vez que se presiona el botón
   };
 
   return (

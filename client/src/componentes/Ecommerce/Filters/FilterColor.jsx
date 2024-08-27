@@ -25,7 +25,7 @@ const FilterColor = () => {
           <button
             value={"Todos"}
             onClick={handleColorFilter}
-            className="px-3 py-2 bg-primary rounded-md text-white text-xs"
+            className="px-3 py-2 bg-secondary rounded-md text-white text-xs"
           >
             Todos
           </button>
@@ -34,7 +34,7 @@ const FilterColor = () => {
               key={index}
               value={color}
               onClick={handleColorFilter}
-              className="px-3 py-2 bg-primary rounded-md text-white text-xs whitespace-nowrap" // Ajusta padding y font-size
+              className="px-3 flex justify-center items-center py-3 bg-secondary w-max rounded-md text-white text-xs whitespace-nowrap" // Ajusta padding y font-size
             >
               {color}
             </button>

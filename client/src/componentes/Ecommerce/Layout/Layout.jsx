@@ -42,15 +42,49 @@ const Layout = ({ children, items }) => {
           >
             {/* Categorías */}
             <div className="mt-8">
-              <h1
-                className="text-black text-xl cursor-pointer"
+              <div
                 onClick={() => setIsCategoriesOpen(!isCategoriesOpen)}
+                className="flex flex-row justify-between cursor-pointer items-center gap-2"
               >
-                Filtrar por categoría
-              </h1>
-              <div className="border border-gray-400 my-2 p-0 w-full"></div>
+                <h1 className="text-black text-xl cursor-pointer">
+                  Filtrar por categoría
+                </h1>
+                {isCategoriesOpen ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.5"
+                    stroke="currentColor"
+                    className="size-4"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="m19.5 8.25-7.5 7.5-7.5-7.5"
+                    />
+                  </svg>
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.5"
+                    stroke="currentColor"
+                    className="size-4"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="m4.5 15.75 7.5-7.5 7.5 7.5"
+                    />
+                  </svg>
+                )}
+              </div>
+
+              <div className="border border-gray-400 my-2 p-0 w-full shadow-md"></div>
               {isCategoriesOpen && (
-                <div className="max-h-52 overflow-y-auto overflow-x-hidden">
+                <div className="max-h-52 border border-gray-500 rounded-md overflow-y-auto overflow-x-hidden">
                   <FilterCategories />
                 </div>
               )}
@@ -58,15 +92,48 @@ const Layout = ({ children, items }) => {
 
             {/* Color */}
             <div className="mt-8">
-              <h1
-                className="text-black text-xl cursor-pointer"
+              <div
                 onClick={() => setIsColorOpen(!isColorOpen)}
+                className="flex flex-row justify-between cursor-pointer items-center gap-2"
               >
-                Filtrar por color
-              </h1>
-              <div className="border border-gray-400 my-2 p-0 w-full"></div>
+                <h1 className="text-black text-xl cursor-pointer">
+                  Filtrar por color
+                </h1>
+                {isColorOpen ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.5"
+                    stroke="currentColor"
+                    className="size-4"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="m19.5 8.25-7.5 7.5-7.5-7.5"
+                    />
+                  </svg>
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.5"
+                    stroke="currentColor"
+                    className="size-4"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="m4.5 15.75 7.5-7.5 7.5 7.5"
+                    />
+                  </svg>
+                )}
+              </div>
+              <div className="border border-gray-400 my-2 p-0 w-full shadow-md"></div>
               {isColorOpen && (
-                <div className="max-h-52 overflow-y-auto overflow-x-hidden">
+                <div className="max-h-60 border border-gray-500 rounded-md overflow-y-auto overflow-x-hidden">
                   <FilterColor />
                 </div>
               )}

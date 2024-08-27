@@ -29,7 +29,7 @@ async function getSheetData(auth) {
     const sheets = google.sheets({ version: "v4", auth });
     const res = await sheets.spreadsheets.values.get({
       spreadsheetId: process.env.GOOGLE_SHEETS_ID,
-      range: "Productos!A2:I",
+      range: "Productos!A2:J",
     });
     const rows = res.data.values || [];
     let lastId = 0;
@@ -47,6 +47,7 @@ async function getSheetData(auth) {
       precio: row[6],
       url: row[7],
       sku: row[8],
+      publicado: row[9],
     }));
 
     return { products, lastId };
@@ -60,7 +61,7 @@ async function getSheetDataById(id, auth) {
     const sheets = google.sheets({ version: "v4", auth });
     const res = await sheets.spreadsheets.values.get({
       spreadsheetId: process.env.GOOGLE_SHEETS_ID,
-      range: "Productos!A2:I",
+      range: "Productos!A2:J",
     });
     const rows = res.data.values || [];
     
@@ -74,6 +75,8 @@ async function getSheetDataById(id, auth) {
       precio: row[6],
       url: row[7],
       sku: row[8],
+      publicado: row[9],
+
     }));
 
     const product = products.find(product => product.id === id);
@@ -101,7 +104,7 @@ async function appendRow(auth, rowData) {
   const sheets = google.sheets({ version: "v4", auth });
   const { rows, lastId } = await getSheetData(auth);
   const newId = lastId + 1;
-  const { categoria, nombre, color, tamaño, cantidad, precio, url } = rowData;
+  const { categoria, nombre, color, tamaño, cantidad, precio, url, publicado } = rowData;
   const sku = generateSKU(categoria, nombre, color, newId);
   const urlString = Array.isArray(url) ? url.join(", ") : url;
   const newRow = [
@@ -114,10 +117,11 @@ async function appendRow(auth, rowData) {
     precio,
     urlString,
     sku,
+    publicado = "no",
   ];
   const res = await sheets.spreadsheets.values.append({
     spreadsheetId: process.env.GOOGLE_SHEETS_ID,
-    range: "Productos!A2:I",
+    range: "Productos!A2:J",
     valueInputOption: "RAW",
     resource: {
       values: [newRow],
@@ -156,12 +160,13 @@ async function updateRow(auth, rowData) {
     rowData.precio,
     urlString,
     rowData.sku,
+    rowData.publicado,
   ];
 
   // Actualizar la fila en la hoja de cálculo
   const res = await sheets.spreadsheets.values.update({
     spreadsheetId: process.env.GOOGLE_SHEETS_ID,
-    range: `Productos!A${rowIndex + 2}:I${rowIndex + 2}`,
+    range: `Productos!A${rowIndex + 2}:J${rowIndex + 2}`,
     valueInputOption: "RAW",
     resource: {
       values: [updatedRow],
@@ -443,7 +448,6 @@ async function getProductsByColor (auth, color) {
   }
 }
 
-
 async function deleteRowById(auth, id) {
   const sheets = google.sheets({ version: "v4", auth });
 
@@ -492,6 +496,55 @@ async function deleteRowById(auth, id) {
 
   return res.data;
 }
+
+async function activeProductById(auth, id) {
+  const sheets = google.sheets({ version: "v4", auth });
+
+  // Obtener todos los datos de la hoja
+  const getRows = await sheets.spreadsheets.values.get({
+    spreadsheetId: process.env.GOOGLE_SHEETS_ID,
+    range: "Productos!A:J", // Ajusta el rango para incluir hasta la columna J
+  });
+
+  const rows = getRows.data.values;
+  let rowIndexToUpdate = null;
+
+  // Encontrar la fila con el ID proporcionado
+  for (let i = 0; i < rows.length; i++) {
+    if (rows[i][0] == id) { // Asumiendo que la columna ID es la primera (A)
+      rowIndexToUpdate = i;
+      break;
+    }
+  }
+
+  if (rowIndexToUpdate === null) {
+    throw new Error("ID not found");
+  }
+
+  // Obtener el valor actual de la columna "Publicado" (columna J, índice 9)
+  const currentPublishedValue = rows[rowIndexToUpdate][9];
+  const newPublishedValue = currentPublishedValue === "si" ? "no" : "si"; // Alternar entre "si" y "no"
+
+  // Actualizar la celda con el nuevo valor
+  const updateResponse = await sheets.spreadsheets.values.update({
+    spreadsheetId: process.env.GOOGLE_SHEETS_ID,
+    range: `Productos!J${rowIndexToUpdate + 1}`, // J es la columna 10, sumamos 1 al índice para la referencia en Sheets
+    valueInputOption: "USER_ENTERED",
+    resource: {
+      values: [[newPublishedValue]],
+    },
+  });
+
+  // Determinar el estado de "Publicado" y enviar el mensaje correspondiente
+  const statusMessage = newPublishedValue === "si" ? "publicado" : "no publicado";
+
+  return {
+    message: `El producto cambio a ${statusMessage}.`,
+    updateResponse: updateResponse.data
+  };
+}
+
+
 
 async function deleteSalesById(auth, id) {
   const sheets = google.sheets({ version: "v4", auth });
@@ -621,7 +674,6 @@ async function getCashFlow(auth) {
   }
 }
 
-// Controlador modificado para devolver solo la nueva entrada
 async function addCashFlowEntry(auth, data) {
   try {
     const { tipo, monto, descripcion, fecha } = data;
@@ -682,5 +734,6 @@ module.exports = {
   getCashFlow,
   addCashFlowEntry,
   getAllColors,
-  getProductsByColor
+  getProductsByColor,
+  activeProductById
 };

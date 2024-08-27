@@ -379,6 +379,23 @@ export const deleteSheetRow = (rowIndex) => async (dispatch) => {
   }
 };
 
+export const publicProductById = (id) => async (dispatch) => {
+  try {
+    const res = await intance.put(`/api/sheets/product/${id}`);
+    if (res.status === 200) {
+      console.log(res)
+      toast.success(res.data.message);
+      dispatch({
+        type: "PUBLIC_PRODUCT_BY_ID",
+        payload: id,
+      });
+      dispatch(fetchSheets());
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export const renderCondition = (condition) => ({
   type: SET_CONDITION,
   payload: condition,
