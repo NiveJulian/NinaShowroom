@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-   "scripts": {
+  "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js"
   },
@@ -21,6 +21,7 @@
     "firebase-admin": "^12.2.0",
     "fs": "^0.0.1-security",
     "googleapis": "^105.0.0",
+    "mercadopago": "^2.0.13",
     "mime-types": "^2.1.35",
     "multiparty": "^4.2.3"
   },
