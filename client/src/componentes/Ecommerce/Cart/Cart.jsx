@@ -25,6 +25,7 @@ const processColors = (colors) => {
 const Cart = ({ product, calcularTotal, usuario }) => {
   const [step, setStep] = useState(1);
   const [selectedColors, setSelectedColors] = useState({});
+  const [mpId, setMpId] = useState(null);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -142,6 +143,7 @@ const Cart = ({ product, calcularTotal, usuario }) => {
       dispatch(decrementQuantity(productId));
     }
   };
+  
 
   return (
     <div className="bg-pink-200 border border-gray-300 shadow-lg">
@@ -201,6 +203,8 @@ const Cart = ({ product, calcularTotal, usuario }) => {
               handleFormaPagoChange={handleFormaPagoChange}
               prevStep={prevStep}
               handleCreateVenta={handleCreateVenta}
+              product={product}
+              usuario={usuario}
             />
           )}
         </div>

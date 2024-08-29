@@ -17,6 +17,9 @@ import Register from "./pages/dashboard/Register";
 import ProductDetail from "./pages/ecommerce/ProductDetail";
 import AllProducts from "./pages/ecommerce/AllProducts";
 
+// Inicializa Mercado Pago con la clave pública
+
+
 function App() {
   const dispatch = useDispatch();
   const isAuth = useSelector((state) => state.auth.isAuth);

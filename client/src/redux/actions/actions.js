@@ -154,6 +154,33 @@ export const updateCart = (updatedCart) => ({
 });
 
 //VENTAS
+export const createPayment = (venta) => async () => {
+  try {
+    const response = await intance.post("/api/mp/create-payment", venta);
+    
+    toast.loading("Redirigiendo a Mercado Pago")
+    if (response.status === 200 ) {
+      // Aquí es donde rediriges al usuario a MercadoPago
+      window.location.href = response.data.redirectUrl;
+    } else {
+      toast.error("Error al crear el pago.");
+      console.error("Error al crear el pago:", response.data.error);
+    }
+  } catch (error) {
+    console.error("Error al conectar con el servidor:", error);
+    toast.error("Error al conectar con el servidor.");
+  }
+};
+
+export const fetchPaymentDetails = (id) => async() =>{
+  try {
+    const res = await intance.get(`/api/mp/payment-status/${id}`)
+    console.log(res)
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 export const getSaleInfo = (id) => async (dispatch) => {
   try {
     const res = await intance.get(`/api/sheets/sale/${id}`);
@@ -484,3 +511,4 @@ export const deleteSaleRow = (rowIndex) => async (dispatch) => {
     console.log(error);
   }
 };
+
