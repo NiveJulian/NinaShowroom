@@ -43,8 +43,8 @@ async function getSheetData(auth) {
       nombre: row[2],
       color: row[3],
       talle: row[4],
-      cantidad: row[5],
-      precio: row[6],
+      cantidad: parseInt(row[5]),
+      precio: parseInt(row[6]),
       url: row[7],
       sku: row[8],
       publicado: row[9],
@@ -64,7 +64,7 @@ async function getSheetDataById(id, auth) {
       range: "Productos!A2:J",
     });
     const rows = res.data.values || [];
-    
+
     const products = rows.map((row) => ({
       id: row[0],
       categoria: row[1],
@@ -76,13 +76,12 @@ async function getSheetDataById(id, auth) {
       url: row[7],
       sku: row[8],
       publicado: row[9],
-
     }));
 
-    const product = products.find(product => product.id === id);
+    const product = products.find((product) => product.id === id);
 
     if (!product) {
-      throw new Error('Producto no encontrado');
+      throw new Error("Producto no encontrado");
     }
 
     return product;
@@ -104,7 +103,8 @@ async function appendRow(auth, rowData) {
   const sheets = google.sheets({ version: "v4", auth });
   const { rows, lastId } = await getSheetData(auth);
   const newId = lastId + 1;
-  const { categoria, nombre, color, tamaño, cantidad, precio, url, publicado } = rowData;
+  const { categoria, nombre, color, tamaño, cantidad, precio, url, publicado } =
+    rowData;
   const sku = generateSKU(categoria, nombre, color, newId);
   const urlString = Array.isArray(url) ? url.join(", ") : url;
   const newRow = [
@@ -117,7 +117,7 @@ async function appendRow(auth, rowData) {
     precio,
     urlString,
     sku,
-    publicado = "no",
+    (publicado = "no"),
   ];
   const res = await sheets.spreadsheets.values.append({
     spreadsheetId: process.env.GOOGLE_SHEETS_ID,
@@ -178,7 +178,18 @@ async function updateRow(auth, rowData) {
 
 async function registerSale(auth, data) {
   try {
-    const { productos, nombreCliente, formaPago } = data;
+    const {
+      productos,
+      nombreCliente,
+      formaPago,
+      tipoEnvio,
+      correo,
+      direccion,
+      provincia,
+      cp,
+      celular,
+      medio,
+    } = data;
 
     const sheets = google.sheets({ version: "v4", auth });
 
@@ -211,17 +222,34 @@ async function registerSale(auth, data) {
       formaPago,
       prod.cantidad * prod.precio,
       currentDate,
+      tipoEnvio || "",
+      correo || "",
+      direccion || "",
+      provincia || "",
+      cp || "",
+      celular || "",
+      medio,
     ]);
+    
+    
 
     // Append the data to the spreadsheet
     const res = await sheets.spreadsheets.values.append({
       spreadsheetId: process.env.GOOGLE_SHEETS_ID,
-      range: "Ventas!A2:I",
+      range: "Ventas!A2:Q",
       valueInputOption: "RAW",
       resource: {
         values: ventaData,
       },
     });
+
+    // Actualizar stock
+    for (const prod of productos) {
+      const amount = parseInt(prod.cantidad);
+      if (amount > 0) {
+        await decreaseStock(auth, prod.id, amount);
+      }
+    }
 
     return { message: "Venta registrada exitosamente", data: res.data };
   } catch (error) {
@@ -316,11 +344,13 @@ async function getSalesByDate(auth, date) {
       spreadsheetId: process.env.GOOGLE_SHEETS_ID,
       range: "Ventas!A2:K", // Ajusta el rango según tu hoja de ventas
     });
-    
+
     const rows = res.data.values || [];
 
     // Filtrar las ventas que coinciden con la fecha
-    const salesForDate = rows.filter((row) => row[10] === date).map((row) => row[0]);
+    const salesForDate = rows
+      .filter((row) => row[10] === date)
+      .map((row) => row[0]);
 
     return salesForDate;
   } catch (error) {
@@ -331,18 +361,21 @@ async function getSalesByDate(auth, date) {
 
 async function increaseStock(auth, productId, amount) {
   const sheets = google.sheets({ version: "v4", auth });
-  const { rows } = await getSheetData(auth);
-  const rowIndex = rows.findIndex((row) => row[0] === productId);
+  const { products } = await getSheetData(auth);
+  const rowIndex = products.findIndex((row) => row.id === productId);
   if (rowIndex === -1) {
     throw new Error("ID no encontrado");
   }
-  rows[rowIndex][5] = parseInt(rows[rowIndex][5]) + amount; // Suponiendo que la columna 5 es la cantidad en stock
+  // Convertir cantidad a número y sumarle la cantidad a aumentar
+  const currentAmount = parseInt(products[rowIndex].cantidad) || 0;
+  products[rowIndex].cantidad = currentAmount + amount;
+
   const res = await sheets.spreadsheets.values.update({
     spreadsheetId: process.env.GOOGLE_SHEETS_ID,
-    range: `Productos!A${rowIndex + 2}:I${rowIndex + 2}`,
+    range: `Productos!A${rowIndex + 2}:J${rowIndex + 2}`,
     valueInputOption: "RAW",
     resource: {
-      values: [rows[rowIndex]],
+      values: [Object.values(products[rowIndex])],
     },
   });
   return res.data;
@@ -350,18 +383,21 @@ async function increaseStock(auth, productId, amount) {
 
 async function decreaseStock(auth, productId, amount) {
   const sheets = google.sheets({ version: "v4", auth });
-  const { rows } = await getSheetData(auth);
-  const rowIndex = rows.findIndex((row) => row[0] === productId);
+  const { products } = await getSheetData(auth);
+  const rowIndex = products.findIndex((row) => row.id === productId);
   if (rowIndex === -1) {
     throw new Error("ID no encontrado");
   }
-  rows[rowIndex][5] = parseInt(rows[rowIndex][5]) - amount; // Suponiendo que la columna 5 es la cantidad en stock
+  // Convertir cantidad a número y restarle la cantidad a disminuir
+  const currentAmount = parseInt(products[rowIndex].cantidad) || 0;
+  products[rowIndex].cantidad = currentAmount - amount;
+
   const res = await sheets.spreadsheets.values.update({
     spreadsheetId: process.env.GOOGLE_SHEETS_ID,
-    range: `Productos!A${rowIndex + 2}:I${rowIndex + 2}`,
+    range: `Productos!A${rowIndex + 2}:J${rowIndex + 2}`,
     valueInputOption: "RAW",
     resource: {
-      values: [rows[rowIndex]],
+      values: [Object.values(products[rowIndex])],
     },
   });
   return res.data;
@@ -372,16 +408,21 @@ async function getProductsByCategory(auth, category) {
     const { products } = await getSheetData(auth);
 
     // Normaliza y elimina espacios en blanco de la categoría recibida
-    const trimmedCategory = category.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    
-    
+    const trimmedCategory = category
+      .trim()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+
     // Filtra los productos basándose en la categoría normalizada
     const filteredProducts = products.filter(
       (product) =>
-        product.categoria.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") === trimmedCategory
+        product.categoria
+          .trim()
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "") === trimmedCategory
     );
-
-    
 
     // Si no se encuentran productos, lanzar un error personalizado
     if (filteredProducts.length === 0) {
@@ -398,9 +439,13 @@ async function getProductsByCategory(auth, category) {
 async function getAllCategories(auth) {
   try {
     const { products } = await getSheetData(auth);
-    
+
     const normalizedCategories = products.map((product) =>
-      product.categoria.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      product.categoria
+        .trim()
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
     );
 
     const categories = [...new Set(normalizedCategories)];
@@ -412,12 +457,21 @@ async function getAllCategories(auth) {
   }
 }
 
-async function getAllColors (auth) {
+async function getAllColors(auth) {
   try {
     const { products } = await getSheetData(auth);
 
-    const colors = [...new Set(products.map((product) => product.color.trim().toLowerCase().
-    normalize("NFD").replace(/[\u0300-\u036f]/g, "")))];
+    const colors = [
+      ...new Set(
+        products.map((product) =>
+          product.color
+            .trim()
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+        )
+      ),
+    ];
 
     return colors;
   } catch (error) {
@@ -426,15 +480,23 @@ async function getAllColors (auth) {
   }
 }
 
-async function getProductsByColor (auth, color) {
+async function getProductsByColor(auth, color) {
   try {
     const { products } = await getSheetData(auth);
 
-    const trimmedColor = color.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const trimmedColor = color
+      .trim()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
 
     const filteredProducts = products.filter(
       (product) =>
-        product.color.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") === trimmedColor
+        product.color
+          .trim()
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "") === trimmedColor
     );
 
     if (filteredProducts.length === 0) {
@@ -511,7 +573,8 @@ async function activeProductById(auth, id) {
 
   // Encontrar la fila con el ID proporcionado
   for (let i = 0; i < rows.length; i++) {
-    if (rows[i][0] == id) { // Asumiendo que la columna ID es la primera (A)
+    if (rows[i][0] == id) {
+      // Asumiendo que la columna ID es la primera (A)
       rowIndexToUpdate = i;
       break;
     }
@@ -536,15 +599,14 @@ async function activeProductById(auth, id) {
   });
 
   // Determinar el estado de "Publicado" y enviar el mensaje correspondiente
-  const statusMessage = newPublishedValue === "si" ? "publicado" : "no publicado";
+  const statusMessage =
+    newPublishedValue === "si" ? "publicado" : "no publicado";
 
   return {
     message: `El producto cambio a ${statusMessage}.`,
-    updateResponse: updateResponse.data
+    updateResponse: updateResponse.data,
   };
 }
-
-
 
 async function deleteSalesById(auth, id) {
   const sheets = google.sheets({ version: "v4", auth });
@@ -570,7 +632,7 @@ async function deleteSalesById(auth, id) {
     throw new Error("ID not found");
   }
 
-  console.log("rowsToDelete: ",rowsToDelete);
+  console.log("rowsToDelete: ", rowsToDelete);
 
   // Crear solicitudes de eliminación para cada fila encontrada
   const requests = rowsToDelete.map((rowIndex) => ({
@@ -604,12 +666,12 @@ async function getCashFlow(auth) {
     // Obtener los datos del flujo de caja
     const resCashFlow = await sheets.spreadsheets.values.get({
       spreadsheetId: process.env.GOOGLE_SHEETS_ID,
-      range: "FlujoDeCaja!A2:F",  // Incluye la columna F para "Caja Final"
+      range: "FlujoDeCaja!A2:F", // Incluye la columna F para "Caja Final"
     });
 
     const rowsCashFlow = resCashFlow.data.values || [];
     let lastId = 0;
-    let saldoAcumulado = 0;  // Para llevar el registro del saldo acumulado
+    let saldoAcumulado = 0; // Para llevar el registro del saldo acumulado
 
     if (rowsCashFlow.length > 0) {
       lastId = parseInt(rowsCashFlow[rowsCashFlow.length - 1][0]);
@@ -632,43 +694,46 @@ async function getCashFlow(auth) {
         monto: monto,
         descripcion: row[3],
         fecha: row[4],
-        cajaFinal: saldoAcumulado,  // Caja final acumulada
+        cajaFinal: saldoAcumulado, // Caja final acumulada
       };
     });
 
     // Obtener los datos de la hoja de ventas
     const resVentas = await sheets.spreadsheets.values.get({
       spreadsheetId: process.env.GOOGLE_SHEETS_ID,
-      range: "Ventas!A2:K",  // Asumiendo que las columnas de interés están en A2:K
+      range: "Ventas!A2:K", // Asumiendo que las columnas de interés están en A2:K
     });
 
     const rowsVentas = resVentas.data.values || [];
-    
+
     // Añadir las ventas al flujo de caja como ingresos
     const ventasData = rowsVentas.map((ventaRow, index) => {
-      const id = lastId + index + 1;  // Incrementar el ID para las nuevas filas
-      const subtotal = parseFloat(ventaRow[7]);  // Subtotal de la venta
-      const total = parseFloat(ventaRow[9]);  // Total de la venta
-      const descripcion = `Venta Producto: ${ventaRow[3]}, Cliente: ${ventaRow[2]}`;  // SKU y Cliente
-      const fecha = ventaRow[10];  // Fecha de la venta
+      const id = lastId + index + 1; // Incrementar el ID para las nuevas filas
+      const subtotal = parseFloat(ventaRow[7]); // Subtotal de la venta
+      const total = parseFloat(ventaRow[9]); // Total de la venta
+      const descripcion = `Venta Producto: ${ventaRow[3]}, Cliente: ${ventaRow[2]}`; // SKU y Cliente
+      const fecha = ventaRow[10]; // Fecha de la venta
 
       // Sumar el total de la venta al saldo acumulado
       saldoAcumulado += total;
 
       return {
         id: id.toString(),
-        tipo: "Ingreso",  // Todas las ventas se consideran como ingresos
+        tipo: "Ingreso", // Todas las ventas se consideran como ingresos
         monto: total,
         descripcion: descripcion,
         fecha: fecha,
-        cajaFinal: saldoAcumulado,  // Caja final actualizada
+        cajaFinal: saldoAcumulado, // Caja final actualizada
       };
     });
 
     // Combinar flujo de caja existente con las ventas
     const allCashFlowData = [...cashFlowData, ...ventasData];
 
-    return { cashFlowData: allCashFlowData, lastId: lastId + rowsVentas.length };
+    return {
+      cashFlowData: allCashFlowData,
+      lastId: lastId + rowsVentas.length,
+    };
   } catch (error) {
     console.log({ error: error.message });
   }
@@ -682,37 +747,73 @@ async function addCashFlowEntry(auth, data) {
     // Obtener la última fila para determinar el ID más reciente
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: process.env.GOOGLE_SHEETS_ID,
-      range: "FlujoDeCaja!A:A", 
+      range: "FlujoDeCaja!A:A",
     });
 
     const rows = response.data.values || [];
-    let lastId = rows.length > 1 ? parseInt(rows[rows.length - 1][0], 10) || 0 : 0;
+    let lastId =
+      rows.length > 1 ? parseInt(rows[rows.length - 1][0], 10) || 0 : 0;
 
     let saldoAcumulado = 0;
     if (rows.length > 1) {
       const lastRow = await sheets.spreadsheets.values.get({
         spreadsheetId: process.env.GOOGLE_SHEETS_ID,
-        range: `FlujoDeCaja!F${rows.length}`, 
+        range: `FlujoDeCaja!F${rows.length}`,
       });
 
-      saldoAcumulado = lastRow.data.values && lastRow.data.values[0] ? parseFloat(lastRow.data.values[0][0]) || 0 : 0;
+      saldoAcumulado =
+        lastRow.data.values && lastRow.data.values[0]
+          ? parseFloat(lastRow.data.values[0][0]) || 0
+          : 0;
     }
 
-    const newSaldoAcumulado = tipo === "Ingreso" ? saldoAcumulado + parseFloat(monto) : saldoAcumulado - parseFloat(monto);
-    const newRow = [lastId + 1, tipo, parseFloat(monto), descripcion, fecha, newSaldoAcumulado];
+    const newSaldoAcumulado =
+      tipo === "Ingreso"
+        ? saldoAcumulado + parseFloat(monto)
+        : saldoAcumulado - parseFloat(monto);
+    const newRow = [
+      lastId + 1,
+      tipo,
+      parseFloat(monto),
+      descripcion,
+      fecha,
+      newSaldoAcumulado,
+    ];
 
     await sheets.spreadsheets.values.append({
       spreadsheetId: process.env.GOOGLE_SHEETS_ID,
-      range: "FlujoDeCaja!A:F", 
+      range: "FlujoDeCaja!A:F",
       valueInputOption: "RAW",
       resource: { values: [newRow] },
     });
 
-    return { id: newRow[0], tipo, monto, descripcion, fecha, cajaFinal: newSaldoAcumulado };
+    return {
+      id: newRow[0],
+      tipo,
+      monto,
+      descripcion,
+      fecha,
+      cajaFinal: newSaldoAcumulado,
+    };
   } catch (error) {
     console.error("Error agregando el movimiento:", error);
     throw new Error("Error agregando el movimiento al flujo de caja");
   }
+}
+
+async function appendRowPayment(auth, rowData) {
+  const sheets = google.sheets({ version: "v4", auth });
+
+  const res = await sheets.spreadsheets.values.append({
+    spreadsheetId: process.env.GOOGLE_SHEETS_ID,
+    range: "PagosMp!A2:M", // Ajusta el rango y hoja según corresponda
+    valueInputOption: "USER_ENTERED",
+    resource: {
+      values: [rowData],
+    },
+  });
+
+  return res.data.updates;
 }
 
 module.exports = {
@@ -735,5 +836,6 @@ module.exports = {
   addCashFlowEntry,
   getAllColors,
   getProductsByColor,
-  activeProductById
+  activeProductById,
+  appendRowPayment,
 };

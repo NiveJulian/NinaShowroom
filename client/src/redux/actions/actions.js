@@ -153,6 +153,32 @@ export const updateCart = (updatedCart) => ({
   payload: updatedCart,
 });
 
+export const createPayment = (venta) => async () => {
+  try {
+    const response = await intance.post("/api/mp/create-payment", venta);
+    
+    toast.loading("Redirigiendo a Mercado Pago")
+    if (response.status === 200 ) {
+      // Aquí es donde rediriges al usuario a MercadoPago
+      window.location.href = response.data.redirectUrl;
+    } else {
+      toast.error("Error al crear el pago.");
+      console.error("Error al crear el pago:", response.data.error);
+    }
+  } catch (error) {
+    console.error("Error al conectar con el servidor:", error);
+    toast.error("Error al conectar con el servidor.");
+  }
+};
+
+export const fetchPaymentDetails = (id) => async() =>{
+  try {
+    const res = await intance.get(`/api/mp/payment-status/${id}`)
+    console.log(res)
+  } catch (error) {
+    console.log(error)
+  }
+}
 //VENTAS
 export const createPayment = (venta) => async () => {
   try {
@@ -209,7 +235,7 @@ export const getSales = () => async (dispatch) => {
 export const createSale = (data) => async (dispatch) => {
   try {
     const res = await intance.post(`/api/sheets/sale`, data);
-    console.log(res);
+
     dispatch({
       type: CREATED_SALE,
       payload: res,
@@ -410,7 +436,7 @@ export const publicProductById = (id) => async (dispatch) => {
   try {
     const res = await intance.put(`/api/sheets/product/${id}`);
     if (res.status === 200) {
-      console.log(res)
+      console.log(res);
       toast.success(res.data.message);
       dispatch({
         type: "PUBLIC_PRODUCT_BY_ID",

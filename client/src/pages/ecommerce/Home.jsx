@@ -41,7 +41,7 @@ const Home = () => {
         <Carrousel />
       </div>
       <div
-        className={`relative md:-top-28 flex w-full justify-center items-center transition-transform duration-1000 bg-pink-100`}
+        className={`relative -top-18 md:-top-28 flex w-full justify-center items-center transition-transform duration-1000 bg-pink-100`}
       >
           <ProdustHome allProducts={sheetsData} />
       </div>
