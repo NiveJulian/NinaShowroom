@@ -8,6 +8,7 @@ const SheetsData = ({
 }) => {
   return (
     <div className="border border-gray-300 p-4">
+      
       <div className="overflow-x-auto custom-scroll border border-gray-300 p-2">
         <table className="basic mt-2">
           <thead>
@@ -24,17 +25,22 @@ const SheetsData = ({
               <th>Acciones</th>
             </tr>
           </thead>
-          <tbody className="text-center">
+          <tbody className="text-center border border-gray-500">
             {data?.length > 0 ? (
               data.map((row, index) => {
                 const imgUrl = row?.url?.split(", ");
 
-                const rowClass = row.cantidad === "0" ? "bg-red-300" : "";
+                const rowClass =
+                  row.cantidad === 0 ? "bg-red-500 text-white" : "";
+                const rowClassWarning =
+                  row.cantidad > 0 && row.cantidad < 2
+                    ? "bg-yellow-100 text-gray-800"
+                    : "";
 
                 return (
                   <tr
                     key={index}
-                    className={`border border-gray-600 ${rowClass}`}
+                    className={`border border-gray-600 ${rowClass} ${rowClassWarning}`}
                   >
                     <td>{row.id}</td>
                     <td>{row.categoria}</td>
@@ -103,47 +109,51 @@ const SheetsData = ({
                           />
                         </svg>
                       </button>
-                      <button
-                        title="Publicar en la pagina"
-                        className={`${
-                          row.publicado === "si"
-                            ? "text-blue-500"
-                            : "text-gray-500"
-                        }`}
-                        onClick={() => toggleActiveModal(row.id)}
-                      >
-                        {row.publicado === "si" ? (
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth="1.5"
-                            stroke="currentColor"
-                            className="size-6"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M12 16.5V9.75m0 0 3 3m-3-3-3 3M6.75 19.5a4.5 4.5 0 0 1-1.41-8.775 5.25 5.25 0 0 1 10.233-2.33 3 3 0 0 1 3.758 3.848A3.752 3.752 0 0 1 18 19.5H6.75Z"
-                            />
-                          </svg>
-                        ) : (
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth="1.5"
-                            stroke="currentColor"
-                            className="size-6"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M12 9.75v6.75m0 0-3-3m3 3 3-3m-8.25 6a4.5 4.5 0 0 1-1.41-8.775 5.25 5.25 0 0 1 10.233-2.33 3 3 0 0 1 3.758 3.848A3.752 3.752 0 0 1 18 19.5H6.75Z"
-                            />
-                          </svg>
-                        )}
-                      </button>
+                      {row.cantidad !== 0 ? (
+                        <button
+                          title="Publicar en la pagina"
+                          className={`${
+                            row.publicado === "si"
+                              ? "text-blue-500"
+                              : "text-gray-800"
+                          }`}
+                          onClick={() => toggleActiveModal(row.id)}
+                        >
+                          {row.publicado === "si" ? (
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              strokeWidth="1.5"
+                              stroke="currentColor"
+                              className="size-6"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M12 16.5V9.75m0 0 3 3m-3-3-3 3M6.75 19.5a4.5 4.5 0 0 1-1.41-8.775 5.25 5.25 0 0 1 10.233-2.33 3 3 0 0 1 3.758 3.848A3.752 3.752 0 0 1 18 19.5H6.75Z"
+                              />
+                            </svg>
+                          ) : (
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              strokeWidth="1.5"
+                              stroke="currentColor"
+                              className="size-6"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M12 9.75v6.75m0 0-3-3m3 3 3-3m-8.25 6a4.5 4.5 0 0 1-1.41-8.775 5.25 5.25 0 0 1 10.233-2.33 3 3 0 0 1 3.758 3.848A3.752 3.752 0 0 1 18 19.5H6.75Z"
+                              />
+                            </svg>
+                          )}
+                        </button>
+                      ) : (
+                        ""
+                      )}
                     </td>
                   </tr>
                 );
@@ -155,6 +165,43 @@ const SheetsData = ({
             )}
           </tbody>
         </table>
+      </div>
+      <div className="flex flex-row my-2 gap-4">
+        <div className="flex justify-center items-center p-2 border rounded-md bg-yellow-600 text-white gap-2">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth="1.5"
+            stroke="currentColor"
+            className="size-6"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
+            />
+          </svg>
+          <span>Poco stock</span>
+        </div>
+        <div className="flex justify-center items-center p-2 border rounded-md bg-red-600 text-white gap-2">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth="1.5"
+            stroke="currentColor"
+            className="size-6"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"
+            />
+          </svg>
+
+          <span>Sin stock</span>
+        </div>
       </div>
     </div>
   );

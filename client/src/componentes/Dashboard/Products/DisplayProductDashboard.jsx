@@ -72,6 +72,7 @@ const DisplayProductDashboard = ({ products }) => {
       total: calculateTotal(),
       formaPago,
       nombreCliente,
+      medio: "Casa central"
     };
     if (venta.formaPago === "") {
       toast.error("Falta forma de pago");

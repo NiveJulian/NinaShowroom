@@ -6,7 +6,6 @@ const TabConfirmPublicProduct = ({ id, onClose }) => {
   const dispatch =  useDispatch()
   const handleActiveProduct = () => {
     dispatch(publicProductById(id))
-    console.log(id);
     onClose();
   };
   return (

@@ -16,6 +16,9 @@ import CartPage from "./pages/ecommerce/CartPage";
 import Register from "./pages/dashboard/Register";
 import ProductDetail from "./pages/ecommerce/ProductDetail";
 import AllProducts from "./pages/ecommerce/AllProducts";
+import SuccessPayment from "./pages/ecommerce/Payment/SuccessPayment";
+import FailurePayment from "./pages/ecommerce/Payment/FailurePayment";
+import PendingPayment from "./pages/ecommerce/Payment/PendingPayment";
 
 function App() {
   const dispatch = useDispatch();
@@ -35,6 +38,9 @@ function App() {
         <Route path="/cart" element={<CartPage />} />
         <Route path="/product" element={<AllProducts />} />
         <Route path="/product/:id" element={<ProductDetail />} />
+        <Route path="/success" element={<SuccessPayment />} />
+        <Route path="/failure" element={<FailurePayment />} />
+        <Route path="/pending" element={<PendingPayment />} />
         {isAuth ? (
           <>
             <Route path="/dashboard/dashboard" element={<Dashboard />} />

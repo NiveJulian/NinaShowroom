@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
   cleanCart,
+  createPayment,
   createSale,
   decrementQuantity,
   incrementQuantity,
@@ -106,25 +107,36 @@ const Cart = ({ product, calcularTotal, usuario }) => {
       })),
       total: calcularTotal(),
       formaPago,
-      cliente: formCliente,
+      cliente: formCliente.nombre,
       tipoEnvio: selectedDeliveryMethod,
+      correo: formCliente.correo,
+      direccion: formCliente.direccion,
+      provincia: formCliente.provincia,
+      cp: formCliente.cp,
+      celular: formCliente.celular,
+      medio: "Pagina"
     };
 
     if (venta.formaPago === "") {
       toast.error("Falta forma de pago");
     } else if (venta.productos.length === 0) {
       toast.error("El carrito está vacío");
-    } else if (venta.cliente.nombre.trim() === "") {
+    } else if (venta.cliente.nombre === "") {
       toast.error("Falta tu nombre :(");
     } else {
-      toast.success("Venta creada exitosamente...");
-      // dispatch(createSale(venta));
 
       setStep(4);
       if (venta.formaPago === "Efectivo") {
-        dispatch(cleanCart());
+        toast.success("Muchas gracias por elegirnos...");
+        dispatch(createSale(venta));
         const enlaceWhatsApp = generarMensajeWhatsApp(venta);
         window.open(enlaceWhatsApp, "_blank", "noopener,noreferrer");
+        dispatch(cleanCart());
+      } else if (venta.formaPago === "Mercadopago") {
+        toast.success("Muchas gracias por elegirnos...");
+        // dispatch(cleanCart());
+        console.log(venta)
+        dispatch(createPayment(venta));
       }
     }
   };
