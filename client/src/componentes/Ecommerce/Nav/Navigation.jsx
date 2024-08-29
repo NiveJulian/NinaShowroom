@@ -146,7 +146,7 @@ const Navigation = ({ isCart }) => {
                       to="/product"
                       className="text-sm px-3 py-2 rounded-md text-gray-800 hover:bg-tertiary hover:text-white transition duration-150 ease-in-out cursor-pointer focus:outline-none focus:text-white focus:bg-gray-700"
                     >
-                      Products
+                      Productos
                     </Link>
                     {showCategories && (
                       <ul className="bg-white border transition duration-150 ease-in-out border-gray-800 rounded-md h-auto absolute p-8 left-0 grid grid-cols-6 top-16 w-full gap-2">
@@ -167,22 +167,10 @@ const Navigation = ({ isCart }) => {
                       </ul>
                     )}
                   </ul>
-                  <Link
-                    to="#"
-                    className="ml-4 px-3 py-2 rounded-md text-sm leading-5 text-gray-800 hover:bg-tertiary hover:text-white transition duration-150 ease-in-out cursor-pointer focus:outline-none focus:text-white focus:bg-gray-700 "
-                  >
-                    Recipe
-                  </Link>
-                  <Link
-                    to="#"
-                    className="ml-4 px-3 py-2 rounded-md text-sm leading-5 text-gray-800 hover:bg-tertiary hover:text-white transition duration-150 ease-in-out cursor-pointer focus:outline-none focus:text-white focus:bg-gray-700 "
-                  >
-                    Promo
-                  </Link>
                 </div>
               </div>
             </div>
-            <div className="flex-1 flex gap-2 px-2 lg:ml-6 lg:justify-end">
+            <div className="flex-1 flex gap-2 px-2 justify-end">
               {!isCart && (
                 <div className="tooltip">
                   <button
@@ -238,7 +226,7 @@ const Navigation = ({ isCart }) => {
                 )}
               </div>
             </div>
-            <div className="relative mt-4">
+            <div className="relative">
               {showCart && (
                 <CartList
                   cartItems={cartItems}

@@ -86,12 +86,12 @@ const ProductCard = ({
   };
 
   return (
-    <article className="w-auto h-full rounded-xl bg-white p-2 shadow-lg hover:shadow-xl hover:transform hover:scale-105 duration-300 mb-6 border border-gray-300">
+    <article className="w-auto h-full rounded-xl bg-white p-2 shadow-lg hover:shadow-xl md:hover:transform md:hover:scale-105 duration-300 md:mb-6 border border-gray-300">
       <div>
         <div className="relative flex items-end overflow-hidden rounded-xl">
           <Link to={`/product/${id}`}>
             {url.includes(",") ? (
-              <Slider {...settings} className="w-64 h-64">
+              <Slider {...settings} className="md:w-64 md:h-64 w-80 h-80">
                 <ImageComponent imageUrls={url} />
               </Slider>
             ) : (
@@ -116,15 +116,15 @@ const ProductCard = ({
         </div>
       </div>
       {isNew && (
-        <div className="absolute top-5 right-5">
+        <div className="absolute md:top-5 md:right-5 top-3 right-10">
           <div className="relative">
-            <div className="transform flex justify-center items-center rotate-45 rounded-t-3xl rounded-b-sm translate-x-1/2 -translate-y-1/2 w-20 bg-red-500 text-white text-center text-xs font-bold px-6 py-1 shadow-lg">
+            <div className="transform flex justify-center items-center md:rotate-45 rounded-t-md md:rounded-t-3xl rounded-b-sm translate-x-1/2 -translate-y-1/2 w-20 bg-red-500 text-white text-center text-xs font-bold px-6 py-1 shadow-lg">
               Nuevo
             </div>
           </div>
         </div>
       )}
-      <div className="mt-1 p-2">
+      <div className="mt-1 p-2 flex flex-col justify-center items-center">
         <h2 className="text-slate-700">{name}</h2>
         <p className="mt-1 text-sm text-slate-400">{sku}</p>
         <div className="mt-3 flex space-x-2">
@@ -143,27 +143,28 @@ const ProductCard = ({
         <div className="mt-2 flex items-center justify-center">
           <p className="text-lg font-bold text-secondary">${price}</p>
         </div>
-        <div
-          onClick={() => onAddToCart()}
-          className="flex items-center justify-center cursor-pointer mt-2 rounded-lg border border-gray-300 p-2"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth="1.5"
-            stroke="currentColor"
-            className="h-4 w-4"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
-            />
-          </svg>
-          <button className="text-sm text-slate-700">Agregar</button>
-        </div>
+
         {/* Sección para mostrar botones de colores */}
+      </div>
+      <div
+        onClick={() => onAddToCart()}
+        className="flex justify-center items-center mt-4 shadow-md active:translate-y-[2px] cursor-pointer rounded-lg border border-gray-300 p-2"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth="1.5"
+          stroke="currentColor"
+          className="h-4 w-4"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
+          />
+        </svg>
+        <button className="text-sm text-slate-700">Agregar</button>
       </div>
     </article>
   );
