@@ -114,7 +114,7 @@ const Cart = ({ product, calcularTotal, usuario }) => {
       provincia: formCliente.provincia,
       cp: formCliente.cp,
       celular: formCliente.celular,
-      medio: "Pagina"
+      medio: "Pagina",
     };
 
     if (venta.formaPago === "") {
@@ -124,7 +124,6 @@ const Cart = ({ product, calcularTotal, usuario }) => {
     } else if (venta.cliente.nombre === "") {
       toast.error("Falta tu nombre :(");
     } else {
-
       setStep(4);
       if (venta.formaPago === "Efectivo") {
         toast.success("Muchas gracias por elegirnos...");
@@ -134,9 +133,9 @@ const Cart = ({ product, calcularTotal, usuario }) => {
         dispatch(cleanCart());
       } else if (venta.formaPago === "Mercadopago") {
         toast.success("Muchas gracias por elegirnos...");
-        // dispatch(cleanCart());
-        console.log(venta)
+        dispatch(createSale(venta));
         dispatch(createPayment(venta));
+        dispatch(cleanCart());
       }
     }
   };

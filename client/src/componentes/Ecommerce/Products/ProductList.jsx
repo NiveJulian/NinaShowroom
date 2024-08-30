@@ -18,8 +18,13 @@ export default function ProductList({ allProducts }) {
   const currentProducts = publishedProducts.slice(0, visibleProducts);
 
   const handleAddToCart = (product) => {
+    console.log(product)
+   if (product.cantidad > 0) {
     toast.success("Producto añadido al carrito");
     dispatch(addToCart(product));
+   }else{
+    toast.error("Producto sin stock")
+   }
   };
 
   useEffect(() => {
@@ -54,7 +59,8 @@ export default function ProductList({ allProducts }) {
                 name={product.nombre}
                 url={product.url}
                 price={product.precio}
-                colors={processColors(product.color)} // Procesa los colores antes de pasarlos
+                quantity={product.cantidad}
+                colors={processColors(product.color)} 
                 onAddToCart={() => handleAddToCart(product)}
                 isNew={false}
               />

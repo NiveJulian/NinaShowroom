@@ -1,5 +1,9 @@
 const { MercadoPagoConfig, Preference } = require("mercadopago");
-const { authorize,appendRowPayment } = require("../sheets/sheetsController");
+const {
+  authorize,
+  appendRowPayment,
+  getSaleData,
+} = require("../sheets/sheetsController");
 
 // Configura tu clave de acceso de Mercado Pago
 const client = new MercadoPagoConfig({
@@ -15,7 +19,9 @@ const createPayment = async (req, res) => {
     quantity: Number(producto.cantidad),
     unit_price: Number(producto.precio),
     currency_id: "ARS", // Asumiendo que usas pesos argentinos (ARS)
-    description: `Color: ${producto.color}, Talle: ${producto.talle ? producto.talle : "N/A"}, SKU: ${producto.sku}`, // Agregar detalles adicionales si es necesario
+    description: `Color: ${producto.color}, Talle: ${
+      producto.talle ? producto.talle : "N/A"
+    }, SKU: ${producto.sku}`, // Agregar detalles adicionales si es necesario
   }));
 
   const body = {
@@ -37,7 +43,8 @@ const createPayment = async (req, res) => {
       pending: "http://localhost:5173/pending",
     },
     auto_return: "approved",
-    notification_url: "https://software-crime-depends-duke.trycloudflare.com/api/mp/webhook", // Cambia esto a tu URL de notificaciones
+    notification_url:
+      "https://joe-referral-inclusion-walking.trycloudflare.com/api/mp/webhook", // Cambia esto a tu URL de notificaciones
     statement_descriptor: "Nina Showroom",
   };
 
@@ -54,6 +61,7 @@ const handlePaymentNotification = async (req, res) => {
   const paymentId = req.query.id;
 
   try {
+    // Obtener los detalles del pago de MercadoPago
     const response = await fetch(
       `https://api.mercadopago.com/v1/payments/${paymentId}`,
       {
@@ -68,21 +76,25 @@ const handlePaymentNotification = async (req, res) => {
       const data = await response.json();
       const auth = await authorize();
 
-      // Extraer los datos relevantes
+      // Obtener el último ID de venta registrado
+      const { lastId } = await getSaleData(auth);
+
+      // Extraer los datos relevantes y añadir el ID de la venta
       const paymentDetails = [
-        data.order.id,                           // OrdenId
-        data.id,                                 // PagoID
-        data.status,                             // Estado
-        data.status_detail,                      // DetalleEstado
-        data.date_created,                       // Fec Creacion
-        data.date_approved,                      // Fec Aprobado
-        data.transaction_amount,                 // Monto total
-        data.installments,                       // Cuotas
-        data.payer.id,                           // Pagador
-        data.payer.email,                        // Email
+        lastId, // Último ID de la venta registrado
+        data.order.id, // OrdenId
+        data.id, // PagoID
+        data.status, // Estado
+        data.status_detail, // DetalleEstado
+        data.date_created, // Fec Creacion
+        data.date_approved, // Fec Aprobado
+        data.transaction_amount, // Monto total
+        data.installments, // Cuotas
+        data.payer.id, // Pagador
+        data.payer.email, // Email
         data.payer.identification?.number || "", // DNI
-        data.payer.first_name || "",             // Nombre
-        data.payer.last_name || "",              // Apellido
+        data.payer.first_name || "", // Nombre
+        data.payer.last_name || "", // Apellido
       ];
 
       // Registrar en Google Sheets
@@ -95,6 +107,8 @@ const handlePaymentNotification = async (req, res) => {
     res.status(500).json({ error: "Error al procesar la notificación" });
   }
 };
+
+
 
 module.exports = {
   createPayment,

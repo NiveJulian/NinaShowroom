@@ -32,8 +32,12 @@ const ProductDetail = () => {
   };
 
   const handleAddToCart = (product) => {
-    toast.success("Producto agregado al carrito");
-    dispatch(addToCart(product));
+    if (product.cantidad > 0) {
+      toast.success("Producto agregado al carrito");
+      dispatch(addToCart(product));
+    } else {
+      toast.error("Producto sin stock");
+    }
   };
 
   const handleQuantityChange = (event) => {
@@ -46,12 +50,12 @@ const ProductDetail = () => {
 
   return (
     <div>
-      <Navigation isCart={false}/>
+      <Navigation isCart={false} />
       <WhatsAppBubble />
 
-      <div className="detail-container my-4">
-        <div className="detail-cont p-4 border">
-          <div className="p-2 flex justify-between border border-gray-300 rounded-lg">
+      <div className="w-full flex justify-center items-center">
+        <div className="detail-cont flex flex-col lg:flex-row p-4 border border-gray-300 rounded-md my-2">
+          <div className="p-2 flex justify-center items-center flex-col-reverse lg:flex-row rounded-lg">
             <div className="flex-col gap-2 mr-1">
               {imgUrl?.length > 1 ? (
                 imgUrl?.map((image, index) => (
@@ -118,31 +122,38 @@ const ProductDetail = () => {
           </div>
 
           <div className="info-container">
-            <p className="product-date">SKU: {product ? product.sku : null}</p>
-            <h1 className="product-name">{product?.Nombre}</h1>
-            <p className="brand">Categoria: {product?.categoria}</p>
-            <p className="product-price">${product?.precio}</p>
-            <div className="product-quantity">
-              <label htmlFor="quantity-select">Cantidad: </label>
-              <select
-                id="quantity-select"
+            <div>
+              <p className="product-date">
+                SKU: {product ? product.sku : null}
+              </p>
+              <h1 className="product-name">{product?.Nombre}</h1>
+              <p className="brand">Categoria: {product?.categoria}</p>
+              <p className="product-price">${product?.precio}</p>
+            </div>
+            <div className="product-quantity flex justify-center items-center flex-col gap-2">
+              <div className="flex flex-row">
+                <label htmlFor="quantity-select">Cantidad: </label>
+                <span className="total-available">
+                  ({product?.cantidad} {"Disponible"})
+                </span>
+              </div>
+              <input
                 value={selectedQuantity}
                 onChange={handleQuantityChange}
-              >
-                {[...Array(product?.quantity).keys()].map((i) => (
-                  <option key={i + 1} value={i + 1}>
-                    {i + 1}
-                  </option>
-                ))}
-              </select>
-              <span className="total-available">
-                ({product?.cantidad} {"Disponible"})
-              </span>
+                className="border p-2 w-16 border-gray-500 rounded-md text-center"
+                type="number"
+                name="quantity-select"
+                id="quantity-select"
+              />
             </div>
-            <div className="flex">
+            <div className="flex w-full">
               <button
                 onClick={() => handleAddToCart(product)}
-                className="p-4 rounded-md text-white w-full shadow-md bg-secondary"
+                className={`p-4 rounded-md text-white w-full shadow-md ${
+                  product?.cantidad === "0"
+                    ? "cursor-not-allowed bg-gray-400"
+                    : "bg-secondary"
+                }`}
               >
                 {"Agregar al carrito"}
               </button>

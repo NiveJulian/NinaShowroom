@@ -44,6 +44,7 @@ const ProductCard = ({
   url,
   sku,
   price,
+  quantity,
   onAddToCart,
   colors,
   isNew,
@@ -148,7 +149,7 @@ const ProductCard = ({
       </div>
       <div
         onClick={() => onAddToCart()}
-        className="flex justify-center items-center mt-4 shadow-md active:translate-y-[2px] cursor-pointer rounded-lg border border-gray-300 p-2"
+        className={`flex justify-center items-center mt-4 ${quantity === 0 ? "cursor-not-allowed text-red-400 border border-red-400 p-2 rounded-md" : "shadow-md active:translate-y-[2px] cursor-pointer rounded-lg border border-gray-300 p-2"}`}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -156,7 +157,7 @@ const ProductCard = ({
           viewBox="0 0 24 24"
           strokeWidth="1.5"
           stroke="currentColor"
-          className="h-4 w-4"
+          className={`h-4 w-4 ${quantity === 0 ? "text-red-400" : ""}`}
         >
           <path
             strokeLinecap="round"
@@ -164,7 +165,7 @@ const ProductCard = ({
             d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
           />
         </svg>
-        <button className="text-sm text-slate-700">Agregar</button>
+        <button className={`text-sm text-slate-700 ${quantity === 0 ? "cursor-not-allowed text-red-400" : ""}`}>{quantity === 0 ? "No stock" : "Agregar"}</button>
       </div>
     </article>
   );

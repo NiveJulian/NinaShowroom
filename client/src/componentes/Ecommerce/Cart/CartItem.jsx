@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import {
   removeFromCart,
@@ -9,11 +9,23 @@ function CartItem({ product }) {
   const [cartQuantity, setCartQuantity] = useState(product?.cantidad || 1);
   const dispatch = useDispatch();
 
+  // Sincronizar el estado con el producto si la cantidad cambia
+  useEffect(() => {
+    setCartQuantity(product.cantidad);
+  }, [product.cantidad]);
+
   // Función para manejar cambios en la cantidad del carrito
   const handleChangeQuantity = (event) => {
     const newCartQuantity = parseInt(event.target.value, 10);
-    setCartQuantity(newCartQuantity);
-    dispatch(updateCartItemQuantity(product.id, newCartQuantity));
+    
+    // Limitar la cantidad al stock disponible
+    if (newCartQuantity > 0 && newCartQuantity <= product.stock) {
+      setCartQuantity(newCartQuantity);
+      dispatch(updateCartItemQuantity(product.id, newCartQuantity));
+    } else if (newCartQuantity > product.stock) {
+      setCartQuantity(product.stock);
+      dispatch(updateCartItemQuantity(product.id, product.stock));
+    }
   };
 
   // Función para eliminar el producto del carrito
@@ -36,19 +48,19 @@ function CartItem({ product }) {
       ) : (
         <div className="p-2 border border-gray-300 rounded-full">
           <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth="1.5"
-          stroke="currentColor"
-          className="w-10 h-10"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
-          />
-        </svg>
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth="1.5"
+            stroke="currentColor"
+            className="w-10 h-10"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
+            />
+          </svg>
         </div>
       )}
       <div className="flex-1">
@@ -61,6 +73,7 @@ function CartItem({ product }) {
         onChange={handleChangeQuantity}
         className="w-9 justify-center border rounded-md p-1 text-center mr-4"
         min="1"
+        max={product.stock} // Agregar un máximo basado en el stock
       />
       <div className="flex-col">
         <p className="text-gray-500 text-sm">Subtotal: </p>
@@ -70,7 +83,6 @@ function CartItem({ product }) {
         onClick={() => handleRemove(product.id)}
         className="text-red-500 hover:drop-shadow-[0_35px_35px_rgba(0,0,0,.6)] hover:text-red-400"
       >
-        {/* Icono para eliminar producto */}
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
