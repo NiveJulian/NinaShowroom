@@ -24,6 +24,9 @@ import FailurePayment from "./pages/ecommerce/Payment/FailurePayment";
 import PendingPayment from "./pages/ecommerce/Payment/PendingPayment";
 import HowCanBuy from "./pages/ecommerce/HowCanBuy";
 
+// Inicializa Mercado Pago con la clave pública
+
+
 function App() {
   const dispatch = useDispatch();
   const isAuth = useSelector((state) => state.auth.isAuth);

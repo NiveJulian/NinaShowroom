@@ -1,8 +1,10 @@
+import { useDispatch } from 'react-redux';
 import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import CartList from "../Cart/CartList";
 import UserLogged from "../User/UserLogged";
+import { clearFilteredProducts, filterByCategory, renderCondition } from "../../../redux/actions/actions";
 
 const Navigation = ({ isCart }) => {
   const [showCart, setShowCart] = useState(false);
@@ -53,6 +55,7 @@ const Navigation = ({ isCart }) => {
   const user = useSelector((state) => state.auth.user);
   const categories = useSelector((state) => state.sheets.categories);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const isEmpty = (obj) => {
     return Object.keys(obj).length === 0;
@@ -82,6 +85,19 @@ const Navigation = ({ isCart }) => {
     }, 0);
 
     return total.toFixed(2);
+  };
+
+  const handleFilter = (category) => {
+    if (category !== "Todos") {
+      dispatch(filterByCategory(category));
+      dispatch(renderCondition("filteredProducts"));
+    } else {
+      dispatch(renderCondition("allProducts"));
+      dispatch(clearFilteredProducts());
+    }
+
+    // Navegar utilizando `useNavigate` en lugar de `window.location.href`
+    navigate("/product");
   };
 
   return (
@@ -161,9 +177,12 @@ const Navigation = ({ isCart }) => {
                                 key={index}
                                 className="border border-gray-400 flex justify-center items-center text-center p-1 hover:text-gray-50 hover:bg-tertiary rounded-md"
                               >
-                                <Link to={`/products/${category}`}>
+                                <button
+                                  onClick={() => handleFilter(category)}
+                                  className="w-full h-full text-center"
+                                >
                                   {category}
-                                </Link>
+                                </button>
                               </li>
                             );
                           }
