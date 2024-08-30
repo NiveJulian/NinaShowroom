@@ -4,35 +4,33 @@ import { useEffect, useState } from "react";
 import { addCashFlowEntry, getCashFlow, getSales } from "../../redux/actions/actions";
 import SheetsCashFlow from "../../componentes/Dashboard/Sheets/SheetsCashFlow";
 import AddCashFlowEntry from "../../componentes/CashManagment/AddCashFlowEntry";
+import SheetsCashDaily from "../../componentes/Dashboard/Sheets/SheetsCashDaily";
 
 const Balance = () => {
   const isAuth = useSelector((state) => state.auth.isAuth);
   const [showAddCashFlowModal, setShowAddCashFlowModal] = useState(false);
-  const [showEditCajaModal, setShowEditCajaModal] = useState(false); // Estado para el modal de caja inicial
-  const [cajaInicial, setCajaInicial] = useState(100000); // Caja inicial editable
+  const [showEditCajaModal, setShowEditCajaModal] = useState(false);
+  const [cajaInicial, setCajaInicial] = useState(100000);
+  const [activeTab, setActiveTab] = useState("diaria"); // Estado para manejar las solapas
   const dispatch = useDispatch();
 
-  // Obtener ventas y flujo de caja del estado de Redux
   const sales = useSelector((state) => state.cart.sales);
   const cashFlow = useSelector((state) => state.sheets.cashFlow);
 
-  // Efectos para cargar ventas y flujo de caja al montar el componente
   useEffect(() => {
     dispatch(getSales());
     dispatch(getCashFlow());
   }, [dispatch]);
 
-  // Manejar la adición de nuevas entradas
   const handleAddCashFlowEntry = (entry) => {
-    dispatch(addCashFlowEntry(entry)); // Guarda la nueva entrada en la store
-    setShowAddCashFlowModal(false);   // Cerrar el modal
+    dispatch(addCashFlowEntry(entry));
+    setShowAddCashFlowModal(false);
   };
 
   const toggleAddCashFlowModal = () => {
     setShowAddCashFlowModal(!showAddCashFlowModal);
   };
 
-  // Calcular ingresos, gastos y caja final
   const totalIngresos = cashFlow
     .filter(entry => entry.tipo === 'Ingreso')
     .reduce((acc, entry) => acc + entry.monto, 0);
@@ -43,9 +41,8 @@ const Balance = () => {
 
   const cajaFinal = cajaInicial + totalIngresos - totalGastos;
 
-  // Paginación
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10); // Cambiar el número según cuántos elementos mostrar por página
+  const [itemsPerPage] = useState(10);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentCashFlow = cashFlow.slice(indexOfFirstItem, indexOfLastItem);
@@ -55,10 +52,14 @@ const Balance = () => {
     setCurrentPage(pageNumber);
   };
 
-  // Función para actualizar la caja inicial
   const handleUpdateCajaInicial = (newCajaInicial) => {
-    setCajaInicial(newCajaInicial); // Actualizar caja inicial
-    setShowEditCajaModal(false); // Cerrar el modal de edición de caja inicial
+    setCajaInicial(newCajaInicial);
+    setShowEditCajaModal(false);
+  };
+
+  // Función para cambiar de solapa
+  const changeTab = (tab) => {
+    setActiveTab(tab);
   };
 
   return (
@@ -66,23 +67,64 @@ const Balance = () => {
       <div className="flex justify-between">
         <h1 className="text-xl text-gray-500">Balance</h1>
       </div>
-      <div className="mt-6 h-screen">
-        <SheetsCashFlow 
-          cashFlow={currentCashFlow} // Pasa el flujo de caja paginado al componente
-          cajaInicial={cajaInicial}
-          cajaFinal={cajaFinal}
-        />
-        <div className="flex gap-4 mt-4">
-          {/* Botón para abrir el modal de añadir entradas */}
-          <button onClick={toggleAddCashFlowModal} className="px-4 py-2 bg-primary text-white rounded-md">
-            Añadir Entrada
-          </button>
 
-          {/* Botón para editar la caja inicial */}
-          <button onClick={() => setShowEditCajaModal(true)} className="px-4 py-2 bg-primary text-white rounded-md">
-            Modificar Caja Inicial
-          </button>
-        </div>
+      {/* Solapas para cambiar entre caja diaria y caja histórica */}
+      <div className="mt-4 flex">
+        <button
+          className={`px-4 py-2 border-b-2 ${
+            activeTab === "diaria" ? "border-primary text-primary" : "border-transparent text-gray-500"
+          }`}
+          onClick={() => changeTab("diaria")}
+        >
+          Caja Diaria
+        </button>
+        <button
+          className={`px-4 py-2 border-b-2 ml-2 ${
+            activeTab === "historica" ? "border-primary text-primary" : "border-transparent text-gray-500"
+          }`}
+          onClick={() => changeTab("historica")}
+        >
+          Caja Histórica
+        </button>
+      </div>
+
+      <div className="mt-6 h-screen">
+        {activeTab === "diaria" ? (
+          <>
+            {/* Contenido para la solapa de Caja Diaria */}
+            <div>
+              <SheetsCashDaily
+                cashFlow={currentCashFlow}
+                cajaInicial={cajaInicial}
+                cajaFinal={cajaFinal}
+              />
+              <div className="flex gap-4 mt-4">
+                <button
+                  onClick={toggleAddCashFlowModal}
+                  className="px-4 py-2 bg-primary text-white rounded-md"
+                >
+                  Añadir Entrada
+                </button>
+
+                <button
+                  onClick={() => setShowEditCajaModal(true)}
+                  className="px-4 py-2 bg-primary text-white rounded-md"
+                >
+                  Modificar Caja Inicial
+                </button>
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            {/* Contenido para la solapa de Caja Histórica */}
+            <SheetsCashFlow
+              cashFlow={cashFlow} // Pasar todo el flujo de caja para mostrar histórico completo
+              cajaInicial={cajaInicial}
+              cajaFinal={cajaFinal}
+            />
+          </>
+        )}
 
         {showAddCashFlowModal && (
           <AddCashFlowEntry
@@ -119,7 +161,6 @@ const Balance = () => {
           </div>
         )}
 
-        {/* Paginación */}
         <div className="flex justify-center mt-1">
           <button
             onClick={() => handlePageChange(currentPage - 1)}

@@ -1,7 +1,6 @@
 const { MercadoPagoConfig, Preference } = require("mercadopago");
 const { authorize,appendRowPayment } = require("../sheets/sheetsController");
-const { MercadoPagoConfig, Preference } = require("mercadopago");
-const { authorize,appendRowPayment } = require("../sheets/sheetsController");
+
 
 // Configura tu clave de acceso de Mercado Pago
 const client = new MercadoPagoConfig({
@@ -39,7 +38,7 @@ const createPayment = async (req, res) => {
       pending: "http://localhost:5173/pending",
     },
     auto_return: "approved",
-    notification_url: "https://software-crime-depends-duke.trycloudflare.com/api/mp/webhook", // Cambia esto a tu URL de notificaciones
+    notification_url: "https://software-crime-depends-duke.trycloudflare.com/", // Cambia esto a tu URL de notificaciones
     statement_descriptor: "Nina Showroom",
   };
 
