@@ -7,7 +7,7 @@ import UserLogged from "../User/UserLogged";
 const Navigation = ({ isCart }) => {
   const [showCart, setShowCart] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(true);
   const [showCategories, setShowCategories] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [animationCompleted, setAnimationCompleted] = useState(false);
@@ -87,7 +87,7 @@ const Navigation = ({ isCart }) => {
   return (
     <nav
       className={`w-full ${
-        isScrolled ? "fixed top-0 z-50" : "relative"
+        isScrolled ? "fixed top-0 z-30" : "relative"
       } bg-white`}
     >
       <div className="relative z-30 bg-transparent shadow-lg">
@@ -117,11 +117,15 @@ const Navigation = ({ isCart }) => {
               </div>
               <div className="logo-container">
                 <Link to="/" className="flex-shrink-0">
-                  <div className={`flex gap-1 items-center ${animationCompleted ? 'completed' : ''}`}>
+                  <div
+                    className={`flex gap-1 items-center ${
+                      animationCompleted ? "completed" : ""
+                    }`}
+                  >
                     {["N", "I", "N", "A"].map((letter, index) => (
                       <span
                         key={index}
-                        className="logo-text text-primary"
+                        className="logo-text text-primary font-serif"
                       >
                         {letter}
                       </span>
@@ -144,7 +148,7 @@ const Navigation = ({ isCart }) => {
                   >
                     <Link
                       to="/product"
-                      className="text-sm px-3 py-2 rounded-md text-gray-800 hover:bg-tertiary hover:text-white transition duration-150 ease-in-out cursor-pointer focus:outline-none focus:text-white focus:bg-gray-700"
+                      className="text-sm px-3 py-2 rounded-md leading-5 text-gray-800 hover:bg-tertiary hover:text-white transition duration-150 ease-in-out cursor-pointer focus:outline-none focus:text-white focus:bg-gray-700"
                     >
                       Productos
                     </Link>
@@ -167,6 +171,12 @@ const Navigation = ({ isCart }) => {
                       </ul>
                     )}
                   </ul>
+                  <Link
+                    to="/howcanbuy"
+                    className="ml-4 px-3 py-2 rounded-md text-sm leading-5 text-gray-800 hover:bg-tertiary hover:text-white transition duration-150 ease-in-out cursor-pointer focus:outline-none focus:text-white focus:bg-gray-700 "
+                  >
+                    ¿Como Comprar?
+                  </Link>
                 </div>
               </div>
             </div>
@@ -238,7 +248,7 @@ const Navigation = ({ isCart }) => {
         </div>
         {isMenuOpen && (
           <div className="lg:hidden absolute bg-gray-100 w-full">
-            <div className="px-2 pt-2 pb-3">
+            <div className="px-2 pt-2 pb-3 gap-2">
               <Link
                 to="/"
                 className="mt-1 block px-3 py-2 rounded-md text-base font-medium text-gray-800 hover:bg-secondary hover:text-white focus:outline-none focus:text-white focus:bg-gray-700 transition duration-150 ease-in-out cursor-pointer"
@@ -249,19 +259,13 @@ const Navigation = ({ isCart }) => {
                 to="/product"
                 className="block px-3 py-2 rounded-md text-base font-medium text-gray-800 hover:bg-secondary hover:text-white focus:outline-none focus:text-white focus:bg-gray-700 transition duration-150 ease-in-out cursor-pointer"
               >
-                Products
+                Productos
               </Link>
               <Link
-                to="#"
-                className="mt-1 block px-3 py-2 rounded-md text-base font-medium text-gray-800 hover:bg-secondary hover:text-white focus:outline-none focus:text-white focus:bg-gray-700 transition duration-150 ease-in-out cursor-pointer"
+                to="/howcanbuy"
+                className="block px-3 py-2 rounded-md text-base font-medium text-gray-800 hover:bg-secondary hover:text-white focus:outline-none focus:text-white focus:bg-gray-700 transition duration-150 ease-in-out cursor-pointer"
               >
-                Recipe
-              </Link>
-              <Link
-                to="#"
-                className="mt-1 block px-3 py-2 rounded-md text-base font-medium text-gray-800 hover:bg-secondary hover:text-white focus:outline-none focus:text-white focus:bg-gray-700 transition duration-150 ease-in-out cursor-pointer"
-              >
-                Promo
+                ¿Como Comprar?
               </Link>
             </div>
           </div>

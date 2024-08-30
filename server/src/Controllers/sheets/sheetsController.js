@@ -43,7 +43,7 @@ async function getSheetData(auth) {
       nombre: row[2],
       color: row[3],
       talle: row[4],
-      cantidad: parseInt(row[5]),
+      stock: parseInt(row[5]),
       precio: parseInt(row[6]),
       url: row[7],
       sku: row[8],

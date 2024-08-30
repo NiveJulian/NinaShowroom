@@ -43,10 +43,10 @@ function FooterPage() {
                 <li>
                   Email:{" "}
                   <a
-                    href="mailto:contacto@neoshop.com"
+                    href="mailto:ryc.general@gmail.com"
                     className="hover:underline"
                   >
-                    contacto@neoshop.com
+                    ryc.general@gmail.com
                   </a>
                 </li>
                 <li>

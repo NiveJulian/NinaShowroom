@@ -1,7 +1,10 @@
 import { Route, Routes } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
-import { authenticateUserFromSession, getCategories } from "./redux/actions/actions";
+import {
+  authenticateUserFromSession,
+  getCategories,
+} from "./redux/actions/actions";
 import { useEffect } from "react";
 import Login from "./pages/dashboard/Login";
 import Dashboard from "./pages/dashboard/Dashboard";
@@ -19,6 +22,7 @@ import AllProducts from "./pages/ecommerce/AllProducts";
 import SuccessPayment from "./pages/ecommerce/Payment/SuccessPayment";
 import FailurePayment from "./pages/ecommerce/Payment/FailurePayment";
 import PendingPayment from "./pages/ecommerce/Payment/PendingPayment";
+import HowCanBuy from "./pages/ecommerce/HowCanBuy";
 
 function App() {
   const dispatch = useDispatch();
@@ -30,12 +34,32 @@ function App() {
   }, [dispatch]);
   return (
     <div>
-      <Toaster />
+      <Toaster
+        toastOptions={{
+          // Define default options
+          className: "",
+          duration: 1500,
+          style: {
+            background: "#363636",
+            color: "#fff",
+          },
+
+          // Default options for specific types
+          success: {
+            duration: 1000,
+            theme: {
+              primary: "green",
+              secondary: "black",
+            },
+          },
+        }}
+      />
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/" element={<Home />} />
         <Route path="/cart" element={<CartPage />} />
+        <Route path="/howcanbuy" element={<HowCanBuy />} />
         <Route path="/product" element={<AllProducts />} />
         <Route path="/product/:id" element={<ProductDetail />} />
         <Route path="/success" element={<SuccessPayment />} />
