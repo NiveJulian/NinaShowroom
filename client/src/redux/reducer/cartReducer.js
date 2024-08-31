@@ -24,16 +24,30 @@ const cartReducer = (state = initialState, action) => {
   const { type, payload } = action;
   let updatedCartItems;
   let existingProductIndex;
+  let productInCart;
+  let totalQuantity;
 
   switch (type) {
     case ADD_TO_CART:
       existingProductIndex = state.cartItems.findIndex(
         (item) => item.id === payload.id
       );
+
+      // Verificar si hay suficiente stock
+      productInCart = state.cartItems.find((item) => item.id === payload.id);
+      totalQuantity = productInCart ? productInCart.cantidad + 1 : 1;
+
+      if (totalQuantity > payload.stock) {
+        return {
+          ...state,
+          cartError: "No hay suficiente stock disponible",
+        };
+      }
+
       if (existingProductIndex >= 0) {
         updatedCartItems = state.cartItems.map((item, index) =>
           index === existingProductIndex
-            ? { ...item, cantidad: (item.cantidad || 1) + 1 }
+            ? { ...item, cantidad: item.cantidad + 1 }
             : item
         );
       } else {
@@ -43,8 +57,8 @@ const cartReducer = (state = initialState, action) => {
       return {
         ...state,
         cartItems: updatedCartItems,
+        cartError: null,
       };
-
     case REMOVE_FROM_CART:
       updatedCartItems = state.cartItems.filter((item) => item.id !== payload);
       localStorage.setItem("cartItems", JSON.stringify(updatedCartItems));
@@ -64,6 +78,7 @@ const cartReducer = (state = initialState, action) => {
         ...state,
         cartItems: updatedCartItems,
       };
+
     case DELETE_CART_ITEM_SUCCESS:
       return {
         ...state,

@@ -31,7 +31,7 @@ const Carrousel = () => {
             <span
               key={index}
               className={`letter-span ${
-                index < 4 ? "text-primary font-bold" : ""
+                index < 4 ? "text-primary font-bold font-serif" : ""
               }`}
               style={{ animationDelay: `${index * 0.005}s` }}
             >
@@ -39,7 +39,7 @@ const Carrousel = () => {
             </span>
           )
         )}
-        <p className="text-sm mt-2 md:mt-4 animate-pulse">No busques moda, <span className="text-primary italic">CREA</span> tu estilo</p>
+        <p className="text-sm mt-2 md:mt-4 animate-pulse">No busques moda, <span className="text-primary italic font-serif font-bold">CREA</span> tu estilo</p>
       </div>
     </div>
   );

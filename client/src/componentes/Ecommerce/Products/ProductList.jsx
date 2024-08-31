@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { addToCart } from "../../../redux/actions/actions";
 import ProductCard from "./ProductCard";
@@ -10,6 +10,7 @@ import ScrollToTopButton from "../Scroll/ScrollToTopButton";
 export default function ProductList({ allProducts }) {
   const [visibleProducts, setVisibleProducts] = useState(8); // Mostrar 8 productos inicialmente
   const dispatch = useDispatch();
+  const cartError = useSelector((state) => state.cart.cartError);
 
   const publishedProducts = allProducts.filter(
     (product) => product.publicado === "si"
@@ -18,9 +19,14 @@ export default function ProductList({ allProducts }) {
   const currentProducts = publishedProducts.slice(0, visibleProducts);
 
   const handleAddToCart = (product) => {
-    toast.success("Producto añadido al carrito");
     dispatch(addToCart(product));
   };
+
+  useEffect(() => {
+    if (cartError) {
+      toast.error(cartError);
+    }
+  }, [cartError]);
 
   useEffect(() => {
     setVisibleProducts(8); // Reiniciar a 8 productos visibles cuando cambien los productos
@@ -54,7 +60,8 @@ export default function ProductList({ allProducts }) {
                 name={product.nombre}
                 url={product.url}
                 price={product.precio}
-                colors={processColors(product.color)} // Procesa los colores antes de pasarlos
+                quantity={product.stock}
+                colors={processColors(product.color)} 
                 onAddToCart={() => handleAddToCart(product)}
                 isNew={false}
               />
