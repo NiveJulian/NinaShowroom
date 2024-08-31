@@ -2,8 +2,12 @@ require("dotenv").config();
 const { Router } = require("express");
 const loginRoutes = Router();
 const { verifyToken, isAdmin } = require("../Middleware/authMiddleware");
-const { authThird } = require("../Controllers/login/login");
-const { isSeller, getUserByEmail } = require("../Controllers/user/userController");
+// const { authThird } = require("../Controllers/login/login");
+const {
+  isSeller,
+  getUserByEmail,
+  createUser,
+} = require("../Controllers/user/userController");
 const { authorize } = require("../Controllers/sheets/sheetsController");
 
 loginRoutes.post("/third", async (req, res) => {
@@ -12,32 +16,39 @@ loginRoutes.post("/third", async (req, res) => {
     const decodedToken = await verifyToken(token);
     const email = decodedToken.email;
 
-    const userData = await authThird(decodedToken);
-    if (await isAdmin(email)) {
-      res.status(200).json({
-        message: "Authentication successful",
-        theUser: {
-          ...userData,
-          rol: "admin",
-        },
+    // Configura el cliente de autenticación de Google
+    const authClient = await authorize();
+
+    let userData = await getUserByEmail(authClient, email);
+
+    // Si el usuario no existe, crea uno nuevo
+    if (!userData) {
+      userData = await createUser(authClient, {
+        uid: decodedToken.uid,
+        email: decodedToken.email,
+        name: decodedToken.name,
+        role: "user", // Asigna el rol por defecto como "user"
       });
-    } else if (await isSeller(email)) {
-      res.status(200).json({
-        message: "Authentication successful",
-        theUser: {
-          ...userData,
-          rol: "vendedor",
-        },
-      });
-    } else {
-      res.status(403).json({ message: "User is not authorized", theUser: { rol: "user" } });
     }
+
+    // Asigna el rol basado en la verificación de admin o vendedor
+    if (await isAdmin(email)) {
+      userData.rol = "admin";
+    } else if (await isSeller(authClient, email)) {
+      userData.rol = "vendedor";
+    }
+
+    res.status(200).json({
+      message: "Authentication successful",
+      theUser: userData,
+    });
   } catch (error) {
     console.log({ error: error.message });
-    res.status(500).json({ message: "Authentication failed", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Authentication failed", error: error.message });
   }
 });
-
 
 loginRoutes.post("/email", async (req, res) => {
   try {
@@ -58,10 +69,10 @@ loginRoutes.post("/email", async (req, res) => {
     }
   } catch (error) {
     console.log({ error: error.message });
-    res.status(401).json({ message: "Authentication failed", error: error.message });
+    res
+      .status(401)
+      .json({ message: "Authentication failed", error: error.message });
   }
 });
-
-
 
 module.exports = loginRoutes;

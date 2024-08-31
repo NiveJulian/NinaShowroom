@@ -92,9 +92,6 @@ sheetsRouter.put("/product/:id", async (req, res) => {
   }
 });
 
-
-
-
 sheetsRouter.post("/images", (req, res) => {
   uploadToS3(req, res);
 });
@@ -133,6 +130,23 @@ sheetsRouter.post("/sale", async (req, res) => {
     res.json(sale);
   } catch (error) {
     res.status(500).send(error.message);
+  }
+});
+
+sheetsRouter.get("/sales/:uid", async (req, res) => {
+  try {
+    const { uid } = req.params;
+
+    // Configura el cliente de autenticación de Google
+    const authClient = await authorize();
+
+    const sales = await getSaleByUserId(authClient, uid);
+    res.status(200).json(sales);
+  } catch (error) {
+    res.status(500).json({
+      message: "Error obteniendo ventas por UID",
+      error: error.message,
+    });
   }
 });
 
@@ -198,7 +212,7 @@ sheetsRouter.get("/colors", async (req, res) => {
   } catch (error) {
     res.status(500).send(error.message);
   }
-})
+});
 
 sheetsRouter.get("/filter/color/:color", async (req, res) => {
   try {
@@ -209,7 +223,7 @@ sheetsRouter.get("/filter/color/:color", async (req, res) => {
   } catch (error) {
     res.status(404).send("Producto no encontrado");
   }
-})
+});
 
 // Obtener todos los movimientos de caja
 sheetsRouter.get("/cashflow", async (req, res) => {

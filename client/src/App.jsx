@@ -23,8 +23,7 @@ import SuccessPayment from "./pages/ecommerce/Payment/SuccessPayment";
 import FailurePayment from "./pages/ecommerce/Payment/FailurePayment";
 import PendingPayment from "./pages/ecommerce/Payment/PendingPayment";
 import HowCanBuy from "./pages/ecommerce/HowCanBuy";
-
-// Inicializa Mercado Pago con la clave pública
+import Purchase from "./pages/ecommerce/Purchase";
 
 
 function App() {
@@ -63,6 +62,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/howcanbuy" element={<HowCanBuy />} />
+        <Route path="/userpurchase/:id" element={<Purchase />} />
         <Route path="/product" element={<AllProducts />} />
         <Route path="/product/:id" element={<ProductDetail />} />
         <Route path="/success" element={<SuccessPayment />} />

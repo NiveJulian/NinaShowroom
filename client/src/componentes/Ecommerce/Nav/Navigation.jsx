@@ -1,15 +1,19 @@
-import { useDispatch } from 'react-redux';
+import { useDispatch } from "react-redux";
 import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import CartList from "../Cart/CartList";
 import UserLogged from "../User/UserLogged";
-import { clearFilteredProducts, filterByCategory, renderCondition } from "../../../redux/actions/actions";
+import {
+  clearFilteredProducts,
+  filterByCategory,
+  renderCondition,
+} from "../../../redux/actions/actions";
 
 const Navigation = ({ isCart }) => {
   const [showCart, setShowCart] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(true);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showCategories, setShowCategories] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [animationCompleted, setAnimationCompleted] = useState(false);
@@ -232,7 +236,7 @@ const Navigation = ({ isCart }) => {
               <div className="tooltip">
                 <button
                   onClick={handleShowLogin}
-                  className={`border hover:shadow-lg hover:border-secondary hover:text-secondary rounded-lg w-auto p-2 flex items-center`}
+                  className={`border hover:shadow-lg hover:border-secondary hover:text-secondary rounded-lg w-auto p-2 flex items-center gap-2`}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -248,6 +252,7 @@ const Navigation = ({ isCart }) => {
                       d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Z"
                     />
                   </svg>
+                  <span>Iniciar sesión  </span>
                 </button>
               </div>
               <div className="relative mt-4">
