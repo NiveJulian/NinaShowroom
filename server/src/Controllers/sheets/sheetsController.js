@@ -678,6 +678,7 @@ async function getCashFlow(auth, date = null) {
     let saldoAcumulado = rowsCashFlow.length > 0 ? parseFloat(rowsCashFlow[rowsCashFlow.length - 1][8]) : 0;
 
     const cashFlowData = [];
+    const cajaInicialData = []; // Array para almacenar las entradas del tipo "Caja Inicial"
     let cajaInicialMañana = 0;
     let cajaInicialTarde = 0;
 
@@ -693,6 +694,18 @@ async function getCashFlow(auth, date = null) {
       const cajaFinal = parseFloat(row[8]) || 0;
 
       if (tipo.toLowerCase() === "caja inicial") {
+        cajaInicialData.push({
+          id: row[0],
+          tipo: tipo,
+          monto: monto,
+          descripcion: descripcion,
+          fecha: fecha,
+          hora: hora,
+          periodo: periodo,
+          cajaInicial: cajaInicial,
+          cajaFinal: cajaFinal,
+        });
+
         if (periodo.toLowerCase() === "mañana") {
           cajaInicialMañana = monto;
         } else if (periodo.toLowerCase() === "tarde") {
@@ -752,7 +765,7 @@ async function getCashFlow(auth, date = null) {
     });
 
     // 3. Combinar flujo de caja existente con las ventas
-    const allCashFlowData = [...cashFlowData, ...ventasData];
+    const allCashFlowData = [...cashFlowData, ...ventasData, ...cajaInicialData]; // Incluir los datos de "Caja Inicial"
 
     // 4. Calcular la caja inicial del día siguiente
     const cajaInicialDiaSiguiente = cajaInicialTarde > 0 ? cajaInicialTarde : cajaInicialMañana;

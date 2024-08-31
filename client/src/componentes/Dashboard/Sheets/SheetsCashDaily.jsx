@@ -9,7 +9,9 @@ const SheetsCashDaily = ({ cashFlow }) => {
   const [showEditCajaModal, setShowEditCajaModal] = useState(false);
   const [newCajaInicial, setNewCajaInicial] = useState(0);
   const [selectedDate, setSelectedDate] = useState('');
-
+ 
+  console.log(cashFlow);
+  
   useEffect(() => {
     if (cashFlow.length > 0) {
       // Establecer la fecha seleccionada como la primera del flujo de caja si no hay ninguna seleccionada
@@ -25,24 +27,26 @@ const SheetsCashDaily = ({ cashFlow }) => {
   const turnoTarde = movimientosHoy.filter(entry => entry.hora && parseInt(entry.hora.split(':')[0]) >= 14);
 
   useEffect(() => {
-    // Recuperar la caja inicial más reciente desde la hoja de cálculo para la fecha seleccionada
-    const fetchCajaInicial = async () => {
-      const response = await fetch(`/api/cashflow?fecha=${selectedDate}`);
-      const data = await response.json();
-
-      const cajaInicialEntry = data.find(entry => entry.tipo === 'Caja Inicial');
-      if (cajaInicialEntry) {
-        setCajaInicial(cajaInicialEntry.monto);
-      }
-    };
-
-    fetchCajaInicial();
-  }, [selectedDate]);
+    // Buscar el valor más reciente de "Caja Inicial" en el arreglo cashFlow para la fecha seleccionada
+    const cajaInicialEntry = cashFlow
+      .filter(entry => entry.fecha === selectedDate && entry.tipo === 'Caja Inicial')
+      .reduce((prev, curr) => (new Date(prev.hora) > new Date(curr.hora) ? prev : curr), { monto: 0 });
+  
+    setCajaInicial(cajaInicialEntry.monto || 0);
+  }, [selectedDate, cashFlow]);
 
   useEffect(() => {
     // Calcular la caja final
-    const saldoFinal = movimientosHoy.reduce((acc, entry) =>
-      entry.tipo === 'Ingreso' ? acc + entry.monto : acc - entry.monto, parseFloat(cajaInicial));
+    const saldoFinal = movimientosHoy.reduce((acc, entry) => {
+      if (entry.tipo === 'Ingreso') {
+        return acc + entry.monto;
+      } else if (entry.tipo === 'Gasto') {
+        return acc - entry.monto;
+      } else {
+        return acc; // Ignorar otros tipos como "Caja Inicial"
+      }
+    }, parseFloat(cajaInicial));
+  
     setCajaFinal(saldoFinal);
   }, [cajaInicial, movimientosHoy]);
 
