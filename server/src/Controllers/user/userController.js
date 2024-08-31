@@ -3,7 +3,7 @@ const { google } = require("googleapis");
 
 async function createUser(authClient, data) {
   try {
-    const { uid, email, name, address, state, postalCode, role } = data;
+    const { uid, email, name, address = "", state = "", postalCode = "", role } = data;
     const sheets = google.sheets({ version: "v4", auth: authClient });
     const currentDate = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
 
@@ -20,6 +20,7 @@ async function createUser(authClient, data) {
     return response;
   } catch (error) {
     console.log({ error: error.message });
+    throw error;
   }
 }
 
@@ -77,7 +78,7 @@ async function getUser(authClient) {
       range: `Usuarios!A2:H`,
     });
 
-    const rows = response.data.values;
+    const rows = response.data.values || []; // Asegúrate de que rows no sea undefined
 
     const data = rows.map((row) => ({
       uid: row[0],
@@ -93,6 +94,7 @@ async function getUser(authClient) {
     return data;
   } catch (error) {
     console.log(error);
+    throw error;
   }
 }
 
@@ -110,40 +112,33 @@ async function isSeller(authClient, email) {
 async function getUserByEmail(authClient, email) {
   try {
     const sellers = await getSeller(authClient);
-    const user = sellers.find((seller) => seller.email === email);
+    let user = sellers.find((seller) => seller.email === email);
 
     if (!user) {
       const users = await getUser(authClient);
-      const user = users.find((user) => user.email === email);
+      user = users.find((user) => user.email === email);
 
       if (!user) {
-        throw new Error("User not found");
+        return null; // Devuelve null si el usuario no se encuentra
       }
-      return {
-        uid: user.uid,
-        email: user.email,
-        nombre: user.nombre,
-        direccion: user.direccion,
-        provincia: user.provincia,
-        cp: user.cp,
-        rol: user.rol,
-      };
-    }
-    else{
-      return {
-        uid: user.uid,
-        email: user.email,
-        nombre: user.nombre,
-        rol: user.rol,
-      };
     }
 
-    
+    return {
+      uid: user.uid,
+      email: user.email,
+      nombre: user.nombre,
+      direccion: user.direccion,
+      provincia: user.provincia,
+      cp: user.cp,
+      rol: user.rol,
+    };
   } catch (error) {
     console.log({ error: error.message });
     throw error;
   }
 }
+
+
 
 module.exports = {
   createUser,

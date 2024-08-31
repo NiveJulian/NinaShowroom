@@ -1,6 +1,6 @@
 import React from "react";
 import { doSignOut } from "../../../firebase/auth";
-
+import { Link } from "react-router-dom";
 const UserLogged = ({ user, onClose }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-50">
@@ -25,7 +25,10 @@ const UserLogged = ({ user, onClose }) => {
           <div className="flex flex-wrap justify-center">
             <div className="w-full text-center mt-20">
               <div className="flex justify-center lg:pt-4 pt-8 pb-0 items-center gap-4">
-                <div className="p-2 text-center flex flex-col gap-2 justify-center items-center hover:animate-pulse">
+                <Link
+                  to={`/userpurchase/${user.uid}`}
+                  className="p-2 w-full rounded-md shadow-md text-center flex flex-col gap-2 justify-center items-center hover:animate-pulse"
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -41,8 +44,8 @@ const UserLogged = ({ user, onClose }) => {
                     />
                   </svg>
                   <span className="text-sm text-slate-400">Compras</span>
-                </div>
-                <div className="p-2 text-center flex flex-col gap-2 justify-center items-center hover:animate-pulse">
+                </Link>
+                <Link className="p-2 w-full rounded-md shadow-md text-center flex flex-col gap-2 justify-center items-center hover:animate-pulse">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -58,8 +61,8 @@ const UserLogged = ({ user, onClose }) => {
                     />
                   </svg>
                   <span className="text-sm text-slate-400">Perfil</span>
-                </div>
-                <div className="p-2 text-center flex flex-col gap-2 justify-center items-center hover:animate-pulse">
+                </Link>
+                <Link className="p-2 w-full rounded-md shadow-md text-center flex flex-col gap-2 justify-center items-center hover:animate-pulse">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -76,7 +79,7 @@ const UserLogged = ({ user, onClose }) => {
                   </svg>
 
                   <span className="text-sm text-slate-400">Ayuda</span>
-                </div>
+                </Link>
               </div>
             </div>
           </div>

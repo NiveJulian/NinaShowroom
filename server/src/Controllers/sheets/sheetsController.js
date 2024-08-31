@@ -1,5 +1,6 @@
 require("dotenv").config();
 const { google } = require("googleapis");
+const { getUserByEmail } = require("../user/userController");
 // const path = require("path");
 
 async function authorize() {
@@ -208,12 +209,23 @@ async function registerSale(auth, data) {
 
     const newId = lastId + 1;
 
-    const currentDate = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+    const currentDate = new Date().toLocaleDateString("es-AR").slice(0, 10);
+
+    const currentTime = new Date().toLocaleTimeString("es-AR", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+
+    const user = await getUserByEmail(auth, correo);
+
+    // Determinar el valor de cliente
+    const cliente = user ? user.uid : nombreCliente;
 
     const ventaData = productos.map((prod) => [
       newId,
       prod.id,
-      nombreCliente,
+      cliente, // Usa el valor determinado de cliente
       prod.sku,
       prod.cantidad,
       prod.talle,
@@ -222,6 +234,7 @@ async function registerSale(auth, data) {
       formaPago,
       prod.cantidad * prod.precio,
       currentDate,
+      currentTime,
       tipoEnvio || "",
       correo || "",
       direccion || "",
@@ -230,8 +243,6 @@ async function registerSale(auth, data) {
       celular || "",
       medio,
     ]);
-    
-    
 
     // Append the data to the spreadsheet
     const res = await sheets.spreadsheets.values.append({
@@ -263,7 +274,7 @@ async function getSaleDataUnitiInfo(auth, id) {
     const sheets = google.sheets({ version: "v4", auth });
     const res = await sheets.spreadsheets.values.get({
       spreadsheetId: process.env.GOOGLE_SHEETS_ID,
-      range: "Ventas!A2:K",
+      range: "Ventas!A2:T",
     });
     const rows = res.data.values || [];
 
@@ -296,7 +307,7 @@ async function getSaleData(auth) {
     const sheets = google.sheets({ version: "v4", auth });
     const res = await sheets.spreadsheets.values.get({
       spreadsheetId: process.env.GOOGLE_SHEETS_ID,
-      range: "Ventas!A2:K",
+      range: "Ventas!A2:T",
     });
     const rows = res.data.values || [];
     let lastId = 0;
@@ -342,7 +353,7 @@ async function getSalesByDate(auth, date) {
     const sheets = google.sheets({ version: "v4", auth });
     const res = await sheets.spreadsheets.values.get({
       spreadsheetId: process.env.GOOGLE_SHEETS_ID,
-      range: "Ventas!A2:K", // Ajusta el rango según tu hoja de ventas
+      range: "Ventas!A2:T", // Ajusta el rango según tu hoja de ventas
     });
 
     const rows = res.data.values || [];
@@ -358,6 +369,27 @@ async function getSalesByDate(auth, date) {
     throw new Error("Error obteniendo ventas por fecha");
   }
 }
+
+async function getSaleByUserId(auth, uid) {
+  try {
+    const sheets = google.sheets({ version: "v4", auth });
+    const res = await sheets.spreadsheets.values.get({
+      spreadsheetId: process.env.GOOGLE_SHEETS_ID,
+      range: "Ventas!A2:Q", // Ajusta el rango según tu hoja de ventas
+    });
+
+    const rows = res.data.values || [];
+
+    // Filtrar las ventas que coinciden con el uid en la columna "cliente"
+    const salesForUser = rows.filter((row) => row[2] === uid);
+
+    return salesForUser;
+  } catch (error) {
+    console.error("Error obteniendo ventas por UID:", error);
+    throw new Error("Error obteniendo ventas por UID");
+  }
+}
+
 
 async function increaseStock(auth, productId, amount) {
   const sheets = google.sheets({ version: "v4", auth });
@@ -414,15 +446,17 @@ async function getProductsByCategory(auth, category) {
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "");
 
-    // Filtra los productos basándose en la categoría normalizada
-    const filteredProducts = products.filter(
-      (product) =>
+    // Filtra los productos basándose en la categoría normalizada y en el estado de publicación
+    const filteredProducts = products.filter((product) => {
+      return (
+        product.publicado === "si" &&
         product.categoria
           .trim()
           .toLowerCase()
           .normalize("NFD")
           .replace(/[\u0300-\u036f]/g, "") === trimmedCategory
-    );
+      );
+    });
 
     // Si no se encuentran productos, lanzar un error personalizado
     if (filteredProducts.length === 0) {
@@ -440,13 +474,16 @@ async function getAllCategories(auth) {
   try {
     const { products } = await getSheetData(auth);
 
-    const normalizedCategories = products.map((product) =>
-      product.categoria
-        .trim()
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-    );
+    // Filtra las categorías de los productos que están en publicado = "si"
+    const normalizedCategories = products
+      .filter((product) => product.publicado === "si")
+      .map((product) =>
+        product.categoria
+          .trim()
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+      );
 
     const categories = [...new Set(normalizedCategories)];
 
@@ -838,4 +875,5 @@ module.exports = {
   getProductsByColor,
   activeProductById,
   appendRowPayment,
+  getSaleByUserId,
 };
