@@ -136,7 +136,7 @@ const Navigation = ({ isCart }) => {
                     {["N", "I", "N", "A"].map((letter, index) => (
                       <span
                         key={index}
-                        className="logo-text text-primary"
+                        className="logo-text text-primary font-serif"
                       >
                         {letter}
                       </span>
