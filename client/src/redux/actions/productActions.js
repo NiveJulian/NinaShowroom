@@ -17,6 +17,8 @@ export const FILTER_CATEGORY = "FILTER_CATEGOTY";
 export const CLEAR_FILTER = "CLEAR_FILTER";
 export const GET_COLORS = "GET_COLORS";
 export const FILTER_COLOR = "FILTER_COLOR";
+export const SEARCH_PRODUCT= "SEARCH_PRODUCT";
+export const CLEAN_SEARCH_PRODUCT= "CLEAN_SEARCH_PRODUCT"
 
 export const GET_CASH_FLOW = "GET_CASH_FLOW";
 export const ADD_CASH_FLOW_ENTRY = "ADD_CASH_FLOW_ENTRY";
@@ -224,6 +226,24 @@ export const uploadImages = (formData) => async (dispatch) => {
       console.error("Error fetching products by color:", error);
     }
   };
+
+  export const searchProduct = (imput) => async (dispatch) =>{
+    try {
+      dispatch({ type: SEARCH_PRODUCT, payload: imput });
+    }
+    catch (error) {
+      console.error("Error searching product:", error);
+      toast.error("Error buscando el producto");
+    }
+  }
+
+  export const cleanSearchProducts = () => async (dispatch) => {
+    try {
+      dispatch({ type: CLEAN_SEARCH_PRODUCT });
+    } catch (error) {
+      console.error("Error cleaning search products:", error);
+    }
+  }
 
   // FLUJO DE CAJA
 // Obtener todos los movimientos de caja

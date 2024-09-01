@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import FilterCategories from "../Filters/FilterCategories";
 import FilterColor from "../Filters/FilterColor";
+import SearchBar from "../Searchbar/SearchBar";
 
 const Layout = ({ children, items }) => {
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
@@ -40,8 +41,10 @@ const Layout = ({ children, items }) => {
               isSidebarOpen ? "block" : "hidden lg:block"
             }`}
           >
+            
             {/* Categorías */}
-            <div className="mt-8">
+            <div className="mt-9">
+            <SearchBar/>
               <div
                 onClick={() => setIsCategoriesOpen(!isCategoriesOpen)}
                 className="flex flex-row justify-between cursor-pointer items-center gap-2"

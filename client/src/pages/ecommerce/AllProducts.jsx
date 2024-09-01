@@ -15,6 +15,10 @@ const AllProducts = () => {
   const filterProducts = useSelector((state) => state.sheets.filterProducts);
   const condition = useSelector((state) => state.sheets.rCondition);
   const filterColors = useSelector((state) => state.sheets.filterColors);
+  const searchedProducts = useSelector((state) => state.sheets.searchedProducts);
+
+  console.log(products);
+  
 
   useEffect(() => {
     dispatch(fetchSheets());
@@ -30,6 +34,8 @@ const AllProducts = () => {
         return <ProductList allProducts={filterProducts} />;
       case "filteredColor":
         return <ProductList allProducts={filterColors} />;
+      case "searchedProducts":
+        return <ProductList allProducts={searchedProducts} />;  
       default:
         return <ProductList allProducts={products} />;
     }

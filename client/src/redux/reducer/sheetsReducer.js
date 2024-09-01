@@ -16,6 +16,8 @@ import {
   FETCH_PRODUCT_SHEET_BY_ID,
   GET_COLORS,
   FILTER_COLOR,
+  SEARCH_PRODUCT,
+  CLEAN_SEARCH_PRODUCT
 } from "../actions/productActions";
 
 const initialState = {
@@ -30,6 +32,7 @@ const initialState = {
   cashFlow: [],
   colors: [],
   filterColors: [],
+  searchedProducts: [],
 };
 
 const sheetsReducer = (state = initialState, action) => {
@@ -109,6 +112,22 @@ const sheetsReducer = (state = initialState, action) => {
         ...state,
         filterColors: action.payload,
       };
+    case SEARCH_PRODUCT:
+        const searchTerm = action.payload.toLowerCase();
+        const searchedProducts = state.sheetsData.filter(item =>
+          item.nombre.toLowerCase().includes(searchTerm) ||
+          item.categoria.toLowerCase().includes(searchTerm)
+        );
+        return {
+          ...state,
+          searchedProducts
+        };
+     
+    case CLEAN_SEARCH_PRODUCT:
+      return {
+        ...state,
+        searchedProducts: []
+      }    
 
     case GET_CASH_FLOW:
       return {
