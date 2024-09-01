@@ -67,17 +67,17 @@ const ProductDetail = () => {
           <Navigation isCart={false} />
           <WhatsAppBubble />
 
-          <div className="w-full flex justify-center items-center">
-            <div className="detail-cont flex flex-col lg:flex-row p-4 border border-gray-300 rounded-md my-2">
-              <div className="p-2 flex justify-center items-center flex-col-reverse lg:flex-row rounded-lg">
-                <div className="flex-col gap-2 mr-1">
+          <div className="w-full">
+            <div className="detail-cont flex flex-col justify-center items-center lg:flex-row p-4 my-2">
+              <div className="p-2 flex justify-center items-center flex-col-reverse rounded-lg">
+                <div className="flex-col gap-2 border mt-2 border-gray-400 rounded-lg shadow-md w-full p-2">
                   {imgUrl?.length > 1 ? (
                     imgUrl?.map((image, index) => (
                       <img
                         key={index}
                         src={image}
                         alt={`Thumbnail ${index + 1}`}
-                        className={`thumbnail border border-gray-300 w-36 h-36 ${
+                        className={`thumbnail rounded-md object-cover border border-gray-500 p-1 flex justify-center items-center w-24 h-24 ${
                           currentImageIndex === index ? "selected" : ""
                         } `}
                         onClick={() => handleThumbnailClick(index)}
@@ -85,13 +85,13 @@ const ProductDetail = () => {
                     ))
                   ) : (
                     <img
-                      className="w-16 h-16 mt-4 rounded-md object-cover border border-gray-300"
+                      className="w-16 h-16 rounded-md object-cover border border-gray-500 p-1 flex justify-center items-center"
                       src={imgUrl ? imgUrl : "neoshoplogo.jpeg"}
                       alt={`Product Image ${currentImageIndex + 1}`}
                     />
                   )}
                 </div>
-                <div className="image-container">
+                <div className="image-container border border-gray-400 rounded-lg p-2 shadow-md">
                   {imgUrl?.length > 1 && (
                     <button onClick={handlePrevImage}>
                       <svg
@@ -137,7 +137,7 @@ const ProductDetail = () => {
                 </div>
               </div>
 
-              <div className="info-container">
+              <div className="info-container md:h-screen border border-gray-400 w-full">
                 <div>
                   <p className="product-date">
                     SKU: {product ? product.sku : null}
