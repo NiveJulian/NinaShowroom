@@ -80,9 +80,7 @@ const Login = () => {
             </div>
           </button>
         </div>
-        <div
-          className="flex w-full mt-2  justify-center items-center gap-2"
-        >
+        <div className="flex w-full mt-2  justify-center items-center gap-2">
           <span className="border border-gray-400 w-full"></span>
 
           <Link
