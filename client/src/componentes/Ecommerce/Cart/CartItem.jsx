@@ -17,7 +17,7 @@ function CartItem({ product }) {
   // Función para manejar cambios en la cantidad del carrito
   const handleChangeQuantity = (event) => {
     const newCartQuantity = parseInt(event.target.value, 10);
-    
+
     // Limitar la cantidad al stock disponible
     if (newCartQuantity > 0 && newCartQuantity <= product.stock) {
       setCartQuantity(newCartQuantity);
@@ -34,8 +34,7 @@ function CartItem({ product }) {
   };
 
   // Calcular el subtotal del producto
-  const subtotal = (parseFloat(product?.precio) * cartQuantity).toFixed(2);
-
+  const subtotal = product?.precio * cartQuantity;
   const imgUrl = product?.url?.split(",")[0];
   return (
     <div className="flex items-center gap-2 border rounded-lg px-2 py-2">

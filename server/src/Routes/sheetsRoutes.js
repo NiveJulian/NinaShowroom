@@ -20,6 +20,7 @@ const {
   getAllColors,
   getProductsByColor,
   activeProductById,
+  getSaleByUserId,
 } = require("../Controllers/sheets/sheetsController.js");
 const uploadToS3 = require("../Controllers/sheets/uploadImages.js");
 
@@ -125,10 +126,13 @@ sheetsRouter.get("/sale", async (req, res) => {
 
 sheetsRouter.post("/sale", async (req, res) => {
   try {
+    const data = req.body;
+    // console.log(data)
     const auth = await authorize();
-    const sale = await registerSale(auth, req.body);
+    const sale = await registerSale(auth, data);
     res.json(sale);
   } catch (error) {
+    // console.log({ error: error.message });
     res.status(500).send(error.message);
   }
 });
@@ -137,10 +141,10 @@ sheetsRouter.get("/sales/:uid", async (req, res) => {
   try {
     const { uid } = req.params;
 
-    // Configura el cliente de autenticación de Google
     const authClient = await authorize();
 
     const sales = await getSaleByUserId(authClient, uid);
+    // console.log(sales)
     res.status(200).json(sales);
   } catch (error) {
     res.status(500).json({

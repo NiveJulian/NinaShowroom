@@ -2,7 +2,7 @@ import { useDispatch } from "react-redux";
 import { doSignInWithGoogle } from "../../firebase/auth";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { FormLogin } from "../../componentes/Dashboard/Users/FormLogin";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -79,6 +79,33 @@ const Login = () => {
               </span>
             </div>
           </button>
+        </div>
+        <div
+          className="flex w-full mt-2  justify-center items-center gap-2"
+        >
+          <span className="border border-gray-400 w-full"></span>
+
+          <Link
+            to={"/"}
+            className="text-sm border border-gray-200 hover:border-pink-400 hover:animate-pulse p-2 rounded-md text-gray-500 flex justify-center items-center gap-2 w-full text-nowrap"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth="1.5"
+              stroke="currentColor"
+              className="size-4"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="m19.5 19.5-15-15m0 0v11.25m0-11.25h11.25"
+              />
+            </svg>
+            Ir a la pagina principal
+          </Link>
+          <span className="border border-gray-400 w-full"></span>
         </div>
       </div>
     </div>

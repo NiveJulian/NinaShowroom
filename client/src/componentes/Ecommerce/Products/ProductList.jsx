@@ -15,10 +15,12 @@ export default function ProductList({ allProducts }) {
   const publishedProducts = allProducts.filter(
     (product) => product.publicado === "si"
   );
+
   // Productos a mostrar basado en el número de productos visibles
   const currentProducts = publishedProducts.slice(0, visibleProducts);
 
   const handleAddToCart = (product) => {
+    console.log(product);
     dispatch(addToCart(product));
   };
 
@@ -53,19 +55,22 @@ export default function ProductList({ allProducts }) {
           </div>
         ) : (
           <div className="max-w-screen grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2">
-            {currentProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                id={product.id}
-                name={product.nombre}
-                url={product.url}
-                price={product.precio}
-                quantity={product.stock}
-                colors={processColors(product.color)} 
-                onAddToCart={() => handleAddToCart(product)}
-                isNew={false}
-              />
-            ))}
+            {currentProducts.map((product) => {
+              return (
+                <ProductCard
+                  key={product.id}
+                  id={product.id}
+                  name={product.nombre}
+                  url={product.url}
+                  sku={product.sku}
+                  price={product.precio}
+                  quantity={product.stock}
+                  colors={processColors(product.color)}
+                  onAddToCart={handleAddToCart} // Pasar directamente handleAddToCart
+                  isNew={false}
+                />
+              );
+            })}
           </div>
         )}
         <InfiniteScroll

@@ -39,6 +39,7 @@ export const DECREMENT_QUANTITY = "DECREMENT_QUANTITY";
 
 export const GET_SALES = "GET_SALES";
 export const GET_SALE_BY_ID = "GET_SALE_BY_ID";
+export const GET_SALE_BY_USER_ID = "GET_SALE_BY_USER_ID";
 export const CREATED_SALE = "CREATED_SALE";
 export const DELETE_SALE_ROW = "DELETE_SALE_ROW";
 
@@ -55,7 +56,6 @@ export const CREATED_USER = "CREATED_USER";
 export const authenticationUser = (email) => async (dispatch) => {
   try {
     const response = await intance.post(`/api/user/auth/${email}`);
-    console.log(response);
     if (response.status === 200) {
       dispatch({
         type: AUTH_SELLER,
@@ -73,7 +73,6 @@ export const createUser = (data) => async (dispatch) => {
   console.log(data);
   try {
     const response = await intance.post(`/api/user/create`, data);
-    console.log(response);
     if (response.ok) {
       dispatch({
         type: CREATED_USER,
@@ -153,22 +152,21 @@ export const updateCart = (updatedCart) => ({
   payload: updatedCart,
 });
 
-
-export const fetchPaymentDetails = (id) => async() =>{
+export const fetchPaymentDetails = (id) => async () => {
   try {
-    const res = await intance.get(`/api/mp/payment-status/${id}`)
-    console.log(res)
+    const res = await intance.get(`/api/mp/payment-status/${id}`);
+    console.log(res);
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-}
+};
 //VENTAS
 export const createPayment = (venta) => async () => {
   try {
     const response = await intance.post("/api/mp/create-payment", venta);
-    
-    toast.loading("Redirigiendo a Mercado Pago")
-    if (response.status === 200 ) {
+
+    toast.loading("Redirigiendo a Mercado Pago");
+    if (response.status === 200) {
       // Aquí es donde rediriges al usuario a MercadoPago
       window.location.href = response.data.redirectUrl;
     } else {
@@ -181,15 +179,28 @@ export const createPayment = (venta) => async () => {
   }
 };
 
-
 export const getSaleInfo = (id) => async (dispatch) => {
   try {
     const res = await intance.get(`/api/sheets/sale/${id}`);
-    console.log(res);
     dispatch({
       type: GET_SALE_BY_ID,
       payload: res.data,
     });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getSaleByUserID = (uid) => async (dispatch) => {
+  try {
+    const res = await intance.get(`/api/sheets/sales/${uid}`);
+    if (res.status === 200) {
+      dispatch({
+        type: GET_SALE_BY_USER_ID,
+        payload: res.data,
+      });
+      
+    }
   } catch (error) {
     console.log(error);
   }
@@ -215,7 +226,6 @@ export const createSale = (data) => async (dispatch) => {
       type: CREATED_SALE,
       payload: res,
     });
-    dispatch(cleanCart());
   } catch (error) {
     console.log({ error: error.message });
   }
@@ -512,4 +522,3 @@ export const deleteSaleRow = (rowIndex) => async (dispatch) => {
     console.log(error);
   }
 };
-

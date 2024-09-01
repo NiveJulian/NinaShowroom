@@ -10,12 +10,14 @@ import {
   GET_SALE_BY_ID,
   DECREMENT_QUANTITY,
   INCREMENT_QUANTITY,
+  GET_SALE_BY_USER_ID,
 } from "../actions/actions";
 
 const initialState = {
   cartItems: JSON.parse(localStorage.getItem("cartItems")) || [],
   sales: [],
   saleInfo: [],
+  sale: {},
   cartSent: false,
   cartError: null,
 };
@@ -111,6 +113,12 @@ const cartReducer = (state = initialState, action) => {
       };
 
     case GET_SALE_BY_ID:
+      return {
+        ...state,
+        saleInfo: payload,
+      };
+
+    case GET_SALE_BY_USER_ID:
       return {
         ...state,
         saleInfo: payload,

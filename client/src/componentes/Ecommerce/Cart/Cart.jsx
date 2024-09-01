@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -27,10 +27,10 @@ const Cart = ({ product, calcularTotal, usuario }) => {
   const [step, setStep] = useState(1);
   const [selectedColors, setSelectedColors] = useState({});
   const [mpId, setMpId] = useState(null);
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [formaPago, setFormaPago] = useState("");
+
   const [formCliente, setFormCliente] = useState({
     nombre: usuario.name || "",
     correo: usuario.email || "",
@@ -39,6 +39,17 @@ const Cart = ({ product, calcularTotal, usuario }) => {
     cp: usuario.cp || "",
     celular: "",
   });
+
+  useEffect(() => {
+    const initialColors = {};
+    product.forEach((prod) => {
+      if (prod.color) {
+        initialColors[prod.id] = prod.color; // Asigna el color preseleccionado si existe
+      }
+    });
+    setSelectedColors(initialColors);
+  }, [product]);
+  
 
   const handleColorSelection = (productId, color) => {
     setSelectedColors((prevState) => ({
@@ -108,7 +119,7 @@ const Cart = ({ product, calcularTotal, usuario }) => {
       })),
       total: calcularTotal(),
       formaPago,
-      cliente: formCliente.nombre,
+      cliente: formCliente,
       tipoEnvio: selectedDeliveryMethod,
       correo: formCliente.correo,
       direccion: formCliente.direccion,
@@ -154,7 +165,6 @@ const Cart = ({ product, calcularTotal, usuario }) => {
       dispatch(decrementQuantity(productId));
     }
   };
-  
 
   return (
     <div className="bg-pink-200 border border-gray-300 shadow-lg">
@@ -232,6 +242,7 @@ const Cart = ({ product, calcularTotal, usuario }) => {
               product?.map((prod, i) => {
                 const imgUrl = prod?.url?.split(",")[0];
                 const colorsArray = processColors(prod?.color);
+                console.log(colorsArray)
 
                 return (
                   <div

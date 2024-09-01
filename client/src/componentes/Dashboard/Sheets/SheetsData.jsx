@@ -31,9 +31,9 @@ const SheetsData = ({
                 const imgUrl = row?.url?.split(", ");
 
                 const rowClass =
-                  row.cantidad === 0 ? "bg-red-500 text-white" : "";
+                  row.stock === 0 ? "bg-red-500 text-white" : "";
                 const rowClassWarning =
-                  row.cantidad > 0 && row.cantidad < 2
+                  row.stock > 0 && row.stock < 2
                     ? "bg-yellow-100 text-gray-800"
                     : "";
 

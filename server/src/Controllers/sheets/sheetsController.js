@@ -79,7 +79,7 @@ async function getSheetDataById(id, auth) {
       publicado: row[9],
     }));
 
-    const product = products.find((product) => product.id === id);
+    const product = products.find((product) => product.id === id.toString());
 
     if (!product) {
       throw new Error("Producto no encontrado");
@@ -179,25 +179,14 @@ async function updateRow(auth, rowData) {
 
 async function registerSale(auth, data) {
   try {
-    const {
-      productos,
-      nombreCliente,
-      formaPago,
-      tipoEnvio,
-      correo,
-      direccion,
-      provincia,
-      cp,
-      celular,
-      medio,
-    } = data;
-
     const sheets = google.sheets({ version: "v4", auth });
+
+    const {productos, formaPago, tipoEnvio, provincia, direccion, celular, medio, cp, correo} = data
 
     // Obtener la última fila para determinar el ID más reciente
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: process.env.GOOGLE_SHEETS_ID,
-      range: "Ventas!A:A", // Ajusta esto si tu ID no está en la columna A
+      range: "Ventas!A:A",
     });
 
     const rows = response.data.values;
@@ -208,9 +197,7 @@ async function registerSale(auth, data) {
     }
 
     const newId = lastId + 1;
-
     const currentDate = new Date().toLocaleDateString("es-AR").slice(0, 10);
-
     const currentTime = new Date().toLocaleTimeString("es-AR", {
       hour: "2-digit",
       minute: "2-digit",
@@ -218,20 +205,20 @@ async function registerSale(auth, data) {
     });
 
     const user = await getUserByEmail(auth, correo);
-
-    // Determinar el valor de cliente
     const cliente = user ? user.uid : nombreCliente;
+    const statePayment = "Pendiente";
 
     const ventaData = productos.map((prod) => [
       newId,
       prod.id,
-      cliente, // Usa el valor determinado de cliente
+      cliente,
       prod.sku,
       prod.cantidad,
       prod.talle,
       prod.color,
       prod.precio,
       formaPago,
+      statePayment,
       prod.cantidad * prod.precio,
       currentDate,
       currentTime,
@@ -244,17 +231,15 @@ async function registerSale(auth, data) {
       medio,
     ]);
 
-    // Append the data to the spreadsheet
     const res = await sheets.spreadsheets.values.append({
       spreadsheetId: process.env.GOOGLE_SHEETS_ID,
-      range: "Ventas!A2:Q",
+      range: "Ventas!A2:T",
       valueInputOption: "RAW",
       resource: {
         values: ventaData,
       },
     });
 
-    // Actualizar stock
     for (const prod of productos) {
       const amount = parseInt(prod.cantidad);
       if (amount > 0) {
@@ -265,7 +250,7 @@ async function registerSale(auth, data) {
     return { message: "Venta registrada exitosamente", data: res.data };
   } catch (error) {
     console.error("Error registrando la venta:", error);
-    throw new Error("Error registrando la venta");
+    throw new Error(`Error registrando la venta: ${error.message}`);
   }
 }
 
@@ -375,7 +360,7 @@ async function getSaleByUserId(auth, uid) {
     const sheets = google.sheets({ version: "v4", auth });
     const res = await sheets.spreadsheets.values.get({
       spreadsheetId: process.env.GOOGLE_SHEETS_ID,
-      range: "Ventas!A2:Q", // Ajusta el rango según tu hoja de ventas
+      range: "Ventas!A2:T", // Ajusta el rango según tu hoja de ventas
     });
 
     const rows = res.data.values || [];
@@ -383,13 +368,39 @@ async function getSaleByUserId(auth, uid) {
     // Filtrar las ventas que coinciden con el uid en la columna "cliente"
     const salesForUser = rows.filter((row) => row[2] === uid);
 
-    return salesForUser;
+    // Obtener la información del producto para cada venta
+    const salesData = await Promise.all(
+      salesForUser.map(async (row) => {
+        const product = await getSheetDataById(Number(row[1]), auth); // Convertir productId a número
+        return {
+          id: row[0],
+          productId: row[1],
+          clientId: row[2],
+          sku: row[3],
+          quantity: row[4],
+          size: row[5],
+          color: row[6],
+          price: row[7],
+          paymentMethod: row[8],
+          status: row[9],
+          totalPrice: row[10],
+          date: row[11],
+          time: row[12],
+          shippingType: row[13],
+          email: row[14],
+          address: row[15],
+          province: row[16],
+          product, // Añadir la información del producto
+        };
+      })
+    );
+
+    return salesData;
   } catch (error) {
     console.error("Error obteniendo ventas por UID:", error);
     throw new Error("Error obteniendo ventas por UID");
   }
 }
-
 
 async function increaseStock(auth, productId, amount) {
   const sheets = google.sheets({ version: "v4", auth });
@@ -421,19 +432,23 @@ async function decreaseStock(auth, productId, amount) {
     throw new Error("ID no encontrado");
   }
   // Convertir cantidad a número y restarle la cantidad a disminuir
-  const currentAmount = parseInt(products[rowIndex].cantidad) || 0;
-  products[rowIndex].cantidad = currentAmount - amount;
+  const currentAmount = parseInt(products[rowIndex].stock) || 0;
+  products[rowIndex].stock = currentAmount - amount;
+
+  // Asegúrate de que solo se escriban las columnas A:J
+  const updatedRow = Object.values(products[rowIndex]).slice(0, 10);
 
   const res = await sheets.spreadsheets.values.update({
     spreadsheetId: process.env.GOOGLE_SHEETS_ID,
     range: `Productos!A${rowIndex + 2}:J${rowIndex + 2}`,
     valueInputOption: "RAW",
     resource: {
-      values: [Object.values(products[rowIndex])],
+      values: [updatedRow],
     },
   });
   return res.data;
 }
+
 
 async function getProductsByCategory(auth, category) {
   try {
