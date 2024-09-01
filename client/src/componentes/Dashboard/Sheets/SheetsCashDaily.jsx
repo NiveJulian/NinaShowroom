@@ -24,8 +24,13 @@ const SheetsCashDaily = ({ cashFlow }) => {
 
   const movimientosHoy = cashFlow.filter(entry => entry.fecha === selectedDate);
 
-  const turnoMañana = movimientosHoy.filter(entry => entry.hora && parseInt(entry.hora.split(':')[0]) < 14);
-  const turnoTarde = movimientosHoy.filter(entry => entry.hora && parseInt(entry.hora.split(':')[0]) >= 14);
+  const turnoMañana = movimientosHoy
+  .filter(entry => entry.hora && parseInt(entry.hora.split(':')[0]) < 14)
+  .sort((a, b) => new Date(`1970-01-01T${b.hora}:00Z`) - new Date(`1970-01-01T${a.hora}:00Z`));
+
+const turnoTarde = movimientosHoy
+  .filter(entry => entry.hora && parseInt(entry.hora.split(':')[0]) >= 14)
+  .sort((a, b) => new Date(`1970-01-01T${b.hora}:00Z`) - new Date(`1970-01-01T${a.hora}:00Z`));
 
   useEffect(() => {
     // Buscar el valor más reciente de "Caja Inicial" en el arreglo cashFlow para la fecha seleccionada
