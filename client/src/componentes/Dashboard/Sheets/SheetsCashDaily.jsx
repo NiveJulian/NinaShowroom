@@ -10,16 +10,17 @@ const SheetsCashDaily = ({ cashFlow }) => {
   const [newCajaInicial, setNewCajaInicial] = useState(0);
   const [selectedDate, setSelectedDate] = useState('');
  
-  console.log(cashFlow);
+  
   
   useEffect(() => {
-    if (cashFlow.length > 0) {
-      // Establecer la fecha seleccionada como la primera del flujo de caja si no hay ninguna seleccionada
-      if (!selectedDate) {
-        setSelectedDate(cashFlow[0].fecha);
-      }
-    }
-  }, [cashFlow]);
+    // if (cashFlow.length > 0) {
+    //   // Establecer la fecha seleccionada como la primera del flujo de caja si no hay ninguna seleccionada
+    //   if (!selectedDate) {
+    //     setSelectedDate(cashFlow[0].fecha);
+    //   }
+    // }
+    setSelectedDate(new Date().toLocaleDateString("es-AR").slice(0, 10))
+  }, []);
 
   const movimientosHoy = cashFlow.filter(entry => entry.fecha === selectedDate);
 
@@ -64,7 +65,22 @@ const SheetsCashDaily = ({ cashFlow }) => {
     setShowEditCajaModal(false);
   };
 
-  const uniqueDates = [...new Set(cashFlow.map(entry => entry.fecha))];
+  // const uniqueDates = [...new Set(cashFlow.map(entry => entry.fecha))];
+
+  const formatDateToArgentinian = (dateString) => {
+    const [year, month, day] = dateString.split('-');
+    
+    // Quitar el '0' delante del mes si existe
+    const formattedDay = day.startsWith('0') ? day.substring(1) : day;
+    const formattedMonth = month.startsWith('0') ? month.substring(1) : month;
+
+    return `${formattedDay}/${formattedMonth}/${year}`;
+  };
+
+  const handleDateChange = (e) => {
+    const finalDate = formatDateToArgentinian(e.target.value);
+    setSelectedDate(finalDate);
+  };
 
   return (
     <div className="p-4">
@@ -79,19 +95,14 @@ const SheetsCashDaily = ({ cashFlow }) => {
 
       {/* Selector de Fecha */}
       <div className="mb-4">
-        <label className="font-semibold">Seleccionar Fecha:</label>
-        <select
-          className="ml-2 border border-gray-300 p-2 rounded"
-          value={selectedDate}
-          onChange={(e) => setSelectedDate(e.target.value)}
-        >
-          {uniqueDates.map((date, index) => (
-            <option key={index} value={date}>
-              {date}
-            </option>
-          ))}
-        </select>
-      </div>
+  <label className="font-semibold">Seleccionar Fecha:</label>
+  <input
+    type="date"
+    className="ml-1 border border-gray-300 p-1 rounded"
+    value={selectedDate}
+    onChange={handleDateChange}
+  />
+</div>
 
       {/* Turno Mañana */}
       <div className="mb-4">
@@ -182,7 +193,7 @@ const SheetsCashDaily = ({ cashFlow }) => {
       )}
 
       {/* Botón para abrir el modal */}
-      <button onClick={() => setShowEditCajaModal(true)} className="bg-gray-800 text-white p-2 rounded mt-4">
+      <button onClick={() => setShowEditCajaModal(true)} className="bg-gray-800 text-white p-2 rounded mt-1">
         Editar Caja Inicial
       </button>
     </div>

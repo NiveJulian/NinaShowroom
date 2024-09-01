@@ -146,7 +146,6 @@ const Navigation = ({ isCart }) => {
                       <span
                         key={index}
                         className="logo-text text-primary font-serif"
-                        className="logo-text text-primary font-serif"
                       >
                         {letter}
                       </span>

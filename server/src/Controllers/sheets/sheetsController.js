@@ -246,7 +246,7 @@ async function registerSale(auth, data) {
     // Append the data to the spreadsheet
     const res = await sheets.spreadsheets.values.append({
       spreadsheetId: process.env.GOOGLE_SHEETS_ID,
-      range: "Ventas!A2:S", // Ajusta el rango para incluir la columna Hora
+      range: "Ventas!A2:T", // Ajusta el rango para incluir la columna Hora
       valueInputOption: "RAW",
       resource: {
         values: ventaData,
@@ -771,34 +771,39 @@ async function getCashFlow(auth, date = null) {
     // 2. Obtener los datos de la hoja de ventas
     const resVentas = await sheets.spreadsheets.values.get({
       spreadsheetId: process.env.GOOGLE_SHEETS_ID,
-      range: "Ventas!A2:Q", // Ajusta el rango según tus columnas
+      range: "Ventas!A2:T", // Ajusta el rango según tus columnas
     });
 
     const rowsVentas = resVentas.data.values || [];
 
-    // Procesar cada fila de ventas y añadirlas como ingresos
-    const ventasData = rowsVentas.map((ventaRow, index) => {
-      const id = lastId + index + 1; // Incrementar el ID para las nuevas filas
-      const total = parseFloat(ventaRow[9]); // Ajusta el índice según la columna de 'Total'
-      const descripcion = `Venta Producto: ${ventaRow[3]}, Cliente: ${ventaRow[2]}`; // Ajusta los índices según tus columnas
-      const fechaVenta = ventaRow[10]; // Ajusta el índice según la columna de 'Fecha'
-      const horaVenta = ventaRow[11]; // Ajusta el índice según la columna de 'Hora'
+// Procesar cada fila de ventas y añadirlas como ingresos
+const ventasData = rowsVentas.map((ventaRow, index) => {
+  // Verificar si la columna 9 contiene "pendiente" (sin importar mayúsculas o minúsculas)
+  if (ventaRow[9].toLowerCase() === "pendiente") {
+    return null; // Saltear esta fila
+  }
 
-      // Sumar el total de la venta al saldo acumulado
-      saldoAcumulado += total;
+  const id = lastId + index + 1; // Incrementar el ID para las nuevas filas
+  const total = parseFloat(ventaRow[10]); // Ajusta el índice según la columna de 'Total'
+  const descripcion = `Venta Producto: ${ventaRow[3]}, Cliente: ${ventaRow[2]}`; // Ajusta los índices según tus columnas
+  const fechaVenta = ventaRow[11]; // Ajusta el índice según la columna de 'Fecha'
+  const horaVenta = ventaRow[12]; // Ajusta el índice según la columna de 'Hora'
 
-      return {
-        id: id.toString(),
-        tipo: "Ingreso", // Todas las ventas se consideran como ingresos
-        monto: total,
-        descripcion: descripcion,
-        fecha: fechaVenta,
-        hora: horaVenta, // Registrar la hora de la venta
-        periodo: "", // Puedes asignar el periodo si es necesario
-        cajaInicial: saldoAcumulado - total, // Caja inicial antes de esta venta
-        cajaFinal: saldoAcumulado, // Caja final actualizada
-      };
-    });
+  // Sumar el total de la venta al saldo acumulado
+  saldoAcumulado += total;
+
+  return {
+    id: id.toString(),
+    tipo: "Ingreso", // Todas las ventas se consideran como ingresos
+    monto: total,
+    descripcion: descripcion,
+    fecha: fechaVenta,
+    hora: horaVenta, // Registrar la hora de la venta
+    periodo: "", // Puedes asignar el periodo si es necesario
+    cajaInicial: saldoAcumulado - total, // Caja inicial antes de esta venta
+    cajaFinal: saldoAcumulado, // Caja final actualizada
+  };
+}).filter(venta => venta !== null); // Filtrar las filas que fueron saltadas
 
     // 3. Combinar flujo de caja existente con las ventas
     const allCashFlowData = [...cashFlowData, ...ventasData, ...cajaInicialData]; // Incluir los datos de "Caja Inicial"

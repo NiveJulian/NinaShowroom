@@ -83,12 +83,13 @@ const DisplayProductDashboard = ({ products }) => {
     } else {
       toast.success("Venta creada exitosamente...");
       dispatch(createSale(venta));
+      dispatch(cleanCart());
       console.log(venta);
     }
   };
 
   const handleAddToCart = (product) => {
-    const available = product.cantidad;
+    const available = product.stock;
 
     const data = {
       id: product.id,
