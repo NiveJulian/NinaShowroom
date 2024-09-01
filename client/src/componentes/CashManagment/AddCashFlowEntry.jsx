@@ -6,6 +6,15 @@ const AddCashFlowEntry = ({ onAddCashFlowEntry, onClose }) => {
   const [date, setDate] = useState('');
   const [type, setType] = useState('Ingreso');  // Estado para el tipo de movimiento
 
+  const formatDateToArgentinian = (dateString) => {
+    const [year, month, day] = dateString.split('-');
+    
+    // Quitar el '0' delante del mes si existe
+    const formattedMonth = month.startsWith('0') ? month.substring(1) : month;
+
+    return `${day}/${formattedMonth}/${year}`;
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -15,12 +24,15 @@ const AddCashFlowEntry = ({ onAddCashFlowEntry, onClose }) => {
       return;
     }
 
+    // Formatear la fecha al formato argentino
+    const formattedDate = formatDateToArgentinian(date);
+
     // Formatear los datos de entrada
     const entry = {
       tipo: type,        // El tipo de movimiento (Ingreso o Gasto)
       monto: parseFloat(amount),   // Asegúrate de que el monto sea un número
       descripcion: description,
-      fecha: date,
+      fecha: formattedDate,
     };
 
     // Pasar la nueva entrada al padre para que dispare la acción
