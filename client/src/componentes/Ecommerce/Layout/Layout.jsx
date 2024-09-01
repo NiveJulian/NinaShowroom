@@ -2,11 +2,23 @@ import React, { useState } from "react";
 import FilterCategories from "../Filters/FilterCategories";
 import FilterColor from "../Filters/FilterColor";
 import SearchBar from "../Searchbar/SearchBar";
+import { useSelector, useDispatch } from "react-redux";
+import { renderCondition, setVariable } from "../../../redux/actions/productActions";
+
 
 const Layout = ({ children, items }) => {
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
   const [isColorOpen, setIsColorOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const filterVar = useSelector((state) => state.sheets.filterVar);
+  const dispatch = useDispatch();
+
+  const handleClearFilter = () => {
+    dispatch(renderCondition("allProducts"));
+    dispatch(setVariable(null))
+    dispatch(clearFilteredProducts());
+    dispatch(clearColor());
+  };
 
   return (
     <section className="bg-gray-100">
@@ -37,14 +49,12 @@ const Layout = ({ children, items }) => {
 
           {/* Sidebar */}
           <div
-            className={`space-y-3 lg:w-1/6 lg:px-2 lg:space-y-4 ${
-              isSidebarOpen ? "block" : "hidden lg:block"
-            }`}
+            className={`space-y-3 lg:w-1/6 lg:px-2 lg:space-y-4 ${isSidebarOpen ? "block" : "hidden lg:block"
+              }`}
           >
-            
             {/* Categorías */}
             <div className="mt-9">
-            <SearchBar/>
+              <SearchBar />
               <div
                 onClick={() => setIsCategoriesOpen(!isCategoriesOpen)}
                 className="flex flex-row justify-between cursor-pointer items-center gap-2"
@@ -141,12 +151,26 @@ const Layout = ({ children, items }) => {
                 </div>
               )}
             </div>
+
           </div>
 
           {/* Products Section */}
           <div className="mt-6 lg:mt-0 lg:px-2 lg:w-4/5">
-            <div className="flex items-center justify-between text-sm tracking-widest uppercase">
-              <p className="text-black">{items} Items</p>
+            <div className="text-sm tracking-widest uppercase">
+              <p className="text-black">   Items {items}</p>
+
+              {/* Filter Variable */}
+              {filterVar && (
+                <div className="mt-2 flex items-center text-black p-2 rounded-md">
+                  <p>{filterVar}</p>
+                  <button
+                    onClick={handleClearFilter}
+                    className="ml-1 bg-red-500 text-white rounded-full p-1 flex justify-center items-center"
+                  >
+                    X
+                  </button>
+                </div>
+              )}
             </div>
 
             <div className="mt-4 lg:border-l border-t lg:rounded-md border-gray-800">

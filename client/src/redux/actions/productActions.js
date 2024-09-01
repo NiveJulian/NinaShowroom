@@ -15,8 +15,10 @@ export const SET_CONDITION = "SET_CONDITION";
 export const GET_CATEGORIES = "GET_CATEGORIES";
 export const FILTER_CATEGORY = "FILTER_CATEGOTY";
 export const CLEAR_FILTER = "CLEAR_FILTER";
+export const CLEAR_COLOR = "CLEAR_COLOR";
 export const GET_COLORS = "GET_COLORS";
 export const FILTER_COLOR = "FILTER_COLOR";
+export const SET_VARIABLE = "SET_VARIABLE";
 export const SEARCH_PRODUCT= "SEARCH_PRODUCT";
 export const CLEAN_SEARCH_PRODUCT= "CLEAN_SEARCH_PRODUCT"
 
@@ -186,6 +188,10 @@ export const uploadImages = (formData) => async (dispatch) => {
   export const clearFilteredProducts = () => ({
     type: CLEAR_FILTER,
   });
+
+  export const clearColor = () => ({
+    type: CLEAR_COLOR,
+  });
   
   export const getCategories = () => async (dispatch) => {
     try {
@@ -224,6 +230,14 @@ export const uploadImages = (formData) => async (dispatch) => {
       dispatch({ type: FILTER_COLOR, payload: products });
     } catch (error) {
       console.error("Error fetching products by color:", error);
+    }
+  };
+
+  export const setVariable = (variable) => async (dispatch) => {
+    try {
+      dispatch({ type: SET_VARIABLE, payload: variable });
+    } catch (error) {
+      console.error("Error setting variable:", error);
     }
   };
 

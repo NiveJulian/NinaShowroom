@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useState, useRef } from "react";
-import { clearFilteredProducts, filterByCategory, renderCondition } from "../../../redux/actions/productActions";
+import { clearFilteredProducts, filterByCategory, renderCondition, setVariable } from "../../../redux/actions/productActions";
 
 const FilterCategories = () => {
   const categories = useSelector((state) => state.sheets.categories);
@@ -12,9 +12,11 @@ const FilterCategories = () => {
     if (category !== "Todos") {
       dispatch(filterByCategory(category));
       dispatch(renderCondition("filteredProducts"));
+      dispatch(setVariable(category))
     } else {
       dispatch(renderCondition("allProducts"));
       dispatch(clearFilteredProducts());
+      dispatch(setVariable(null))
     }
   };
 
