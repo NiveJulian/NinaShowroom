@@ -4,7 +4,7 @@ import SheetsData from "../../componentes/Dashboard/Sheets/SheetsData";
 import TabFormCreateProduct from "../../componentes/Dashboard/Popup/TabFormCreateProduct";
 
 import { useDispatch, useSelector } from "react-redux";
-import { fetchSheets } from "../../redux/actions/actions";
+import { fetchSheets } from "../../redux/actions/productActions";
 import TabDeleteRowButton from "../../componentes/Dashboard/Popup/TabDeleteRowButton";
 import TabConfirmPublicProduct from "../../componentes/Dashboard/Popup/TabConfirmPublicProduct";
 

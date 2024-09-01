@@ -54,6 +54,7 @@ sheetsRouter.post("/data", async (req, res) => {
     const updates = await appendRow(auth, data);
     res.json(updates);
   } catch (error) {
+    console.log({error: error.message});
     res.status(500).send(error.message);
   }
 });
@@ -269,8 +270,5 @@ sheetsRouter.post("/cashflow/add", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
-
-
 
 module.exports = sheetsRouter;

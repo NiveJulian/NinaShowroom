@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import UserPurchase from "../../componentes/Ecommerce/User/UserPurchase";
 import Navigation from "../../componentes/Ecommerce/Nav/Navigation";
 import { useDispatch, useSelector } from "react-redux";
-import { getSaleByUserID } from "../../redux/actions/actions";
 import { useParams } from "react-router-dom";
 import Loader from "../../componentes/Ecommerce/Loader/Loader";
 import FooterPage from "../../componentes/Ecommerce/Footer/FooterPage";
+import { getSaleByUserID } from "../../redux/actions/salesActions";
 
 const Purchase = () => {
   const [isLoading, setIsLoading] = useState(true);

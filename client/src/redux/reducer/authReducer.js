@@ -1,4 +1,4 @@
-import { LOGIN_WITH_GOOGLE, AUTHENTICATE_USER_FROM_SESSION  } from "../actions/actions";
+import { LOGIN_WITH_GOOGLE, AUTHENTICATE_USER_FROM_SESSION  } from "../actions/authActions";
 
 const initialState = {
   user: {},

@@ -1,4 +1,4 @@
-import { CREATED_SELLER, FETCH_USERS } from "../actions/actions";
+import { CREATED_SELLER, FETCH_USERS } from "../actions/authActions";
 
 const initialState = {
   users: [],

@@ -16,7 +16,7 @@ import {
   FETCH_PRODUCT_SHEET_BY_ID,
   GET_COLORS,
   FILTER_COLOR,
-} from "../actions/actions";
+} from "../actions/productActions";
 
 const initialState = {
   sheetsData: [],

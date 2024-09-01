@@ -1,17 +1,11 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  addToCart,
-  cleanCart,
-  createSale,
-  decrementQuantity,
-  incrementQuantity,
-  removeFromCart,
-} from "../../../redux/actions/actions";
 import toast from "react-hot-toast";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import Filter from "../Filter/Filter";
+import { createSale } from "../../../redux/actions/salesActions";
+import { addToCart, cleanCart, decrementQuantity, incrementQuantity, removeFromCart } from "../../../redux/actions/cartActions";
 
 const DisplayProductDashboard = ({ products }) => {
   const cartItems = useSelector((state) => state.cart.cartItems);

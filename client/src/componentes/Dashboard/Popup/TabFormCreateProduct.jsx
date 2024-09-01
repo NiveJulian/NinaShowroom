@@ -1,15 +1,10 @@
 import { useState, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Compressor from "compressorjs";
-import {
-  addSheetRow,
-  updateRow,
-  uploadImages,
-  clearImages,
-} from "../../../redux/actions/actions";
 import Spinner from "../Spinner/Spinner";
 import validationProductForm from "./validationProductForm";
 import toast from "react-hot-toast";
+import { addSheetRow, clearImages, updateRow, uploadImages } from "../../../redux/actions/productActions";
 
 export default function TabFormCreateProduct({ isOpen, onClose, product }) {
   const dispatch = useDispatch();
@@ -20,7 +15,7 @@ export default function TabFormCreateProduct({ isOpen, onClose, product }) {
     tamaño: "",
     cantidad: "",
     color: "",
-    precio: "",
+    precio: 0,
     url: [],
   });
   const [errors, setErrors] = useState({});
@@ -42,7 +37,7 @@ export default function TabFormCreateProduct({ isOpen, onClose, product }) {
         nombre: product.nombre || "",
         color: product.color || "",
         tamaño: product.talle || "",
-        cantidad: product.cantidad || "",
+        cantidad: product.stock || "",
         precio: product.precio || "",
         url: product.url ? product.url.split(",").map((url) => url.trim()) : [],
       });
@@ -83,7 +78,7 @@ export default function TabFormCreateProduct({ isOpen, onClose, product }) {
         };
 
         if (product) {
-          const updatedRow = {
+          const updatedRows = {
             id: formData.id,
             categoria: formData.categoria,
             nombre: formData.nombre,
@@ -94,9 +89,7 @@ export default function TabFormCreateProduct({ isOpen, onClose, product }) {
             url: formData.url.join(", "),
           };
 
-          console.log("Llego a update row: ", updatedRow);
-
-          dispatch(updateRow(updatedRow));
+          dispatch(updateRow(updatedRows));
         } else {
           dispatch(addSheetRow(newRow));
         }
@@ -310,7 +303,7 @@ export default function TabFormCreateProduct({ isOpen, onClose, product }) {
             <label htmlFor="cantidad">Cantidad</label>
             <input
               className={`bg-white w-full p-2 text-center mt-2 rounded-md border ${
-                errors.cantidad ? "border-red-500" : "border-gray-400"
+                errors.stock ? "border-red-500" : "border-gray-400"
               }`}
               type="text"
               id="cantidad"
@@ -319,8 +312,8 @@ export default function TabFormCreateProduct({ isOpen, onClose, product }) {
               onChange={handleChange}
               placeholder="Cantidad"
             />
-            {errors.cantidad && (
-              <p className="text-red-500 text-xs">{errors.cantidad}</p>
+            {errors.stock && (
+              <p className="text-red-500 text-xs">{errors.stock}</p>
             )}
           </div>
         </div>

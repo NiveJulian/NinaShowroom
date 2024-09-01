@@ -104,10 +104,10 @@ async function appendRow(auth, rowData) {
   const sheets = google.sheets({ version: "v4", auth });
   const { rows, lastId } = await getSheetData(auth);
   const newId = lastId + 1;
-  const { categoria, nombre, color, tamaño, cantidad, precio, url, publicado } =
-    rowData;
+  const { categoria, nombre, color, tamaño, cantidad, precio, url } = rowData;
   const sku = generateSKU(categoria, nombre, color, newId);
   const urlString = Array.isArray(url) ? url.join(", ") : url;
+  const publicadoValue = "no"; // Nueva variable para el valor de publicado
   const newRow = [
     newId,
     categoria,
@@ -118,7 +118,7 @@ async function appendRow(auth, rowData) {
     precio,
     urlString,
     sku,
-    (publicado = "no"),
+    publicadoValue, // Usar la nueva variable aquí
   ];
   const res = await sheets.spreadsheets.values.append({
     spreadsheetId: process.env.GOOGLE_SHEETS_ID,
@@ -130,6 +130,7 @@ async function appendRow(auth, rowData) {
   });
   return res.data.updates;
 }
+
 
 async function updateRow(auth, rowData) {
   const sheets = google.sheets({ version: "v4", auth });
@@ -181,7 +182,18 @@ async function registerSale(auth, data) {
   try {
     const sheets = google.sheets({ version: "v4", auth });
 
-    const {productos, formaPago, tipoEnvio, provincia, direccion, celular, medio, cp, correo} = data
+    const {
+      productos,
+      nombreCliente,
+      formaPago,
+      tipoEnvio,
+      provincia,
+      direccion,
+      celular,
+      medio,
+      cp,
+      correo,
+    } = data;
 
     // Obtener la última fila para determinar el ID más reciente
     const response = await sheets.spreadsheets.values.get({
@@ -221,7 +233,7 @@ async function registerSale(auth, data) {
       statePayment,
       prod.cantidad * prod.precio,
       currentDate,
-      currentTime,  // Agregar la hora actual
+      currentTime, // Agregar la hora actual
       tipoEnvio || "",
       correo || "",
       direccion || "",
@@ -253,7 +265,6 @@ async function registerSale(auth, data) {
     throw new Error(`Error registrando la venta: ${error.message}`);
   }
 }
-
 
 async function getSaleDataUnitiInfo(auth, id) {
   try {
@@ -451,7 +462,6 @@ async function decreaseStock(auth, productId, amount) {
   });
   return res.data;
 }
-
 
 async function getProductsByCategory(auth, category) {
   try {
@@ -726,8 +736,14 @@ async function getCashFlow(auth, date = null) {
     });
 
     const rowsCashFlow = resCashFlow.data.values || [];
-    let lastId = rowsCashFlow.length > 0 ? parseInt(rowsCashFlow[rowsCashFlow.length - 1][0]) : 0;
-    let saldoAcumulado = rowsCashFlow.length > 0 ? parseFloat(rowsCashFlow[rowsCashFlow.length - 1][8]) : 0;
+    let lastId =
+      rowsCashFlow.length > 0
+        ? parseInt(rowsCashFlow[rowsCashFlow.length - 1][0])
+        : 0;
+    let saldoAcumulado =
+      rowsCashFlow.length > 0
+        ? parseFloat(rowsCashFlow[rowsCashFlow.length - 1][8])
+        : 0;
 
     const cashFlowData = [];
     const cajaInicialData = []; // Array para almacenar las entradas del tipo "Caja Inicial"
@@ -792,70 +808,80 @@ async function getCashFlow(auth, date = null) {
 
     const rowsVentas = resVentas.data.values || [];
 
-// Procesar cada fila de ventas y añadirlas como ingresos
-const ventasData = rowsVentas.map((ventaRow, index) => {
-  // Verificar si la columna 9 contiene "pendiente" (sin importar mayúsculas o minúsculas)
-  if (ventaRow[9].toLowerCase() === "pendiente") {
-    return null; // Saltear esta fila
-  }
+    // Procesar cada fila de ventas y añadirlas como ingresos
+    const ventasData = rowsVentas
+      .map((ventaRow, index) => {
+        // Verificar si la columna 9 contiene "pendiente" (sin importar mayúsculas o minúsculas)
+        if (ventaRow[9].toLowerCase() === "pendiente") {
+          return null; // Saltear esta fila
+        }
 
-  const id = lastId + index + 1; // Incrementar el ID para las nuevas filas
-  const total = parseFloat(ventaRow[10]); // Ajusta el índice según la columna de 'Total'
-  const descripcion = `Venta Producto: ${ventaRow[3]}, Cliente: ${ventaRow[2]}`; // Ajusta los índices según tus columnas
-  const fechaVenta = ventaRow[11]; // Ajusta el índice según la columna de 'Fecha'
-  const horaVenta = ventaRow[12]; // Ajusta el índice según la columna de 'Hora'
+        const id = lastId + index + 1; // Incrementar el ID para las nuevas filas
+        const total = parseFloat(ventaRow[10]); // Ajusta el índice según la columna de 'Total'
+        const descripcion = `Venta Producto: ${ventaRow[3]}, Cliente: ${ventaRow[2]}`; // Ajusta los índices según tus columnas
+        const fechaVenta = ventaRow[11]; // Ajusta el índice según la columna de 'Fecha'
+        const horaVenta = ventaRow[12]; // Ajusta el índice según la columna de 'Hora'
 
-  // Sumar el total de la venta al saldo acumulado
-  saldoAcumulado += total;
+        // Sumar el total de la venta al saldo acumulado
+        saldoAcumulado += total;
 
-  return {
-    id: id.toString(),
-    tipo: "Ingreso", // Todas las ventas se consideran como ingresos
-    monto: total,
-    descripcion: descripcion,
-    fecha: fechaVenta,
-    hora: horaVenta, // Registrar la hora de la venta
-    periodo: "", // Puedes asignar el periodo si es necesario
-    cajaInicial: saldoAcumulado - total, // Caja inicial antes de esta venta
-    cajaFinal: saldoAcumulado, // Caja final actualizada
-  };
-}).filter(venta => venta !== null); // Filtrar las filas que fueron saltadas
+        return {
+          id: id.toString(),
+          tipo: "Ingreso", // Todas las ventas se consideran como ingresos
+          monto: total,
+          descripcion: descripcion,
+          fecha: fechaVenta,
+          hora: horaVenta, // Registrar la hora de la venta
+          periodo: "", // Puedes asignar el periodo si es necesario
+          cajaInicial: saldoAcumulado - total, // Caja inicial antes de esta venta
+          cajaFinal: saldoAcumulado, // Caja final actualizada
+        };
+      })
+      .filter((venta) => venta !== null); // Filtrar las filas que fueron saltadas
 
     // 3. Combinar flujo de caja existente con las ventas
-    const allCashFlowData = [...cashFlowData, ...ventasData, ...cajaInicialData]; // Incluir los datos de "Caja Inicial"
+    const allCashFlowData = [
+      ...cashFlowData,
+      ...ventasData,
+      ...cajaInicialData,
+    ]; // Incluir los datos de "Caja Inicial"
 
     // 4. Calcular la caja inicial del día siguiente
-    const cajaInicialDiaSiguiente = cajaInicialTarde > 0 ? cajaInicialTarde : cajaInicialMañana;
+    const cajaInicialDiaSiguiente =
+      cajaInicialTarde > 0 ? cajaInicialTarde : cajaInicialMañana;
 
-    return { 
-      cashFlowData: allCashFlowData, 
+    return {
+      cashFlowData: allCashFlowData,
       lastId: lastId + rowsVentas.length,
       cajaInicialMañana,
       cajaInicialTarde,
-      cajaInicialDiaSiguiente
+      cajaInicialDiaSiguiente,
     };
   } catch (error) {
     console.error("Error al obtener el flujo de caja:", error.message);
-    throw new Error('Error al obtener el flujo de caja');
+    throw new Error("Error al obtener el flujo de caja");
   }
 }
-
-
 
 async function addCashFlowEntry(auth, data) {
   try {
     const { tipo, monto, descripcion, fecha, periodo } = data;
-    const hora = new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false });
+    const hora = new Date().toLocaleTimeString("es-AR", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
 
-    const sheets = google.sheets({ version: 'v4', auth });
+    const sheets = google.sheets({ version: "v4", auth });
 
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: process.env.GOOGLE_SHEETS_ID,
-      range: 'FlujoDeCaja!A:A',
+      range: "FlujoDeCaja!A:A",
     });
 
     const rows = response.data.values || [];
-    let lastId = rows.length > 1 ? parseInt(rows[rows.length - 1][0], 10) || 0 : 0;
+    let lastId =
+      rows.length > 1 ? parseInt(rows[rows.length - 1][0], 10) || 0 : 0;
 
     // Obtener saldo acumulado y caja inicial del último movimiento del periodo específico
     const lastRowResponse = await sheets.spreadsheets.values.get({
@@ -864,10 +890,13 @@ async function addCashFlowEntry(auth, data) {
     });
 
     const lastRowData = lastRowResponse.data.values || [];
-    let saldoAcumulado = lastRowData.length > 0 ? parseFloat(lastRowData[lastRowData.length - 1][1]) || 0 : 0;
+    let saldoAcumulado =
+      lastRowData.length > 0
+        ? parseFloat(lastRowData[lastRowData.length - 1][1]) || 0
+        : 0;
     let cajaInicial = 0;
 
-    if (tipo === 'Caja Inicial') {
+    if (tipo === "Caja Inicial") {
       lastId += 1;
       cajaInicial = parseFloat(monto);
 
@@ -880,14 +909,14 @@ async function addCashFlowEntry(auth, data) {
         fecha,
         hora,
         periodo,
-        cajaInicial,  // Caja inicial
-        saldoAcumulado,     // Caja final (puede estar en 0 o depender de lógica adicional)
+        cajaInicial, // Caja inicial
+        saldoAcumulado, // Caja final (puede estar en 0 o depender de lógica adicional)
       ];
 
       await sheets.spreadsheets.values.append({
         spreadsheetId: process.env.GOOGLE_SHEETS_ID,
-        range: 'FlujoDeCaja!A:I',
-        valueInputOption: 'RAW',
+        range: "FlujoDeCaja!A:I",
+        valueInputOption: "RAW",
         resource: { values: [newRow] },
       });
 
@@ -904,7 +933,10 @@ async function addCashFlowEntry(auth, data) {
       };
     }
 
-    const newSaldoAcumulado = tipo === 'Ingreso' ? saldoAcumulado + parseFloat(monto) : saldoAcumulado - parseFloat(monto);
+    const newSaldoAcumulado =
+      tipo === "Ingreso"
+        ? saldoAcumulado + parseFloat(monto)
+        : saldoAcumulado - parseFloat(monto);
 
     const newRow = [
       lastId + 1,
@@ -920,8 +952,8 @@ async function addCashFlowEntry(auth, data) {
 
     await sheets.spreadsheets.values.append({
       spreadsheetId: process.env.GOOGLE_SHEETS_ID,
-      range: 'FlujoDeCaja!A:I',
-      valueInputOption: 'RAW',
+      range: "FlujoDeCaja!A:I",
+      valueInputOption: "RAW",
       resource: { values: [newRow] },
     });
 
@@ -937,12 +969,10 @@ async function addCashFlowEntry(auth, data) {
       cajaFinal: newSaldoAcumulado,
     };
   } catch (error) {
-    console.error('Error agregando el movimiento:', error);
-    throw new Error('Error agregando el movimiento al flujo de caja');
+    console.error("Error agregando el movimiento:", error);
+    throw new Error("Error agregando el movimiento al flujo de caja");
   }
 }
-
-
 
 async function appendRowPayment(auth, rowData) {
   const sheets = google.sheets({ version: "v4", auth });

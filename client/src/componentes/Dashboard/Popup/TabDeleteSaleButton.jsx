@@ -1,12 +1,11 @@
 import React from "react";
 import { useDispatch } from "react-redux";
-import { deleteSaleRow } from "../../../redux/actions/actions";
+import { deleteSaleRow } from "../../../redux/actions/salesActions";
 
 const TabDeleteSaleButton = ({ rowIndex, onClose }) => {
   const dispatch = useDispatch();
   const handleDelete = () => {
     dispatch(deleteSaleRow(rowIndex));
-    console.log(rowIndex);
     onClose();
   };
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { addCashFlowEntry } from '../../../redux/actions/actions';
+import { addCashFlowEntry } from '../../../redux/actions/productActions';
 
 const SheetsCashDaily = ({ cashFlow }) => {
   const dispatch = useDispatch();

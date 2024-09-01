@@ -4,11 +4,7 @@ import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import CartList from "../Cart/CartList";
 import UserLogged from "../User/UserLogged";
-import {
-  clearFilteredProducts,
-  filterByCategory,
-  renderCondition,
-} from "../../../redux/actions/actions";
+import { clearFilteredProducts, filterByCategory, renderCondition } from "../../../redux/actions/productActions";
 
 const Navigation = ({ isCart }) => {
   const [showCart, setShowCart] = useState(false);

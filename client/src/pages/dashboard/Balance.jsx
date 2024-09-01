@@ -1,10 +1,11 @@
 import { useDispatch, useSelector } from "react-redux";
 import { Layout } from "../../componentes/Dashboard/Layout/Layout";
 import { useEffect, useState } from "react";
-import { addCashFlowEntry, getCashFlow, getSales } from "../../redux/actions/actions";
 import SheetsCashFlow from "../../componentes/Dashboard/Sheets/SheetsCashFlow";
 import AddCashFlowEntry from "../../componentes/CashManagment/AddCashFlowEntry";
 import SheetsCashDaily from "../../componentes/Dashboard/Sheets/SheetsCashDaily";
+import { getSales } from "../../redux/actions/salesActions";
+import { addCashFlowEntry, getCashFlow } from "../../redux/actions/productActions";
 
 const Balance = () => {
   const isAuth = useSelector((state) => state.auth.isAuth);

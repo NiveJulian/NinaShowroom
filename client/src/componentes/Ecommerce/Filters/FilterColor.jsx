@@ -1,8 +1,7 @@
 import { useDispatch } from "react-redux";
 import React from "react";
 import { useSelector } from "react-redux";
-import { getProductsByColor, renderCondition } from "../../../redux/actions/actions";
-
+import { getProductsByColor, renderCondition } from "../../../redux/actions/productActions";
 const FilterColor = () => {
   const colors = useSelector((state) => state.sheets.colors);
   const dispatch = useDispatch();

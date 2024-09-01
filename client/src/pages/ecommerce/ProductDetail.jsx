@@ -4,10 +4,11 @@ import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import Navigation from "../../componentes/Ecommerce/Nav/Navigation";
 import FooterPage from "../../componentes/Ecommerce/Footer/FooterPage";
-import { addToCart, getProductById } from "../../redux/actions/actions";
 import "./ProductDetail.css";
 import WhatsAppBubble from "../../componentes/Ecommerce/Whatsapp/WhatsAppBubble";
 import Loader from "../../componentes/Ecommerce/Loader/Loader";
+import { getProductById } from "../../redux/actions/productActions";
+import { addToCart } from "../../redux/actions/cartActions";
 
 const ProductDetail = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -57,7 +58,7 @@ const ProductDetail = () => {
   };
 
   return (
-    <div>
+    <div className="w-full">
       {isLoading ? (
         <div className="flex justify-center items-center h-screen">
           <Loader />

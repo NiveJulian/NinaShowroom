@@ -1,9 +1,6 @@
 import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import {
-  removeFromCart,
-  updateCartItemQuantity,
-} from "../../../redux/actions/actions";
+import { removeFromCart, updateCartItemQuantity } from "../../../redux/actions/cartActions";
 
 function CartItem({ product }) {
   const [cartQuantity, setCartQuantity] = useState(product?.cantidad || 1);

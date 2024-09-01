@@ -2,20 +2,15 @@ import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import {
-  cleanCart,
-  createPayment,
-  createSale,
-  decrementQuantity,
-  incrementQuantity,
-  removeFromCart,
-} from "../../../redux/actions/actions";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import StepContact from "../StepsOrders/StepContact";
 import StepShipping from "../StepsOrders/StepShipping";
 import StepPayment from "../StepsOrders/StepPayment";
 import ProgressSteps from "../StepsOrders/ProgressSteps";
 import colorMap from "../../Colors/colorsMap";
+import { createSale } from "../../../redux/actions/salesActions";
+import { cleanCart, decrementQuantity, incrementQuantity, removeFromCart } from "../../../redux/actions/cartActions";
+import { createPayment } from "../../../redux/actions/authActions";
 
 const processColors = (colors) => {
   return colors

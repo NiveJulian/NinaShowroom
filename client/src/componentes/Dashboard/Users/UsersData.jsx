@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import CreateUser from "./CreateUser";
-import { fetchUsers } from "../../../redux/actions/actions";
+import { fetchUsers } from "../../../redux/actions/authActions";
 
 const UsersData = () => {
   const [activeForm, setActiveForm] = useState(false);

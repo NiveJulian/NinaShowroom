@@ -1,4 +1,6 @@
 const { MercadoPagoConfig, Preference } = require("mercadopago");
+require("dotenv").config();
+const { google } = require("googleapis");
 const {
   authorize,
   appendRowPayment,
@@ -108,9 +110,43 @@ const handlePaymentNotification = async (req, res) => {
   }
 };
 
+const getPaymentsMercadopago = async (req, res) => {
+  try {
+    const auth = await authorize();
+    const sheets = google.sheets({ version: "v4", auth });
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: process.env.GOOGLE_SHEETS_ID,
+      range: "PagosMp!A2:N", // Asegúrate de que el rango cubra todas las columnas necesarias
+    });
 
+    const rows = response.data.values || [];
+
+    const paymentsMp = rows.map((row) => ({
+      ventaId: row[0],
+      ordenId: row[1],
+      pagoId: row[2],
+      estado: row[3],
+      detalleEstado: row[4],
+      fecCreacion: row[5],
+      fecAprobado: row[6],
+      montoTotal: parseFloat(row[7]),
+      cuotas: parseInt(row[8]),
+      idPagador: row[9],
+      email: row[10],
+      dni: row[11],
+      nombre: row[12],
+      apellido: row[13],
+    }));
+
+    res.json({ paymentsMp });
+  } catch (error) {
+    console.error("Error al obtener los pagos de MercadoPago:", error.message);
+    res.status(500).send(error.message);
+  }
+};
 
 module.exports = {
   createPayment,
   handlePaymentNotification,
+  getPaymentsMercadopago,
 };

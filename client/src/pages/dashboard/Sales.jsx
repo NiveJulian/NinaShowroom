@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Layout } from "../../componentes/Dashboard/Layout/Layout";
 import { useDispatch, useSelector } from "react-redux";
-import { getSaleInfo, getSales } from "../../redux/actions/actions";
+import { getSaleInfo, getSales } from "../../redux/actions/salesActions";
 import SheetsSales from "../../componentes/Dashboard/Sheets/SheetsSales";
 import TabViewSale from "../../componentes/Dashboard/Popup/TabViewSale";
 import TabDeleteSaleButton from "../../componentes/Dashboard/Popup/TabDeleteSaleButton";

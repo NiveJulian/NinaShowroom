@@ -6,12 +6,14 @@ import {
   DELETE_CART_ITEM_SUCCESS,
   DELETE_CART_ITEM_FAILURE,
   UPDATE_CART,
-  GET_SALES,
-  GET_SALE_BY_ID,
   DECREMENT_QUANTITY,
   INCREMENT_QUANTITY,
+} from "../actions/cartActions";
+import {
+  GET_SALE_BY_ID,
   GET_SALE_BY_USER_ID,
-} from "../actions/actions";
+  GET_SALES,
+} from "../actions/salesActions";
 
 const initialState = {
   cartItems: JSON.parse(localStorage.getItem("cartItems")) || [],

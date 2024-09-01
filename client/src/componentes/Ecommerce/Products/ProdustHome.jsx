@@ -2,8 +2,8 @@ import React, { useEffect } from "react";
 import { useInView } from "react-intersection-observer";
 import ProductCard from "./ProductCard";
 import { useDispatch } from "react-redux";
-import { addToCart } from "../../../redux/actions/actions";
 import toast from "react-hot-toast";
+import { addToCart } from "../../../redux/actions/cartActions";
 
 const ProdustHome = ({ allProducts }) => {
   const dispatch = useDispatch();

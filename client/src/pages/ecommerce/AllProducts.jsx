@@ -6,7 +6,7 @@ import {
   fetchSheets,
   getCategories,
   getColors,
-} from "../../redux/actions/actions";
+} from "../../redux/actions/productActions";
 import WhatsAppBubble from "../../componentes/Ecommerce/Whatsapp/WhatsAppBubble";
 
 const AllProducts = () => {

@@ -3,8 +3,7 @@ import { Toaster } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import {
   authenticateUserFromSession,
-  getCategories,
-} from "./redux/actions/actions";
+} from "./redux/actions/authActions";
 import { useEffect } from "react";
 import Login from "./pages/dashboard/Login";
 import Dashboard from "./pages/dashboard/Dashboard";
@@ -24,6 +23,8 @@ import FailurePayment from "./pages/ecommerce/Payment/FailurePayment";
 import PendingPayment from "./pages/ecommerce/Payment/PendingPayment";
 import HowCanBuy from "./pages/ecommerce/HowCanBuy";
 import Purchase from "./pages/ecommerce/Purchase";
+import PagePayment from "./pages/dashboard/PagePayment";
+import { getCategories } from "./redux/actions/productActions";
 
 
 function App() {
@@ -76,6 +77,7 @@ function App() {
             <Route path="/dashboard/users" element={<Users />} />
             <Route path="/dashboard/balance" element={<Balance />} />
             <Route path="/dashboard/support" element={<Support />} />
+            <Route path="/dashboard/pagepayment" element={<PagePayment />} />
           </>
         ) : (
           <Route path="/error" element={<Error />} />

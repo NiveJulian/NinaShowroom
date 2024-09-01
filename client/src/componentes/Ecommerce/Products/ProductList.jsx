@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
-import { addToCart } from "../../../redux/actions/actions";
 import ProductCard from "./ProductCard";
 import Layout from "../Layout/Layout";
 import InfiniteScroll from "../Paginate/InfiniteScroll";
 import ScrollToTopButton from "../Scroll/ScrollToTopButton";
+import { addToCart } from "../../../redux/actions/cartActions";
 
 export default function ProductList({ allProducts }) {
   const [visibleProducts, setVisibleProducts] = useState(8); // Mostrar 8 productos inicialmente
