@@ -12,7 +12,7 @@ export default function ProductList({ allProducts }) {
   const dispatch = useDispatch();
   const cartError = useSelector((state) => state.cart.cartError);
 
-  const publishedProducts = allProducts.filter(
+  const publishedProducts = allProducts?.filter(
     (product) => product.publicado === "si"
   );
 
@@ -20,7 +20,6 @@ export default function ProductList({ allProducts }) {
   const currentProducts = publishedProducts.slice(0, visibleProducts);
 
   const handleAddToCart = (product) => {
-    console.log(product);
     dispatch(addToCart(product));
   };
 

@@ -12,7 +12,7 @@ const PagePayment = () => {
   const [itemsPerPage] = useState(5);
   const [visiblePages, setVisiblePages] = useState([1, 2, 3, 4, 5]);
   const [filteredData, setFilteredData] = useState([]);
-  const [searchTerm, setSearchTerm] = useState(""); // Nuevo estado para el término de búsqueda
+  const [searchTerm, setSearchTerm] = useState(""); 
 
   useEffect(() => {
     setFilteredData(allPayments);

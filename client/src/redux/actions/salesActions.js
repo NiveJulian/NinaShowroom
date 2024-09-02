@@ -1,5 +1,6 @@
 import toast from "react-hot-toast";
 import instance from "../../api/axiosConfig";
+import { sendEmail, sendEmailOrder } from "./emailActions";
 
 export const GET_SALES = "GET_SALES";
 export const GET_SALE_BY_ID = "GET_SALE_BY_ID";
@@ -50,11 +51,15 @@ export const getSaleInfo = (id) => async (dispatch) => {
   export const createSale = (data) => async (dispatch) => {
     try {
       const res = await instance.post(`/api/sheets/sale`, data);
-  
-      dispatch({
-        type: CREATED_SALE,
-        payload: res,
-      });
+      if (res.status === 200) {
+        // console.log(data.cliente.correo, data)
+        await sendEmail(data.cliente.correo, data)
+        await sendEmailOrder("matiassjv@gmail.com", data)
+        dispatch({
+          type: CREATED_SALE,
+          payload: res,
+        });
+      }
     } catch (error) {
       console.log({ error: error.message });
     }
@@ -81,3 +86,5 @@ export const getSaleInfo = (id) => async (dispatch) => {
       console.log(error);
     }
   };
+
+  

@@ -131,7 +131,6 @@ async function appendRow(auth, rowData) {
   return res.data.updates;
 }
 
-
 async function updateRow(auth, rowData) {
   const sheets = google.sheets({ version: "v4", auth });
 
@@ -182,18 +181,9 @@ async function registerSale(auth, data) {
   try {
     const sheets = google.sheets({ version: "v4", auth });
 
-    const {
-      productos,
-      nombreCliente,
-      formaPago,
-      tipoEnvio,
-      provincia,
-      direccion,
-      celular,
-      medio,
-      cp,
-      correo,
-    } = data;
+    const { productos, formaPago, tipoEnvio, medio } = data;
+
+    const { nombre, correo, provincia, direccion, celular, cp } = data.cliente;
 
     // Obtener la última fila para determinar el ID más reciente
     const response = await sheets.spreadsheets.values.get({
@@ -217,7 +207,7 @@ async function registerSale(auth, data) {
     });
 
     const user = await getUserByEmail(auth, correo);
-    const cliente = user ? user.uid : nombreCliente;
+    const cliente = user ? user.uid : (nombreCliente = nombre);
     const statePayment = "Pendiente";
 
     const ventaData = productos.map((prod) => [
