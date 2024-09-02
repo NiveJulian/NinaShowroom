@@ -10,6 +10,7 @@ const SheetsCashDaily = ({ cashFlow }) => {
   const [newCajaInicial, setNewCajaInicial] = useState(0);
   const [selectedDate, setSelectedDate] = useState('');
  
+  console.log(cashFlow);
   
   
   useEffect(() => {
@@ -20,9 +21,16 @@ const SheetsCashDaily = ({ cashFlow }) => {
     //   }
     // }
     setSelectedDate(new Date().toLocaleDateString("es-AR").slice(0, 10))
+    
   }, []);
 
-  const movimientosHoy = cashFlow.filter(entry => entry.fecha === selectedDate);
+  const normalizeDate = (dateString) => {
+    const [day, month, year] = dateString.split('/');
+    return `${parseInt(day)}/${parseInt(month)}/${year}`;
+  };
+  
+  const movimientosHoy = cashFlow.filter(entry => normalizeDate(entry.fecha) === normalizeDate(selectedDate));
+
 
   const turnoMañana = movimientosHoy
   .filter(entry => entry.hora && parseInt(entry.hora.split(':')[0]) < 14)
