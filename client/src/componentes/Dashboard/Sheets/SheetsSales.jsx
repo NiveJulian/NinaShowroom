@@ -1,27 +1,52 @@
+import { FaWhatsapp } from "react-icons/fa";
 import Loader from "../../Ecommerce/Loader/Loader";
 
 const SheetsSales = ({ data, onViewSale, toggleDelete, changeState }) => {
+  console.log(data);
+  const handleSendMessage = (phoneNumber) => {
+    window.open(`https://wa.me/${phoneNumber}`, "_blank");
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4 border border-gray-300 rounded-md">
       {data.length > 0 ? (
         data.map((prod, index) => (
           <div
             key={index}
-            className="border border-gray-400 p-4 rounded-lg shadow-lg flex flex-col justify-between h-52"
+            className="border border-gray-400 p-4 rounded-lg shadow-lg flex flex-col justify-between"
           >
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-bold mb-2">Venta #{prod.id}</h3>
-              <span
-                className={`p-2 border border-gray-300 rounded-md ${
-                  prod.estadoPago === "Confirmada"
-                    ? "bg-green-400 text-white"
-                    : prod.estadoPago === "Pendiente"
-                    ? "bg-orange-500 text-white"
-                    : "bg-yellow-500 text-white"
-                }`}
-              >
-                {prod.estadoPago}
-              </span>
+              <div className="flex flex-col-reverse justify-end items-end gap-2">
+                <span className="flex gap-1 border border-gray-400 p-1 rounded-md bg-gray-200">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.5"
+                    stroke="currentColor"
+                    className="size-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                    />
+                  </svg>
+                  {prod.hora}
+                </span>
+                <span
+                  className={`p-2 border border-gray-300 rounded-md ${
+                    prod.estadoPago === "Confirmada"
+                      ? "bg-green-400 text-white"
+                      : prod.estadoPago === "Pendiente"
+                      ? "bg-orange-500 text-white"
+                      : "bg-yellow-500 text-white"
+                  }`}
+                >
+                  {prod.estadoPago}
+                </span>
+              </div>
             </div>
             <div>
               <p>
@@ -32,6 +57,9 @@ const SheetsSales = ({ data, onViewSale, toggleDelete, changeState }) => {
               </p>
               <p>
                 <strong>Total:</strong> ${prod.total}
+              </p>
+              <p>
+                <strong>Medio:</strong> {prod.medio}
               </p>
             </div>
             <div className="flex justify-between items-center mt-4 w-full rounded-md p-1">
@@ -52,6 +80,14 @@ const SheetsSales = ({ data, onViewSale, toggleDelete, changeState }) => {
                 {prod.fecha}
               </div>
               <div className="flex flex-row">
+                <button
+                  onClick={() => handleSendMessage(prod.celular)}
+                  className={`hover:text-green-500 hover:border-green-500 border border-gray-200 rounded-full p-2 mr-2 ${
+                    prod.celular !== "" ? "block" : "invisible"
+                  }`}
+                >
+                  <FaWhatsapp size={24} className="relative" />
+                </button>
                 <button
                   className="hover:text-blue-500 hover:border-blue-500 border border-gray-200 rounded-full p-2 mr-2"
                   onClick={() => changeState(prod.id, prod.estadoPago)}
