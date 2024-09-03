@@ -21,6 +21,8 @@ const {
   getProductsByColor,
   activeProductById,
   getSaleByUserId,
+  registerSaleDashboard,
+  putSaleChangeState,
 } = require("../Controllers/sheets/sheetsController.js");
 const uploadToS3 = require("../Controllers/sheets/uploadImages.js");
 
@@ -54,7 +56,7 @@ sheetsRouter.post("/data", async (req, res) => {
     const updates = await appendRow(auth, data);
     res.json(updates);
   } catch (error) {
-    console.log({error: error.message});
+    console.log({ error: error.message });
     res.status(500).send(error.message);
   }
 });
@@ -98,6 +100,16 @@ sheetsRouter.post("/images", (req, res) => {
   uploadToS3(req, res);
 });
 
+sheetsRouter.get("/sale", async (req, res) => {
+  try {
+    const auth = await authorize();
+    const sale = await getSaleData(auth);
+    res.json(sale.salesData);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
 sheetsRouter.get("/sale/:id", async (req, res) => {
   try {
     const auth = await authorize();
@@ -115,12 +127,28 @@ sheetsRouter.get("/sale/:id", async (req, res) => {
   }
 });
 
-sheetsRouter.get("/sale", async (req, res) => {
+sheetsRouter.put("/sale/:id/changestate/:state", async (req, res) => {
   try {
+    const { id, state } = req.params;
     const auth = await authorize();
-    const sale = await getSaleData(auth);
-    res.json(sale.salesData);
+    const saleChanged = await putSaleChangeState(auth, id, state);
+
+    res.json(saleChanged);
   } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send(error.message);
+  }
+});
+
+sheetsRouter.post("/sale/dashboard", async (req, res) => {
+  try {
+    const data = req.body;
+    // console.log(data)
+    const auth = await authorize();
+    const sale = await registerSaleDashboard(auth, data);
+    res.json(sale);
+  } catch (error) {
+    // console.log({ error: error.message });
     res.status(500).send(error.message);
   }
 });

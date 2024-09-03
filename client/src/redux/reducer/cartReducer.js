@@ -63,6 +63,7 @@ const cartReducer = (state = initialState, action) => {
         cartItems: updatedCartItems,
         cartError: null,
       };
+    
     case REMOVE_FROM_CART:
       updatedCartItems = state.cartItems.filter((item) => item.id !== payload);
       localStorage.setItem("cartItems", JSON.stringify(updatedCartItems));

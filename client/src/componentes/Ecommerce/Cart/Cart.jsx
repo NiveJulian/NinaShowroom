@@ -108,7 +108,7 @@ const Cart = ({ product, calcularTotal, usuario }) => {
         sku: prod.sku,
         nombre: prod.nombre,
         talle: prod.talle,
-        color: selectedColors[prod.id], // Usar el color seleccionado
+        color: selectedColors[prod.id],
         precio: prod.precio,
         cantidad: prod.cantidad,
       })),
@@ -116,11 +116,6 @@ const Cart = ({ product, calcularTotal, usuario }) => {
       formaPago,
       cliente: formCliente,
       tipoEnvio: selectedDeliveryMethod,
-      correo: formCliente.correo,
-      direccion: formCliente.direccion,
-      provincia: formCliente.provincia,
-      cp: formCliente.cp,
-      celular: formCliente.celular,
       medio: "Pagina",
     };
 
@@ -237,8 +232,7 @@ const Cart = ({ product, calcularTotal, usuario }) => {
               product?.map((prod, i) => {
                 const imgUrl = prod?.url?.split(",")[0];
                 const colorsArray = processColors(prod?.color);
-                console.log(colorsArray)
-
+              
                 return (
                   <div
                     key={i}

@@ -4,8 +4,14 @@ import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import Filter from "../Filter/Filter";
-import { createSale } from "../../../redux/actions/salesActions";
-import { addToCart, cleanCart, decrementQuantity, incrementQuantity, removeFromCart } from "../../../redux/actions/cartActions";
+import { createSaleDashboard } from "../../../redux/actions/salesActions";
+import {
+  addToCart,
+  cleanCart,
+  decrementQuantity,
+  incrementQuantity,
+  removeFromCart,
+} from "../../../redux/actions/cartActions";
 
 const DisplayProductDashboard = ({ products }) => {
   const cartItems = useSelector((state) => state.cart.cartItems);
@@ -66,7 +72,7 @@ const DisplayProductDashboard = ({ products }) => {
       total: calculateTotal(),
       formaPago,
       nombreCliente,
-      medio: "Casa central"
+      medio: "Casa central",
     };
     if (venta.formaPago === "") {
       toast.error("Falta forma de pago");
@@ -76,40 +82,63 @@ const DisplayProductDashboard = ({ products }) => {
       toast.error("Falta nombre del cliente");
     } else {
       toast.success("Venta creada exitosamente...");
-      dispatch(createSale(venta));
-      dispatch(cleanCart())
+      dispatch(createSaleDashboard(venta));
+      dispatch(cleanCart());
     }
   };
 
   const handleAddToCart = (product) => {
     const available = product.stock;
 
-    const data = {
-      id: product.id,
-      categoria: product.categoria,
-      nombre: product.nombre,
-      color: product.color,
-      talle: product.talle,
-      cantidad: 1, // Empezamos con 1 porque lo vamos a agregar al carrito
-      precio: product.precio,
-      imagen: product.url,
-      sku: product.sku,
-    };
+    const existingCartItem = cartItems.find((item) => item.id === product.id);
 
-    if (available > 0) {
-      toast.success("Se agregó al carrito");
-      dispatch(addToCart(data));
+    if (existingCartItem) {
+      if (existingCartItem.cantidad < available) {
+        dispatch(incrementQuantity(product.id));
+        toast.success("Cantidad actualizada en el carrito");
+      } else {
+        toast.error("No hay suficiente stock disponible");
+      }
     } else {
-      toast.error("Producto sin stock");
+      if (available > 0) {
+        const data = {
+          id: product.id,
+          categoria: product.categoria,
+          nombre: product.nombre,
+          color: product.color,
+          talle: product.talle,
+          cantidad: 1,
+          precio: product.precio,
+          imagen: product.url,
+          sku: product.sku,
+        };
+        dispatch(addToCart(data));
+        toast.success("Se agregó al carrito");
+      } else {
+        toast.error("Producto sin stock");
+      }
     }
   };
 
   const handleQuantityChange = (index, action) => {
-    const productId = cartItems[index].id;
+    const item = cartItems[index];
+    const product = products.find((p) => p.id === item.id);
+
+    if (!product) {
+      toast.error("Producto no encontrado");
+      return;
+    }
+
+    const availableStock = product.stock;
+
     if (action === "increase") {
-      dispatch(incrementQuantity(productId));
+      if (item.cantidad < availableStock) {
+        dispatch(incrementQuantity(item.id));
+      } else {
+        toast.error("No hay suficiente stock disponible");
+      }
     } else if (action === "decrease") {
-      dispatch(decrementQuantity(productId));
+      dispatch(decrementQuantity(item.id));
     }
   };
 
@@ -230,6 +259,8 @@ const DisplayProductDashboard = ({ products }) => {
             {cartItems?.length > 0
               ? cartItems?.map((item, i) => {
                   const imgUrl = item?.imagen?.split(",");
+                  const product = products.find((p) => p.id === item.id);
+                  const availableStock = product ? product.stock : 0;
                   return (
                     <div
                       key={i}
@@ -249,6 +280,7 @@ const DisplayProductDashboard = ({ products }) => {
                         <button
                           onClick={() => handleQuantityChange(i, "decrease")}
                           className="px-3 py-1 rounded-md bg-gray-300"
+                          disabled={item.cantidad <= 1} // Opcional: Deshabilitar si cantidad es 1
                         >
                           -
                         </button>
@@ -257,7 +289,12 @@ const DisplayProductDashboard = ({ products }) => {
                         </span>
                         <button
                           onClick={() => handleQuantityChange(i, "increase")}
-                          className="px-3 py-1 rounded-md bg-gray-300"
+                          className={`px-3 py-1 rounded-md bg-gray-300 ${
+                            item.cantidad >= availableStock
+                              ? "cursor-not-allowed opacity-50"
+                              : ""
+                          }`}
+                          disabled={item.cantidad >= availableStock}
                         >
                           +
                         </button>

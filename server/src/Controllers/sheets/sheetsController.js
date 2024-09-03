@@ -1,6 +1,6 @@
 require("dotenv").config();
 const { google } = require("googleapis");
-const { getUserByEmail } = require("../user/userController");
+const { getUserByEmail, getUser } = require("../user/userController");
 // const path = require("path");
 
 async function authorize() {
@@ -131,7 +131,6 @@ async function appendRow(auth, rowData) {
   return res.data.updates;
 }
 
-
 async function updateRow(auth, rowData) {
   const sheets = google.sheets({ version: "v4", auth });
 
@@ -182,18 +181,9 @@ async function registerSale(auth, data) {
   try {
     const sheets = google.sheets({ version: "v4", auth });
 
-    const {
-      productos,
-      nombreCliente,
-      formaPago,
-      tipoEnvio,
-      provincia,
-      direccion,
-      celular,
-      medio,
-      cp,
-      correo,
-    } = data;
+    const { productos, formaPago, tipoEnvio, medio } = data;
+
+    const { nombre, correo, provincia, direccion, celular, cp } = data.cliente;
 
     // Obtener la última fila para determinar el ID más reciente
     const response = await sheets.spreadsheets.values.get({
@@ -217,8 +207,8 @@ async function registerSale(auth, data) {
     });
 
     const user = await getUserByEmail(auth, correo);
-    const cliente = user ? user.uid : nombreCliente;
-    const statePayment = "Pendiente";
+    const cliente = user ? user.uid : (nombreCliente = nombre);
+    const statePayment = medio === "Casa central" ? "Completada" : "Pendiente";
 
     const ventaData = productos.map((prod) => [
       newId,
@@ -266,6 +256,80 @@ async function registerSale(auth, data) {
   }
 }
 
+async function registerSaleDashboard(auth, data) {
+  try {
+    const sheets = google.sheets({ version: "v4", auth });
+
+    const { productos, formaPago, tipoEnvio, medio, nombreCliente } = data;
+
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: process.env.GOOGLE_SHEETS_ID,
+      range: "Ventas!A:A",
+    });
+
+    const rows = response.data.values;
+    let lastId = 0;
+
+    if (rows && rows.length > 1) {
+      lastId = rows.length - 1;
+    }
+
+    const newId = lastId + 1;
+    const currentDate = new Date().toLocaleDateString("es-AR").slice(0, 10);
+    const currentTime = new Date().toLocaleTimeString("es-AR", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+
+    const statePayment = "Completada";
+
+    const ventaData = productos.map((prod) => [
+      newId,
+      prod.id,
+      nombreCliente,
+      prod.sku,
+      prod.cantidad,
+      prod.talle,
+      prod.color,
+      prod.precio,
+      formaPago,
+      statePayment,
+      prod.cantidad * prod.precio,
+      currentDate,
+      currentTime,
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      medio,
+    ]);
+
+    const res = await sheets.spreadsheets.values.append({
+      spreadsheetId: process.env.GOOGLE_SHEETS_ID,
+      range: "Ventas!A2:T",
+      valueInputOption: "RAW",
+      resource: {
+        values: ventaData,
+      },
+    });
+
+    for (const prod of productos) {
+      const amount = parseInt(prod.cantidad);
+      if (amount > 0) {
+        await decreaseStock(auth, prod.id, amount);
+      }
+    }
+
+    return { message: "Venta registrada exitosamente", data: res.data };
+  } catch (error) {
+    console.error("Error registrando la venta:", error);
+    throw new Error(`Error registrando la venta: ${error.message}`);
+  }
+}
+
 async function getSaleDataUnitiInfo(auth, id) {
   try {
     const sheets = google.sheets({ version: "v4", auth });
@@ -283,14 +347,22 @@ async function getSaleDataUnitiInfo(auth, id) {
         idProducto: row[1],
         cliente: row[2],
         sku: row[3],
-        cantidad: row[4],
+        cantidad: parseInt(row[4]),
         talle: row[5],
         color: row[6],
-        subtotal: row[7],
+        subtotal: parseFloat(row[7]),
         pago: row[8],
-        total: row[9],
-        fecha: row[10],
-        hora: row[11],
+        estadoPago: row[9],
+        total: parseFloat(row[10]),
+        fecha: row[11],
+        hora: row[12],
+        formaEnvio: row[13],
+        correo: row[14],
+        direccion: row[15],
+        provincia: row[16],
+        cp: row[17],
+        celular: row[18],
+        medio: row[19],
       }));
 
     return sales;
@@ -303,49 +375,125 @@ async function getSaleDataUnitiInfo(auth, id) {
 async function getSaleData(auth) {
   try {
     const sheets = google.sheets({ version: "v4", auth });
+
+    // Obtener las ventas
     const res = await sheets.spreadsheets.values.get({
       spreadsheetId: process.env.GOOGLE_SHEETS_ID,
       range: "Ventas!A2:T",
     });
     const rows = res.data.values || [];
-    let lastId = 0;
-    if (rows.length > 0) {
-      lastId = parseInt(rows[rows.length - 1][0]);
-    }
 
-    const salesMap = {};
+    // Obtener los usuarios
+    const users = await getUser(auth); // Usamos la función getUser para obtener los usuarios
 
-    rows.forEach((row) => {
-      const id = row[0];
-      if (!salesMap[id]) {
-        salesMap[id] = {
-          id: row[0],
-          idProducto: row[1],
-          cliente: row[2],
-          sku: row[3],
-          cantidad: parseInt(row[4]),
-          talle: row[5],
-          color: row[6],
-          subtotal: parseFloat(row[7]),
-          pago: row[8],
-          total: parseFloat(row[9]),
-          fecha: row[10],
-          hora: row[11],
-        };
-      } else {
-        salesMap[id].cantidad += parseInt(row[4]);
-        salesMap[id].subtotal += parseFloat(row[7]);
-        salesMap[id].total += parseFloat(row[9]);
-      }
+    // Crear un array para almacenar los datos de las ventas
+    const salesData = rows.map((row) => {
+      const clienteId = row[2]; // Asumiendo que el ID del cliente está en la columna 3 (índice 2)
+      const user = users.find((user) => user.uid === clienteId); // Buscar el usuario por uid
+      const clienteNombre = user ? user.nombre : "Desconocido"; // Si no encuentra el nombre, poner "Desconocido"
+
+      return {
+        id: row[0],
+        idProducto: row[1],
+        idCliente: row[2],
+        cliente: clienteNombre, // Reemplazar el ID del cliente con su nombre
+        sku: row[3],
+        cantidad: parseInt(row[4]),
+        talle: row[5],
+        color: row[6],
+        subtotal: parseFloat(row[7]),
+        pago: row[8],
+        estadoPago: row[9],
+        total: parseFloat(row[10]),
+        fecha: row[11],
+        hora: row[12],
+        formaEnvio: row[13],
+        correo: row[14],
+        direccion: row[15],
+        provincia: row[16],
+        cp: row[17],
+        celular: row[18],
+        medio: row[19],
+      };
     });
 
-    const salesData = Object.values(salesMap);
-
-    return { salesData, lastId };
+    return { salesData, lastId: rows.length };
   } catch (error) {
     console.log({ error: error.message });
+    throw new Error("Error retrieving sales data");
   }
 }
+
+async function putSaleChangeState(auth, id, state) {
+  const sheets = google.sheets({ version: "v4", auth });
+
+  // Obtener todos los datos de la hoja
+  const { salesData } = await getSaleData(auth);
+
+  // Filtrar todas las filas que coincidan con el ID proporcionado
+  const rowsToUpdate = salesData.filter((sale) => sale.id === id);
+
+  if (rowsToUpdate.length === 0) {
+    throw new Error("ID not found");
+  }
+
+  // Corregir el valor de 'state' si es necesario
+  const correctedState = state === "Enproceso" ? "En proceso" : state;
+
+  // Obtener el ID de la hoja de cálculo
+  const sheetInfo = await sheets.spreadsheets.get({
+    spreadsheetId: process.env.GOOGLE_SHEETS_ID,
+  });
+
+  const sheet = sheetInfo.data.sheets.find(
+    (s) => s.properties.title === "Ventas" // Asegúrate de que este sea el nombre correcto de tu hoja
+  );
+
+  if (!sheet) {
+    throw new Error("Sheet not found");
+  }
+
+  const sheetId = sheet.properties.sheetId;
+
+  // Crear las solicitudes de actualización para todas las filas coincidentes
+  const requests = rowsToUpdate.map((sale) => {
+    const rowIndex = salesData.indexOf(sale);
+    return {
+      updateCells: {
+        range: {
+          sheetId: sheetId, // Usamos el sheetId obtenido
+          startRowIndex: rowIndex + 1, // +1 porque las filas en Google Sheets empiezan en 1
+          endRowIndex: rowIndex + 2,
+          startColumnIndex: 9, // Columna del estadoPago (columna J)
+          endColumnIndex: 10,
+        },
+        rows: [
+          {
+            values: [
+              {
+                userEnteredValue: {
+                  stringValue: correctedState,
+                },
+              },
+            ],
+          },
+        ],
+        fields: "userEnteredValue",
+      },
+    };
+  });
+
+  // Ejecutar la actualización
+  const res = await sheets.spreadsheets.batchUpdate({
+    spreadsheetId: process.env.GOOGLE_SHEETS_ID,
+    resource: {
+      requests,
+    },
+  });
+
+  return res.data;
+}
+
 
 async function getSalesByDate(auth, date) {
   try {
@@ -677,21 +825,12 @@ async function deleteSalesById(auth, id) {
   const sheets = google.sheets({ version: "v4", auth });
 
   // Obtener todos los datos de la hoja
-  const getRows = await sheets.spreadsheets.values.get({
-    spreadsheetId: process.env.GOOGLE_SHEETS_ID,
-    range: "Ventas!A:K", // Ajusta el rango según sea necesario
-  });
+  const { salesData } = await getSaleData(auth);
 
-  const rows = getRows.data.values;
-  let rowsToDelete = [];
-
-  // Encontrar las filas con el ID proporcionado
-  for (let i = 0; i < rows.length; i++) {
-    if (rows[i][0] == id) {
-      // Asumiendo que la columna ID es la primera (A)
-      rowsToDelete.push(i);
-    }
-  }
+  // Filtrar las filas que coinciden con el ID proporcionado
+  const rowsToDelete = salesData
+    .map((sale, index) => (sale.id === id ? index + 1 : -1)) // +1 porque las filas en Google Sheets empiezan en 1
+    .filter((index) => index !== -1);
 
   if (rowsToDelete.length === 0) {
     throw new Error("ID not found");
@@ -1012,4 +1151,6 @@ module.exports = {
   activeProductById,
   appendRowPayment,
   getSaleByUserId,
+  registerSaleDashboard,
+  putSaleChangeState
 };
