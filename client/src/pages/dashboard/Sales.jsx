@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Layout } from "../../componentes/Dashboard/Layout/Layout";
 import { useDispatch, useSelector } from "react-redux";
-import { getSaleChangeState, getSaleInfo, getSales } from "../../redux/actions/salesActions";
+import {
+  getSaleChangeState,
+  getSaleInfo,
+  getSales,
+} from "../../redux/actions/salesActions";
 import SheetsSales from "../../componentes/Dashboard/Sheets/SheetsSales";
 import TabViewSale from "../../componentes/Dashboard/Popup/TabViewSale";
 import TabDeleteSaleButton from "../../componentes/Dashboard/Popup/TabDeleteSaleButton";
@@ -11,10 +15,8 @@ const Sales = () => {
   const [openModal, setOpenModal] = useState(false);
   const [deleteRowIndex, setDeleteRowIndex] = useState(null);
   const [openModalChangeState, setOpenModalChangeState] = useState(false);
-  const [selectedSaleId, setSelectedSaleId] = useState(null); // Para mantener el ID de la venta seleccionada
+  const [selectedSaleId, setSelectedSaleId] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(9);
   const [searchTerm, setSearchTerm] = useState("");
 
   const dispatch = useDispatch();
@@ -51,8 +53,9 @@ const Sales = () => {
     dispatch(getSales());
   }, [dispatch]);
 
+  const filteredSales = sales.filter((sale) => sale.estadoPago !== "Anulado");
   // Filtrar las ventas
-  const filteredSales = sales.filter((sale) => {
+  const searchedSales  = filteredSales?.filter((sale) => {
     const lowercasedFilter = searchTerm.toLowerCase();
     return (
       sale.id.toString().toLowerCase().includes(lowercasedFilter) ||
@@ -63,38 +66,6 @@ const Sales = () => {
     );
   });
 
-  // Recalcular las páginas y actualizar la vista cuando cambian las ventas filtradas o la página actual
-  const totalPages = Math.ceil(filteredSales.length / itemsPerPage);
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredSales.slice(indexOfFirstItem, indexOfLastItem);
-
-  const updateVisiblePages = (pageNumber) => {
-    let startPage, endPage;
-    if (totalPages <= 3) {
-      startPage = 1;
-      endPage = totalPages;
-    } else {
-      if (pageNumber === 1) {
-        startPage = 1;
-        endPage = 3;
-      } else if (pageNumber === totalPages) {
-        startPage = totalPages - 2;
-        endPage = totalPages;
-      } else {
-        startPage = pageNumber - 1;
-        endPage = pageNumber + 1;
-      }
-    }
-    return [...Array(endPage - startPage + 1).keys()].map((i) => startPage + i);
-  };
-
-  const visiblePages = updateVisiblePages(currentPage);
-
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
-
   return (
     <Layout isAuth={isAuth}>
       {openModal && (
@@ -103,7 +74,6 @@ const Sales = () => {
           onClose={() => setOpenModal(false)}
           sale={sale}
           loading={isLoading}
-          infoVentas={sales}
         />
       )}
       {deleteRowIndex !== null && (
@@ -114,7 +84,9 @@ const Sales = () => {
       )}
       {openModalChangeState && (
         <TabConfirmStateChangeSale
-          buttonChange={(state) => toggleModalChangeState(selectedSaleId, state)}
+          buttonChange={(state) =>
+            toggleModalChangeState(selectedSaleId, state)
+          }
           isOpen={openModalChangeState}
           onClose={() => setOpenModalChangeState(false)}
         />
@@ -148,38 +120,11 @@ const Sales = () => {
           />
         </div>
         <SheetsSales
-          data={currentItems}
+          data={searchedSales}
           onViewSale={toggleModal}
           toggleDelete={toggleDeleteModal}
           changeState={openChangeStateModal}
         />
-      </div>
-      <div className="flex justify-center mt-4">
-        <button
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-          className="px-4 py-2 mx-1 bg-pink-400 text-white border border-gray-400 rounded-md disabled:opacity-50"
-        >
-          Anterior
-        </button>
-        {visiblePages.map((number) => (
-          <button
-            key={number}
-            onClick={() => handlePageChange(number)}
-            className={`px-4 py-2 mx-1 border border-gray-400 rounded-md ${
-              currentPage === number ? "bg-primary text-white" : "bg-white"
-            }`}
-          >
-            {number}
-          </button>
-        ))}
-        <button
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-          className="px-4 py-2 mx-1 bg-pink-400 text-white border border-gray-400 rounded-md disabled:opacity-50"
-        >
-          Siguiente
-        </button>
       </div>
     </Layout>
   );

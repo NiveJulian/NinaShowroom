@@ -33,7 +33,6 @@ export default function ProductList({ allProducts }) {
     setVisibleProducts(8); // Reiniciar a 8 productos visibles cuando cambien los productos
   }, [allProducts]);
 
-  // Función para procesar los colores
   const processColors = (colorString) => {
     return colorString
       .split(",") // Divide la cadena por comas
