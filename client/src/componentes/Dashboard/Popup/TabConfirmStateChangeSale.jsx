@@ -1,4 +1,5 @@
 import React from "react";
+import { getSaleInfo } from "../../../redux/actions/salesActions";
 
 const TabConfirmStateChangeSale = ({ isOpen, buttonChange, onClose }) => {
   if (!isOpen) {

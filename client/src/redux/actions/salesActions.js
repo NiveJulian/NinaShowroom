@@ -1,6 +1,10 @@
 import toast from "react-hot-toast";
 import instance from "../../api/axiosConfig";
-import { sendEmail, sendEmailOrder } from "./emailActions";
+import {
+  sendEmail,
+  sendEmailChangeStateOrder,
+  sendEmailOrder,
+} from "./emailActions";
 
 export const GET_SALES = "GET_SALES";
 export const GET_SALE_BY_ID = "GET_SALE_BY_ID";
@@ -24,11 +28,27 @@ export const getSaleInfo = (id) => async (dispatch) => {
 
 export const getSaleChangeState = (id, state) => async (dispatch) => {
   try {
+    // Primero obtenemos la información de la venta
+    const saleInfoResponse = await instance.get(`/api/sheets/sale/${id}`);
+    const saleInfo = saleInfoResponse.data;
+
+    // Luego actualizamos el estado de la venta
     const res = await instance.put(
       `/api/sheets/sale/${id}/changestate/${state}`
     );
-    console.log(res);
     if (res.status === 200) {
+      // Después de actualizar el estado, obtenemos la información del usuario
+      const userMail = saleInfo[0].correo; // Asegúrate de que esto sea correcto según tu API
+      const paymentDetail = {
+        orderNumber: saleInfo[0].id,
+        newStatus: state,
+        cliente: { nombre: saleInfo[0].cliente }, // Datos del cliente
+      };
+
+      // Enviamos el correo electrónico
+      await sendEmailChangeStateOrder(userMail, paymentDetail);
+
+      // Actualizamos la información en el store de Redux
       dispatch(getSales());
       dispatch({
         type: GET_SALE_CHANGE_STATE,
@@ -83,9 +103,10 @@ export const createSale = (data) => async (dispatch) => {
   try {
     const res = await instance.post(`/api/sheets/sale`, data);
     if (res.status === 200) {
-      // console.log(data.cliente.correo, data)
+      dispatch(getSales());
+
       await sendEmail(data.cliente.correo, data);
-      await sendEmailOrder("matiassjv@gmail.com", data);
+      await sendEmailOrder("niveyrojulian5@gmail.com", data);
       dispatch({
         type: CREATED_SALE,
         payload: res,
@@ -100,6 +121,8 @@ export const createSaleDashboard = (data) => async (dispatch) => {
   try {
     const res = await instance.post(`/api/sheets/sale/dashboard`, data);
     if (res.status === 200) {
+      dispatch(getSales());
+
       dispatch({
         type: CREATED_SALE_DASHBOARD,
         payload: res,
@@ -111,16 +134,12 @@ export const createSaleDashboard = (data) => async (dispatch) => {
 };
 
 export const deleteSaleRow = (rowIndex) => async (dispatch) => {
-  const token = localStorage.getItem("authToken");
   try {
-    const res = await instance.delete(`/api/sheets/delete/sale/${rowIndex}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    console.log(res);
+    const res = await instance.delete(`/api/sheets/delete/sale/${rowIndex}`);
     if (res.status === 200) {
       toast.success("Eliminado exitosamente");
+      dispatch(getSales());
+
       dispatch({
         type: DELETE_SALE_ROW,
         payload: rowIndex,

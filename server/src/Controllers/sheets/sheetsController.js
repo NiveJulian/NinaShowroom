@@ -339,31 +339,40 @@ async function getSaleDataUnitiInfo(auth, id) {
     });
     const rows = res.data.values || [];
 
+    const users = await getUser(auth); // Usamos la función getUser para obtener los usuarios
+
     // Filtrar las ventas con el id correspondiente y mapear a objetos
     const sales = rows
       .filter((row) => row[0] === id.toString())
-      .map((row) => ({
-        id: row[0],
-        idProducto: row[1],
-        cliente: row[2],
-        sku: row[3],
-        cantidad: parseInt(row[4]),
-        talle: row[5],
-        color: row[6],
-        subtotal: parseFloat(row[7]),
-        pago: row[8],
-        estadoPago: row[9],
-        total: parseFloat(row[10]),
-        fecha: row[11],
-        hora: row[12],
-        formaEnvio: row[13],
-        correo: row[14],
-        direccion: row[15],
-        provincia: row[16],
-        cp: row[17],
-        celular: row[18],
-        medio: row[19],
-      }));
+      .map((row) => {
+        const clienteId = row[2]; // Asumiendo que el ID del cliente está en la columna 3 (índice 2)
+        const user = users.find((user) => user.uid === clienteId); // Buscar el usuario por uid
+        const clienteNombre = user ? user.nombre : "Desconocido"; // Si no encuentra el nombre, poner "Desconocido"
+
+        return {
+          id: row[0],
+          idProducto: row[1],
+          idCliente: clienteId,
+          cliente: clienteNombre,
+          sku: row[3],
+          cantidad: parseInt(row[4]),
+          talle: row[5],
+          color: row[6],
+          subtotal: parseFloat(row[7]),
+          pago: row[8],
+          estadoPago: row[9],
+          total: parseFloat(row[10]),
+          fecha: row[11],
+          hora: row[12],
+          formaEnvio: row[13],
+          correo: row[14],
+          direccion: row[15],
+          provincia: row[16],
+          cp: row[17],
+          celular: row[18],
+          medio: row[19],
+        };
+      });
 
     return sales;
   } catch (error) {
@@ -493,7 +502,6 @@ async function putSaleChangeState(auth, id, state) {
 
   return res.data;
 }
-
 
 async function getSalesByDate(auth, date) {
   try {
@@ -772,6 +780,76 @@ async function deleteRowById(auth, id) {
   return res.data;
 }
 
+async function deleteSalesById(auth, id) {
+  const sheets = google.sheets({ version: "v4", auth });
+
+  // Obtener todos los datos de la hoja
+  const { salesData } = await getSaleData(auth);
+
+  // Filtrar todas las filas que coincidan con el ID proporcionado
+  const rowsToUpdate = salesData.filter((sale) => sale.id === id);
+
+  if (rowsToUpdate.length === 0) {
+    throw new Error("ID not found");
+  }
+
+  // Estado al que queremos cambiar
+  const canceledState = "Anulado";
+
+  // Obtener el ID de la hoja de cálculo
+  const sheetInfo = await sheets.spreadsheets.get({
+    spreadsheetId: process.env.GOOGLE_SHEETS_ID,
+  });
+
+  const sheet = sheetInfo.data.sheets.find(
+    (s) => s.properties.title === "Ventas" // Asegúrate de que este sea el nombre correcto de tu hoja
+  );
+
+  if (!sheet) {
+    throw new Error("Sheet not found");
+  }
+
+  const sheetId = sheet.properties.sheetId;
+
+  // Crear las solicitudes de actualización para todas las filas coincidentes
+  const requests = rowsToUpdate.map((sale) => {
+    const rowIndex = salesData.indexOf(sale);
+    return {
+      updateCells: {
+        range: {
+          sheetId: sheetId, // Usamos el sheetId obtenido
+          startRowIndex: rowIndex + 1, // +1 porque las filas en Google Sheets empiezan en 1
+          endRowIndex: rowIndex + 2,
+          startColumnIndex: 9, // Columna del estadoPago (columna J)
+          endColumnIndex: 10,
+        },
+        rows: [
+          {
+            values: [
+              {
+                userEnteredValue: {
+                  stringValue: canceledState,
+                },
+              },
+            ],
+          },
+        ],
+        fields: "userEnteredValue",
+      },
+    };
+  });
+
+  // Ejecutar la actualización
+  const res = await sheets.spreadsheets.batchUpdate({
+    spreadsheetId: process.env.GOOGLE_SHEETS_ID,
+    resource: {
+      requests,
+    },
+  });
+
+  return res.data;
+}
+
 async function activeProductById(auth, id) {
   const sheets = google.sheets({ version: "v4", auth });
 
@@ -819,48 +897,6 @@ async function activeProductById(auth, id) {
     message: `El producto cambio a ${statusMessage}.`,
     updateResponse: updateResponse.data,
   };
-}
-
-async function deleteSalesById(auth, id) {
-  const sheets = google.sheets({ version: "v4", auth });
-
-  // Obtener todos los datos de la hoja
-  const { salesData } = await getSaleData(auth);
-
-  // Filtrar las filas que coinciden con el ID proporcionado
-  const rowsToDelete = salesData
-    .map((sale, index) => (sale.id === id ? index + 1 : -1)) // +1 porque las filas en Google Sheets empiezan en 1
-    .filter((index) => index !== -1);
-
-  if (rowsToDelete.length === 0) {
-    throw new Error("ID not found");
-  }
-
-  console.log("rowsToDelete: ", rowsToDelete);
-
-  // Crear solicitudes de eliminación para cada fila encontrada
-  const requests = rowsToDelete.map((rowIndex) => ({
-    deleteDimension: {
-      range: {
-        sheetId: 0, // Asegúrate de que este sea el ID correcto de la hoja
-        dimension: "ROWS",
-        startIndex: rowIndex,
-        endIndex: rowIndex + 1,
-      },
-    },
-  }));
-
-  // Las solicitudes deben ser enviadas en orden inverso para evitar conflictos de índice
-  requests.reverse();
-
-  const res = await sheets.spreadsheets.batchUpdate({
-    spreadsheetId: process.env.GOOGLE_SHEETS_ID,
-    resource: {
-      requests,
-    },
-  });
-
-  return res.data;
 }
 
 async function getCashFlow(auth, date = null) {
@@ -1152,5 +1188,5 @@ module.exports = {
   appendRowPayment,
   getSaleByUserId,
   registerSaleDashboard,
-  putSaleChangeState
+  putSaleChangeState,
 };
