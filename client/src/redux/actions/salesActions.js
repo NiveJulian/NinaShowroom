@@ -5,6 +5,7 @@ import {
   sendEmailChangeStateOrder,
   sendEmailOrder,
 } from "./emailActions";
+import { fetchSheets } from "./productActions";
 
 export const GET_SALES = "GET_SALES";
 export const GET_SALE_BY_ID = "GET_SALE_BY_ID";
@@ -122,6 +123,7 @@ export const createSaleDashboard = (data) => async (dispatch) => {
     const res = await instance.post(`/api/sheets/sale/dashboard`, data);
     if (res.status === 200) {
       dispatch(getSales());
+      dispatch(fetchSheets());
 
       dispatch({
         type: CREATED_SALE_DASHBOARD,

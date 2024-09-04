@@ -32,30 +32,40 @@ async function getSheetData(auth) {
       spreadsheetId: process.env.GOOGLE_SHEETS_ID,
       range: "Productos!A2:J",
     });
-    const rows = res.data.values || [];
+    const rows = res.data.values;
+
     let lastId = 0;
     if (rows.length > 0) {
       lastId = parseInt(rows[rows.length - 1][0]);
     }
 
-    const products = rows.map((row) => ({
-      id: row[0],
-      categoria: row[1],
-      nombre: row[2],
-      color: row[3],
-      talle: row[4],
-      stock: parseInt(row[5]),
-      precio: parseInt(row[6]),
-      url: row[7],
-      sku: row[8],
-      publicado: row[9],
-    }));
+    const products = rows.map((row) => {
+      const product = {
+        id: row[0],
+        categoria: row[1],
+        nombre: row[2],
+        color: row[3],
+        talle: row[4],
+        stock: parseInt(row[5]),
+        precio: parseInt(row[6]),
+        url: row[7],
+        sku: row[8],
+        publicado: row[9],
+      };
+
+      // Filtra las propiedades que no están vacías o undefined
+      return Object.fromEntries(
+        Object.entries(product).filter(([_, value]) => value !== undefined && value !== "")
+      );
+    });
 
     return { products, lastId };
   } catch (error) {
     console.log({ error: error.message });
+    throw new Error(error.message);
   }
 }
+
 
 async function getSheetDataById(id, auth) {
   try {
@@ -290,7 +300,7 @@ async function registerSaleDashboard(auth, data) {
       nombreCliente,
       prod.sku,
       prod.cantidad,
-      prod.talle,
+      prod.talle || "",
       prod.color,
       prod.precio,
       formaPago,
@@ -333,21 +343,61 @@ async function registerSaleDashboard(auth, data) {
 async function getSaleDataUnitiInfo(auth, id) {
   try {
     const sheets = google.sheets({ version: "v4", auth });
+
+    // Obtener ventas
     const res = await sheets.spreadsheets.values.get({
       spreadsheetId: process.env.GOOGLE_SHEETS_ID,
       range: "Ventas!A2:T",
     });
     const rows = res.data.values || [];
 
-    const users = await getUser(auth); // Usamos la función getUser para obtener los usuarios
+    // Obtener usuarios
+    const users = await getUser(auth);
+
+    // Obtener pagos de Mercado Pago
+    const paymentsResponse = await sheets.spreadsheets.values.get({
+      spreadsheetId: process.env.GOOGLE_SHEETS_ID,
+      range: "PagosMp!A2:N", // Ajusta el rango según tu hoja de cálculo
+    });
+    const paymentRows = paymentsResponse.data.values || [];
+
+    // Crear un array de pagos de Mercado Pago
+    const paymentsMp = paymentRows.map((row) => ({
+      ventaId: row[0],
+      ordenId: row[1],
+      pagoId: row[2],
+      estado: row[3],
+      detalleEstado: row[4],
+      fecCreacion: row[5],
+      fecAprobado: row[6],
+      montoTotal: parseFloat(row[7]),
+      cuotas: parseInt(row[8]),
+      idPagador: row[9],
+      email: row[10],
+      dni: row[11],
+      nombre: row[12],
+      apellido: row[13],
+    }));
 
     // Filtrar las ventas con el id correspondiente y mapear a objetos
     const sales = rows
       .filter((row) => row[0] === id.toString())
       .map((row) => {
-        const clienteId = row[2]; // Asumiendo que el ID del cliente está en la columna 3 (índice 2)
-        const user = users.find((user) => user.uid === clienteId); // Buscar el usuario por uid
-        const clienteNombre = user ? user.nombre : "Desconocido"; // Si no encuentra el nombre, poner "Desconocido"
+        const clienteId = row[2]; // ID del cliente
+        const user = users.find((user) => user.uid === clienteId);
+        const clienteNombre = user ? user.nombre : "Desconocido"; // Nombre del cliente
+
+        // Verificar si la forma de pago es Mercado Pago
+        let paymentInfo = null;
+        if (row[8] === "Mercado Pago" || row[8] === "Mercadopago") { // Suponiendo que la forma de pago está en la columna 9
+          // Buscar el pago relacionado en la tabla PagosMp
+          paymentInfo = paymentsMp.find((payment) => payment.ventaId === id.toString());
+
+          // Si no existe un pago registrado, añadir un mensaje de que no existe actualmente
+          if (!paymentInfo) {
+            paymentInfo = { mensaje: "No existe pago" };
+          }
+        }
 
         return {
           id: row[0],
@@ -371,7 +421,10 @@ async function getSaleDataUnitiInfo(auth, id) {
           cp: row[17],
           celular: row[18],
           medio: row[19],
-        };
+          paymentInfo: paymentInfo.estado || null, // Agregar la información del pago de Mercado Pago si existe o el mensaje
+          paymentOrdenId: paymentInfo.ordenId || null,
+          paymentPagoId: paymentInfo.pagoId || null,
+        }
       });
 
     return sales;
@@ -596,28 +649,37 @@ async function increaseStock(auth, productId, amount) {
 
 async function decreaseStock(auth, productId, amount) {
   const sheets = google.sheets({ version: "v4", auth });
+
+  // Obtener los datos actuales de los productos
   const { products } = await getSheetData(auth);
+
+  // Buscar la fila correspondiente al ID del producto
   const rowIndex = products.findIndex((row) => row.id === productId);
   if (rowIndex === -1) {
     throw new Error("ID no encontrado");
   }
-  // Convertir cantidad a número y restarle la cantidad a disminuir
+
+  // Obtener el stock actual y disminuirlo
   const currentAmount = parseInt(products[rowIndex].stock) || 0;
-  products[rowIndex].stock = currentAmount - amount;
+  const newStock = currentAmount - amount;
 
-  // Asegúrate de que solo se escriban las columnas A:J
-  const updatedRow = Object.values(products[rowIndex]).slice(0, 10);
+  if (newStock < 0) {
+    throw new Error("Stock insuficiente");
+  }
 
+  // Actualizar solo la columna del stock
   const res = await sheets.spreadsheets.values.update({
     spreadsheetId: process.env.GOOGLE_SHEETS_ID,
-    range: `Productos!A${rowIndex + 2}:J${rowIndex + 2}`,
+    range: `Productos!F${rowIndex + 2}`, // Asegúrate de que la columna de stock sea la columna G (ajusta si es diferente)
     valueInputOption: "RAW",
     resource: {
-      values: [updatedRow],
+      values: [[newStock]],
     },
   });
+
   return res.data;
 }
+
 
 async function getProductsByCategory(auth, category) {
   try {
@@ -682,15 +744,21 @@ async function getAllColors(auth) {
   try {
     const { products } = await getSheetData(auth);
 
+    console.log(products)
+
     const colors = [
       ...new Set(
-        products.map((product) =>
-          product.color
-            .trim()
-            .toLowerCase()
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-        )
+        products
+          .filter((product) => product.publicado === "si")
+          .flatMap((product) => {
+            const colorList = product.color
+              .trim()
+              .toLowerCase()
+              .normalize("NFD")
+              .replace(/[\u0300-\u036f]/g, "");
+
+            return colorList.includes(",") ? colorList.split(",") : [colorList];
+          })
       ),
     ];
 
@@ -711,14 +779,19 @@ async function getProductsByColor(auth, color) {
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "");
 
-    const filteredProducts = products.filter(
-      (product) =>
-        product.color
+    const filteredProducts = products
+      .filter((product) => product.publicado === "si")
+      .filter((product) => {
+        const colorList = product.color
           .trim()
           .toLowerCase()
           .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "") === trimmedColor
-    );
+          .replace(/[\u0300-\u036f]/g, "");
+
+        return colorList.includes(",")
+          ? colorList.split(",").includes(trimmedColor)
+          : colorList === trimmedColor;
+      });
 
     if (filteredProducts.length === 0) {
       throw new Error("Producto no encontrado");

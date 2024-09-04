@@ -48,7 +48,7 @@ export default function CartList({ cartItems, calculateTotal }) {
             cartItems.length === 0 ? "hidden" : ""
           }`}
         >
-          Continuar Compra
+          Continuar compra
         </button>
       </div>
     </div>

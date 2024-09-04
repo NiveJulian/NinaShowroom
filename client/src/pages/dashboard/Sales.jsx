@@ -62,7 +62,8 @@ const Sales = () => {
       sale.cliente.toLowerCase().includes(lowercasedFilter) ||
       sale.total.toString().toLowerCase().includes(lowercasedFilter) ||
       sale.fecha.toLowerCase().includes(lowercasedFilter) ||
-      sale.hora.toLowerCase().includes(lowercasedFilter)
+      sale.hora.toLowerCase().includes(lowercasedFilter) ||
+      sale.pago.toLowerCase().includes(lowercasedFilter)
     );
   });
 

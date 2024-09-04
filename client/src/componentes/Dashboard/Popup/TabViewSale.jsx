@@ -51,6 +51,20 @@ const TabViewSale = ({ isOpen, onClose, sale, loading }) => {
         <span className="font-bold">Hora: </span>
         {primerVenta?.hora}
       </p>
+      {primerVenta.paymentInfo ? (
+        <p>
+          <span className="font-bold">Estado del pago: </span>
+          <span
+            className={`p-2 border border-gray-200 rounded-md bg-gray-400 text-white ${
+              primerVenta?.paymentInfo === "approved" ? "bg-green-500" : ""
+            }`}
+          >
+            {primerVenta?.paymentInfo}
+          </span>
+        </p>
+      ) : (
+        ""
+      )}
     </li>
   ) : (
     <p>No hay información de envío disponible</p>
