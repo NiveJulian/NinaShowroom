@@ -15,8 +15,12 @@ export const SET_CONDITION = "SET_CONDITION";
 export const GET_CATEGORIES = "GET_CATEGORIES";
 export const FILTER_CATEGORY = "FILTER_CATEGOTY";
 export const CLEAR_FILTER = "CLEAR_FILTER";
+export const CLEAR_COLOR = "CLEAR_COLOR";
 export const GET_COLORS = "GET_COLORS";
 export const FILTER_COLOR = "FILTER_COLOR";
+export const SET_VARIABLE = "SET_VARIABLE";
+export const SEARCH_PRODUCT= "SEARCH_PRODUCT";
+export const CLEAN_SEARCH_PRODUCT= "CLEAN_SEARCH_PRODUCT"
 
 export const GET_CASH_FLOW = "GET_CASH_FLOW";
 export const ADD_CASH_FLOW_ENTRY = "ADD_CASH_FLOW_ENTRY";
@@ -184,6 +188,10 @@ export const uploadImages = (formData) => async (dispatch) => {
   export const clearFilteredProducts = () => ({
     type: CLEAR_FILTER,
   });
+
+  export const clearColor = () => ({
+    type: CLEAR_COLOR,
+  });
   
   export const getCategories = () => async (dispatch) => {
     try {
@@ -224,6 +232,32 @@ export const uploadImages = (formData) => async (dispatch) => {
       console.error("Error fetching products by color:", error);
     }
   };
+
+  export const setVariable = (variable) => async (dispatch) => {
+    try {
+      dispatch({ type: SET_VARIABLE, payload: variable });
+    } catch (error) {
+      console.error("Error setting variable:", error);
+    }
+  };
+
+  export const searchProduct = (imput) => async (dispatch) =>{
+    try {
+      dispatch({ type: SEARCH_PRODUCT, payload: imput });
+    }
+    catch (error) {
+      console.error("Error searching product:", error);
+      toast.error("Error buscando el producto");
+    }
+  }
+
+  export const cleanSearchProducts = () => async (dispatch) => {
+    try {
+      dispatch({ type: CLEAN_SEARCH_PRODUCT });
+    } catch (error) {
+      console.error("Error cleaning search products:", error);
+    }
+  }
 
   // FLUJO DE CAJA
 // Obtener todos los movimientos de caja

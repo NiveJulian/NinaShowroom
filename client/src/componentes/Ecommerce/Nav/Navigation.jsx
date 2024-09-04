@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import CartList from "../Cart/CartList";
 import UserLogged from "../User/UserLogged";
-import { clearFilteredProducts, filterByCategory, renderCondition } from "../../../redux/actions/productActions";
+import { clearFilteredProducts, filterByCategory, renderCondition, setVariable } from "../../../redux/actions/productActions";
 
 const Navigation = ({ isCart }) => {
   const [showCart, setShowCart] = useState(false);
@@ -91,6 +91,7 @@ const Navigation = ({ isCart }) => {
     if (category !== "Todos") {
       dispatch(filterByCategory(category));
       dispatch(renderCondition("filteredProducts"));
+      dispatch(setVariable(category))
     } else {
       dispatch(renderCondition("allProducts"));
       dispatch(clearFilteredProducts());
