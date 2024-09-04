@@ -83,7 +83,7 @@ sheetsRouter.delete("/delete/:rowIndex", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-//PUBLICAR O NO EL PRODUCTO EN LA PAGINA
+
 sheetsRouter.put("/product/:id", async (req, res) => {
   try {
     const auth = await authorize();
@@ -258,7 +258,6 @@ sheetsRouter.get("/filter/color/:color", async (req, res) => {
   }
 });
 
-// Obtener todos los movimientos de caja
 sheetsRouter.get("/cashflow", async (req, res) => {
   try {
     const auth = await authorize(); // Asegúrate de que authorize está correctamente implementado
@@ -278,7 +277,6 @@ sheetsRouter.get("/cashflow", async (req, res) => {
   }
 });
 
-// Agregar un nuevo movimiento al flujo de caja
 sheetsRouter.post("/cashflow/add", async (req, res) => {
   try {
     const auth = await authorize();

@@ -14,7 +14,11 @@ export default function CartList({ cartItems, calculateTotal }) {
   };
 
   return (
-    <div className="absolute w-max top-8 right-0 bg-white rounded-b-lg p-4 shadow-lg">
+    <div
+      className={`absolute ${
+        cartItems.length === 0 ? "w-64" : " w-max"
+      } top-8 right-4 bg-white rounded-b-lg p-4 shadow-lg`}
+    >
       <div
         className={`${
           cartItems.length > 4 ? "h-60 overflow-y-scroll" : "overflow-hidden"
