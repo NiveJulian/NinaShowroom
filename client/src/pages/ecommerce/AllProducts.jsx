@@ -17,9 +17,6 @@ const AllProducts = () => {
   const filterColors = useSelector((state) => state.sheets.filterColors);
   const searchedProducts = useSelector((state) => state.sheets.searchedProducts);
 
-  console.log(products);
-  
-
   useEffect(() => {
     dispatch(fetchSheets());
     dispatch(getCategories());

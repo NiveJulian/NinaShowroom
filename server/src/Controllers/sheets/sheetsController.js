@@ -387,19 +387,8 @@ async function getSaleDataUnitiInfo(auth, id) {
         const user = users.find((user) => user.uid === clienteId);
         const clienteNombre = user ? user.nombre : "Desconocido"; // Nombre del cliente
 
-        // Verificar si la forma de pago es Mercado Pago
-        let paymentInfo = null;
-        if (row[8] === "Mercado Pago" || row[8] === "Mercadopago") { // Suponiendo que la forma de pago está en la columna 9
-          // Buscar el pago relacionado en la tabla PagosMp
-          paymentInfo = paymentsMp.find((payment) => payment.ventaId === id.toString());
-
-          // Si no existe un pago registrado, añadir un mensaje de que no existe actualmente
-          if (!paymentInfo) {
-            paymentInfo = { mensaje: "No existe pago" };
-          }
-        }
-
-        return {
+        // Inicializamos el objeto de la venta
+        let saleData = {
           id: row[0],
           idProducto: row[1],
           idCliente: clienteId,
@@ -421,10 +410,27 @@ async function getSaleDataUnitiInfo(auth, id) {
           cp: row[17],
           celular: row[18],
           medio: row[19],
-          paymentInfo: paymentInfo.estado || null, // Agregar la información del pago de Mercado Pago si existe o el mensaje
-          paymentOrdenId: paymentInfo.ordenId || null,
-          paymentPagoId: paymentInfo.pagoId || null,
+        };
+
+        // Verificar si la forma de pago es Mercado Pago
+        if (row[8] === "Mercado Pago" || row[8] === "Mercadopago") {
+          // Buscar el pago relacionado en la tabla PagosMp
+          const paymentInfo = paymentsMp.find(
+            (payment) => payment.ventaId === id.toString()
+          );
+
+          // Si existe el pago, añadir la información al objeto saleData
+          if (paymentInfo) {
+            saleData.paymentInfo = paymentInfo.estado;
+            saleData.paymentOrdenId = paymentInfo.ordenId;
+            saleData.paymentPagoId = paymentInfo.pagoId;
+          } else {
+            // Si no existe un pago registrado, añadir un mensaje de que no existe actualmente
+            saleData.paymentInfo = "No existe pago";
+          }
         }
+
+        return saleData;
       });
 
     return sales;
@@ -433,6 +439,7 @@ async function getSaleDataUnitiInfo(auth, id) {
     throw error;
   }
 }
+
 
 async function getSaleData(auth) {
   try {

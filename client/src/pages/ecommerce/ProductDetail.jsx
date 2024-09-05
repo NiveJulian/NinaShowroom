@@ -17,6 +17,7 @@ const ProductDetail = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const product = useSelector((state) => state.sheets.product);
+  const cartItems = useSelector((state) => state.cart.cartItems); // Obtener el carrito del estado
   const imgUrl = product?.url?.split(", ");
 
   useEffect(() => {
@@ -40,17 +41,39 @@ const ProductDetail = () => {
     );
   };
 
+  // Validar cantidad al agregar al carrito
   const handleAddToCart = (product) => {
-    if (product.cantidad > 0) {
-      toast.success("Producto agregado al carrito");
-      dispatch(addToCart(product));
+    const available = parseInt(product.cantidad); // Cantidad disponible en stock
+    const selectedQty = parseInt(selectedQuantity); // Cantidad seleccionada por el usuario
+
+    // Buscar si el producto ya está en el carrito
+    const cartItem = cartItems.find((item) => item.id === product.id);
+    const totalInCart = cartItem ? cartItem.cantidad : 0;
+
+    // Validar si la cantidad total en el carrito más la cantidad seleccionada supera el stock
+    if (selectedQty + totalInCart > available) {
+      toast.error(`Solo quedan ${available} unidades disponibles.`);
+    } else if (selectedQty <= 0) {
+      toast.error("La cantidad debe ser mayor que 0.");
     } else {
-      toast.error("Producto sin stock");
+      toast.success("Producto agregado al carrito");
+      dispatch(
+        addToCart({
+          ...product,
+          cantidad: selectedQty, // Agregar la cantidad seleccionada al carrito
+        })
+      );
     }
   };
 
   const handleQuantityChange = (event) => {
-    setSelectedQuantity(event.target.value);
+    const value = parseInt(event.target.value);
+
+    if (value > 0) {
+      setSelectedQuantity(value); // Actualizar la cantidad seleccionada
+    } else {
+      setSelectedQuantity(1); // Evitar cantidades negativas o cero
+    }
   };
 
   const handleThumbnailClick = (index) => {
@@ -161,6 +184,8 @@ const ProductDetail = () => {
                     type="number"
                     name="quantity-select"
                     id="quantity-select"
+                    min="1"
+                    max={product?.cantidad}
                   />
                 </div>
                 <div className="flex w-full">
@@ -186,3 +211,4 @@ const ProductDetail = () => {
 };
 
 export default ProductDetail;
+
