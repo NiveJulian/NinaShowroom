@@ -17,8 +17,8 @@ const validationProductForm = (formData) => {
   }
 
   // Validación de cantidad
-  if (formData.cantidad && !formData.cantidad.trim()) {
-    errors.cantidad = "La cantidad es requerida";
+  if (formData.stock && !formData.stock.trim()) {
+    errors.stock = "La cantidad es requerida";
   }
 
   // Validación de color
@@ -26,7 +26,9 @@ const validationProductForm = (formData) => {
     errors.color = "El color es requerido";
   }
 
-  const sanitizedPrice = formData.precio.replace(/,/g, '');
+  // Asegúrate de que formData.precio sea una cadena
+  const precioString = formData.precio ? formData.precio.toString() : '';
+  const sanitizedPrice = precioString.replace(/,/g, '');
 
   if (formData.precio && !sanitizedPrice) {
     errors.precio = "El precio es requerido";

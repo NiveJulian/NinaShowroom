@@ -9,7 +9,7 @@ export default function InfiniteScroll({
       {visibleProducts < totalProducts && (
         <button
           onClick={onLoadMore}
-          className="mt-8 px-4 py-2 flex gap-4 bg-gray-300 border-gray-500 hover:bg-secondary shadow-md text-white rounded-md"
+          className="mt-8 px-4 py-2 flex gap-4 bg-gray-800 border-gray-700 hover:bg-secondary shadow-md text-white rounded-md"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

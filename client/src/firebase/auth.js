@@ -12,7 +12,7 @@ import {
   createSeller,
   createUser,
   loginWithGoogle,
-} from "../redux/actions/actions";
+} from "../redux/actions/authActions";
 import CryptoJS from "crypto-js";
 import toast from "react-hot-toast";
 

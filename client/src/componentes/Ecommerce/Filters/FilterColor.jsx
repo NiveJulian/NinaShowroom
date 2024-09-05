@@ -1,8 +1,7 @@
 import { useDispatch } from "react-redux";
 import React from "react";
 import { useSelector } from "react-redux";
-import { getProductsByColor, renderCondition } from "../../../redux/actions/actions";
-
+import { clearColor, getProductsByColor, renderCondition, setVariable } from "../../../redux/actions/productActions";
 const FilterColor = () => {
   const colors = useSelector((state) => state.sheets.colors);
   const dispatch = useDispatch();
@@ -13,8 +12,11 @@ const FilterColor = () => {
     if (color !== "Todos") {
       dispatch(getProductsByColor(color));
       dispatch(renderCondition("filteredColor"));
+      dispatch(setVariable(color))
     } else {
       dispatch(renderCondition("allProducts"));
+      dispatch(clearColor());
+      dispatch(setVariable(null))
     }
   };
 

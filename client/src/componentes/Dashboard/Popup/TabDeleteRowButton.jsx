@@ -1,6 +1,6 @@
 import React from "react";
 import { useDispatch } from "react-redux";
-import { deleteSheetRow } from "../../../redux/actions/actions";
+import { deleteSheetRow } from "../../../redux/actions/productActions";
 
 const TabDeleteRowButton = ({ rowIndex, onClose }) => {
   const dispatch = useDispatch();

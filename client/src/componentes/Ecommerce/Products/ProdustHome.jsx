@@ -1,14 +1,21 @@
 import React, { useEffect } from "react";
 import { useInView } from "react-intersection-observer";
 import ProductCard from "./ProductCard";
-import { useDispatch } from "react-redux";
-import { addToCart } from "../../../redux/actions/actions";
+import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
+import { addToCart } from "../../../redux/actions/cartActions";
 
 const ProdustHome = ({ allProducts }) => {
   const dispatch = useDispatch();
+  const cartError = useSelector((state) => state.cart.cartError);
 
-  const publishedProducts = allProducts.filter(
+  useEffect(() => {
+    if (cartError) {
+      toast.error(cartError);
+    }
+  }, [cartError]);
+
+  const publishedProducts = allProducts?.filter(
     (product) => product.publicado === "si"
   );
   // Obtener los últimos 8 productos
@@ -33,8 +40,8 @@ const FloatingProductCard = ({ product, dispatch }) => {
   const processColors = (colorString) => {
     return colorString
       .split(",") // Divide la cadena por comas
-      .map(color => color.trim().toLowerCase()) // Elimina espacios y convierte a minúsculas
-      .filter(color => color); // Elimina entradas vacías
+      .map((color) => color.trim().toLowerCase()) // Elimina espacios y convierte a minúsculas
+      .filter((color) => color); // Elimina entradas vacías
   };
   return (
     <div
@@ -49,6 +56,7 @@ const FloatingProductCard = ({ product, dispatch }) => {
         url={product.url}
         sku={product.sku}
         price={product.precio}
+        quantity={product.stock}
         colors={processColors(product.color)}
         onAddToCart={() => handleAddToCart(product, dispatch)}
         isNew={true}
@@ -60,7 +68,6 @@ const FloatingProductCard = ({ product, dispatch }) => {
 const handleAddToCart = (product, dispatch) => {
   // Lógica para añadir al carrito
   dispatch(addToCart(product));
-  toast.success(`Producto ${product.nombre} añadido al carrito`);
 };
 
 export default ProdustHome;

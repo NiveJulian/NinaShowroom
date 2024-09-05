@@ -1,20 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import {
-  cleanCart,
-  createSale,
-  decrementQuantity,
-  incrementQuantity,
-  removeFromCart,
-} from "../../../redux/actions/actions";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import StepContact from "../StepsOrders/StepContact";
 import StepShipping from "../StepsOrders/StepShipping";
 import StepPayment from "../StepsOrders/StepPayment";
 import ProgressSteps from "../StepsOrders/ProgressSteps";
 import colorMap from "../../Colors/colorsMap";
+import { createSale } from "../../../redux/actions/salesActions";
+import { cleanCart, decrementQuantity, incrementQuantity, removeFromCart } from "../../../redux/actions/cartActions";
+import { createPayment } from "../../../redux/actions/authActions";
 
 const processColors = (colors) => {
   return colors
@@ -25,10 +21,11 @@ const processColors = (colors) => {
 const Cart = ({ product, calcularTotal, usuario }) => {
   const [step, setStep] = useState(1);
   const [selectedColors, setSelectedColors] = useState({});
-
+  const [mpId, setMpId] = useState(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [formaPago, setFormaPago] = useState("");
+
   const [formCliente, setFormCliente] = useState({
     nombre: usuario.name || "",
     correo: usuario.email || "",
@@ -37,6 +34,17 @@ const Cart = ({ product, calcularTotal, usuario }) => {
     cp: usuario.cp || "",
     celular: "",
   });
+
+  useEffect(() => {
+    const initialColors = {};
+    product.forEach((prod) => {
+      if (prod.color) {
+        initialColors[prod.id] = prod.color; // Asigna el color preseleccionado si existe
+      }
+    });
+    setSelectedColors(initialColors);
+  }, [product]);
+  
 
   const handleColorSelection = (productId, color) => {
     setSelectedColors((prevState) => ({
@@ -100,7 +108,7 @@ const Cart = ({ product, calcularTotal, usuario }) => {
         sku: prod.sku,
         nombre: prod.nombre,
         talle: prod.talle,
-        color: selectedColors[prod.id], // Usar el color seleccionado
+        color: selectedColors[prod.id],
         precio: prod.precio,
         cantidad: prod.cantidad,
       })),
@@ -108,23 +116,28 @@ const Cart = ({ product, calcularTotal, usuario }) => {
       formaPago,
       cliente: formCliente,
       tipoEnvio: selectedDeliveryMethod,
+      medio: "Pagina",
     };
 
     if (venta.formaPago === "") {
       toast.error("Falta forma de pago");
     } else if (venta.productos.length === 0) {
       toast.error("El carrito está vacío");
-    } else if (venta.cliente.nombre.trim() === "") {
+    } else if (venta.cliente.nombre === "") {
       toast.error("Falta tu nombre :(");
     } else {
-      toast.success("Venta creada exitosamente...");
-      // dispatch(createSale(venta));
-
       setStep(4);
       if (venta.formaPago === "Efectivo") {
-        dispatch(cleanCart());
+        toast.success("Muchas gracias por elegirnos...");
+        dispatch(createSale(venta));
         const enlaceWhatsApp = generarMensajeWhatsApp(venta);
         window.open(enlaceWhatsApp, "_blank", "noopener,noreferrer");
+        dispatch(cleanCart());
+      } else if (venta.formaPago === "Mercadopago") {
+        toast.success("Muchas gracias por elegirnos...");
+        dispatch(createSale(venta));
+        dispatch(createPayment(venta));
+        dispatch(cleanCart());
       }
     }
   };
@@ -201,6 +214,8 @@ const Cart = ({ product, calcularTotal, usuario }) => {
               handleFormaPagoChange={handleFormaPagoChange}
               prevStep={prevStep}
               handleCreateVenta={handleCreateVenta}
+              product={product}
+              usuario={usuario}
             />
           )}
         </div>
@@ -217,7 +232,7 @@ const Cart = ({ product, calcularTotal, usuario }) => {
               product?.map((prod, i) => {
                 const imgUrl = prod?.url?.split(",")[0];
                 const colorsArray = processColors(prod?.color);
-
+              
                 return (
                   <div
                     key={i}

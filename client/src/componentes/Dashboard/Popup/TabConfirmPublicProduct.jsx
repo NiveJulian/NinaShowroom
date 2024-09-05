@@ -1,22 +1,21 @@
 import React from "react";
 import { useDispatch } from "react-redux";
-import { publicProductById } from "../../../redux/actions/actions";
+import { publicProductById } from "../../../redux/actions/productActions";
 
 const TabConfirmPublicProduct = ({ id, onClose }) => {
   const dispatch =  useDispatch()
   const handleActiveProduct = () => {
     dispatch(publicProductById(id))
-    console.log(id);
     onClose();
   };
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-50">
       <div className="bg-white p-6 flex flex-col gap-8 justify-center items-center rounded-md m-6">
-        <div className="flex flex-col justify-center items-center">
-          <h1 className="font-semibold text-lg">
-            Estas a punto de publicar un producto!
+        <div className="flex flex-col gap-2 justify-center items-center">
+          <h1 className="font-semibold text-center text-lg">
+            Estas a punto de cambiar el estado de publicacion de tu producto!
           </h1>
-          <p className="text-sm text-gray-500">Al confirmar este producto se vera en la pagina principal</p>
+          <p className="text-xs text-clips text-gray-500">ℹ Al confirmar este producto se vera en la pagina principal o se quitara de la pagina principal</p>
         </div>
         <div className="flex flex-row gap-2">
           <button

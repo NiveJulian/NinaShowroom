@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Layout } from "../../componentes/Dashboard/Layout/Layout";
 import DisplayProductDashboard from "../../componentes/Dashboard/Products/DisplayProductDashboard";
 import { useEffect } from "react";
-import { fetchSheets, getCategories } from "../../redux/actions/actions";
+import { fetchSheets, getCategories } from "../../redux/actions/productActions";
 
 
 

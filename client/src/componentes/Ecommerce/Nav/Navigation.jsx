@@ -1,8 +1,10 @@
+import { useDispatch } from "react-redux";
 import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import CartList from "../Cart/CartList";
 import UserLogged from "../User/UserLogged";
+import { clearFilteredProducts, filterByCategory, renderCondition, setVariable } from "../../../redux/actions/productActions";
 
 const Navigation = ({ isCart }) => {
   const [showCart, setShowCart] = useState(false);
@@ -53,6 +55,7 @@ const Navigation = ({ isCart }) => {
   const user = useSelector((state) => state.auth.user);
   const categories = useSelector((state) => state.sheets.categories);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const isEmpty = (obj) => {
     return Object.keys(obj).length === 0;
@@ -84,10 +87,24 @@ const Navigation = ({ isCart }) => {
     return total.toFixed(2);
   };
 
+  const handleFilter = (category) => {
+    if (category !== "Todos") {
+      dispatch(filterByCategory(category));
+      dispatch(renderCondition("filteredProducts"));
+      dispatch(setVariable(category))
+    } else {
+      dispatch(renderCondition("allProducts"));
+      dispatch(clearFilteredProducts());
+    }
+
+    // Navegar utilizando `useNavigate` en lugar de `window.location.href`
+    navigate("/product");
+  };
+
   return (
     <nav
       className={`w-full ${
-        isScrolled ? "fixed top-0 z-50" : "relative"
+        isScrolled ? "fixed top-0 z-30" : "relative"
       } bg-white`}
     >
       <div className="relative z-30 bg-transparent shadow-lg">
@@ -117,11 +134,15 @@ const Navigation = ({ isCart }) => {
               </div>
               <div className="logo-container">
                 <Link to="/" className="flex-shrink-0">
-                  <div className={`flex gap-1 items-center ${animationCompleted ? 'completed' : ''}`}>
+                  <div
+                    className={`flex gap-1 items-center ${
+                      animationCompleted ? "completed" : ""
+                    }`}
+                  >
                     {["N", "I", "N", "A"].map((letter, index) => (
                       <span
                         key={index}
-                        className="logo-text text-primary"
+                        className="logo-text text-primary font-serif"
                       >
                         {letter}
                       </span>
@@ -144,7 +165,7 @@ const Navigation = ({ isCart }) => {
                   >
                     <Link
                       to="/product"
-                      className="text-sm px-3 py-2 rounded-md text-gray-800 hover:bg-tertiary hover:text-white transition duration-150 ease-in-out cursor-pointer focus:outline-none focus:text-white focus:bg-gray-700"
+                      className="text-sm px-3 py-2 rounded-md leading-5 text-gray-800 hover:bg-tertiary hover:text-white transition duration-150 ease-in-out cursor-pointer focus:outline-none focus:text-white focus:bg-gray-700"
                     >
                       Productos
                     </Link>
@@ -157,9 +178,12 @@ const Navigation = ({ isCart }) => {
                                 key={index}
                                 className="border border-gray-400 flex justify-center items-center text-center p-1 hover:text-gray-50 hover:bg-tertiary rounded-md"
                               >
-                                <Link to={`/products/${category}`}>
+                                <button
+                                  onClick={() => handleFilter(category)}
+                                  className="w-full h-full text-center"
+                                >
                                   {category}
-                                </Link>
+                                </button>
                               </li>
                             );
                           }
@@ -167,6 +191,12 @@ const Navigation = ({ isCart }) => {
                       </ul>
                     )}
                   </ul>
+                  <Link
+                    to="/howcanbuy"
+                    className="ml-4 px-3 py-2 rounded-md text-sm leading-5 text-gray-800 hover:bg-tertiary hover:text-white transition duration-150 ease-in-out cursor-pointer focus:outline-none focus:text-white focus:bg-gray-700 "
+                  >
+                    ¿Como Comprar?
+                  </Link>
                 </div>
               </div>
             </div>
@@ -202,7 +232,7 @@ const Navigation = ({ isCart }) => {
               <div className="tooltip">
                 <button
                   onClick={handleShowLogin}
-                  className={`border hover:shadow-lg hover:border-secondary hover:text-secondary rounded-lg w-auto p-2 flex items-center`}
+                  className={`border hover:shadow-lg hover:border-secondary hover:text-secondary rounded-lg w-auto p-2 flex items-center gap-2`}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -218,6 +248,7 @@ const Navigation = ({ isCart }) => {
                       d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Z"
                     />
                   </svg>
+                  <span>{user !== null ? `Hola ${user.name}` : "Iniciar sesión"}</span>
                 </button>
               </div>
               <div className="relative mt-4">
@@ -238,7 +269,7 @@ const Navigation = ({ isCart }) => {
         </div>
         {isMenuOpen && (
           <div className="lg:hidden absolute bg-gray-100 w-full">
-            <div className="px-2 pt-2 pb-3">
+            <div className="px-2 pt-2 pb-3 gap-2">
               <Link
                 to="/"
                 className="mt-1 block px-3 py-2 rounded-md text-base font-medium text-gray-800 hover:bg-secondary hover:text-white focus:outline-none focus:text-white focus:bg-gray-700 transition duration-150 ease-in-out cursor-pointer"
@@ -249,19 +280,13 @@ const Navigation = ({ isCart }) => {
                 to="/product"
                 className="block px-3 py-2 rounded-md text-base font-medium text-gray-800 hover:bg-secondary hover:text-white focus:outline-none focus:text-white focus:bg-gray-700 transition duration-150 ease-in-out cursor-pointer"
               >
-                Products
+                Productos
               </Link>
               <Link
-                to="#"
-                className="mt-1 block px-3 py-2 rounded-md text-base font-medium text-gray-800 hover:bg-secondary hover:text-white focus:outline-none focus:text-white focus:bg-gray-700 transition duration-150 ease-in-out cursor-pointer"
+                to="/howcanbuy"
+                className="block px-3 py-2 rounded-md text-base font-medium text-gray-800 hover:bg-secondary hover:text-white focus:outline-none focus:text-white focus:bg-gray-700 transition duration-150 ease-in-out cursor-pointer"
               >
-                Recipe
-              </Link>
-              <Link
-                to="#"
-                className="mt-1 block px-3 py-2 rounded-md text-base font-medium text-gray-800 hover:bg-secondary hover:text-white focus:outline-none focus:text-white focus:bg-gray-700 transition duration-150 ease-in-out cursor-pointer"
-              >
-                Promo
+                ¿Como Comprar?
               </Link>
             </div>
           </div>

@@ -20,6 +20,9 @@ const {
   getAllColors,
   getProductsByColor,
   activeProductById,
+  getSaleByUserId,
+  registerSaleDashboard,
+  putSaleChangeState,
 } = require("../Controllers/sheets/sheetsController.js");
 const uploadToS3 = require("../Controllers/sheets/uploadImages.js");
 
@@ -53,6 +56,7 @@ sheetsRouter.post("/data", async (req, res) => {
     const updates = await appendRow(auth, data);
     res.json(updates);
   } catch (error) {
+    console.log({ error: error.message });
     res.status(500).send(error.message);
   }
 });
@@ -79,7 +83,7 @@ sheetsRouter.delete("/delete/:rowIndex", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-//PUBLICAR O NO EL PRODUCTO EN LA PAGINA
+
 sheetsRouter.put("/product/:id", async (req, res) => {
   try {
     const auth = await authorize();
@@ -92,11 +96,18 @@ sheetsRouter.put("/product/:id", async (req, res) => {
   }
 });
 
-
-
-
 sheetsRouter.post("/images", (req, res) => {
   uploadToS3(req, res);
+});
+
+sheetsRouter.get("/sale", async (req, res) => {
+  try {
+    const auth = await authorize();
+    const sale = await getSaleData(auth);
+    res.json(sale.salesData);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
 });
 
 sheetsRouter.get("/sale/:id", async (req, res) => {
@@ -116,23 +127,59 @@ sheetsRouter.get("/sale/:id", async (req, res) => {
   }
 });
 
-sheetsRouter.get("/sale", async (req, res) => {
+sheetsRouter.put("/sale/:id/changestate/:state", async (req, res) => {
   try {
+    const { id, state } = req.params;
     const auth = await authorize();
-    const sale = await getSaleData(auth);
-    res.json(sale.salesData);
+    const saleChanged = await putSaleChangeState(auth, id, state);
+
+    res.json(saleChanged);
   } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send(error.message);
+  }
+});
+
+sheetsRouter.post("/sale/dashboard", async (req, res) => {
+  try {
+    const data = req.body;
+    // console.log(data)
+    const auth = await authorize();
+    const sale = await registerSaleDashboard(auth, data);
+    res.json(sale);
+  } catch (error) {
+    // console.log({ error: error.message });
     res.status(500).send(error.message);
   }
 });
 
 sheetsRouter.post("/sale", async (req, res) => {
   try {
+    const data = req.body;
+    // console.log(data)
     const auth = await authorize();
-    const sale = await registerSale(auth, req.body);
+    const sale = await registerSale(auth, data);
     res.json(sale);
   } catch (error) {
+    // console.log({ error: error.message });
     res.status(500).send(error.message);
+  }
+});
+
+sheetsRouter.get("/sales/:uid", async (req, res) => {
+  try {
+    const { uid } = req.params;
+
+    const authClient = await authorize();
+
+    const sales = await getSaleByUserId(authClient, uid);
+    // console.log(sales)
+    res.status(200).json(sales);
+  } catch (error) {
+    res.status(500).json({
+      message: "Error obteniendo ventas por UID",
+      error: error.message,
+    });
   }
 });
 
@@ -198,7 +245,7 @@ sheetsRouter.get("/colors", async (req, res) => {
   } catch (error) {
     res.status(500).send(error.message);
   }
-})
+});
 
 sheetsRouter.get("/filter/color/:color", async (req, res) => {
   try {
@@ -209,9 +256,8 @@ sheetsRouter.get("/filter/color/:color", async (req, res) => {
   } catch (error) {
     res.status(404).send("Producto no encontrado");
   }
-})
+});
 
-// Obtener todos los movimientos de caja
 sheetsRouter.get("/cashflow", async (req, res) => {
   try {
     const auth = await authorize(); // Asegúrate de que authorize está correctamente implementado
@@ -231,7 +277,6 @@ sheetsRouter.get("/cashflow", async (req, res) => {
   }
 });
 
-// Agregar un nuevo movimiento al flujo de caja
 sheetsRouter.post("/cashflow/add", async (req, res) => {
   try {
     const auth = await authorize();

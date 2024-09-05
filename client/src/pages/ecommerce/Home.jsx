@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useInView } from "react-intersection-observer";
 import Navigation from "../../componentes/Ecommerce/Nav/Navigation";
 import Carrousel from "../../componentes/Ecommerce/Carrousel/Carrousel";
-import { fetchSheets } from "../../redux/actions/actions";
+import { fetchSheets } from "../../redux/actions/productActions";
 import ProdustHome from "../../componentes/Ecommerce/Products/ProdustHome";
 import Features from "../../componentes/Ecommerce/Features/Features";
 import FooterPage from "../../componentes/Ecommerce/Footer/FooterPage";
