@@ -47,6 +47,7 @@ function FooterPage() {
                     className="hover:underline"
                   >
                     ryc.general@gmail.com
+
                   </a>
                 </li>
                 <li>
