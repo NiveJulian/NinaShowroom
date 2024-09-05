@@ -682,15 +682,21 @@ async function getAllColors(auth) {
   try {
     const { products } = await getSheetData(auth);
 
+    console.log(products)
+
     const colors = [
       ...new Set(
-        products.map((product) =>
-          product.color
-            .trim()
-            .toLowerCase()
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-        )
+        products
+          .filter((product) => product.publicado === "si")
+          .flatMap((product) => {
+            const colorList = product.color
+              .trim()
+              .toLowerCase()
+              .normalize("NFD")
+              .replace(/[\u0300-\u036f]/g, "");
+
+            return colorList.includes(",") ? colorList.split(",") : [colorList];
+          })
       ),
     ];
 
@@ -711,14 +717,19 @@ async function getProductsByColor(auth, color) {
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "");
 
-    const filteredProducts = products.filter(
-      (product) =>
-        product.color
+    const filteredProducts = products
+      .filter((product) => product.publicado === "si")
+      .filter((product) => {
+        const colorList = product.color
           .trim()
           .toLowerCase()
           .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "") === trimmedColor
-    );
+          .replace(/[\u0300-\u036f]/g, "");
+
+        return colorList.includes(",")
+          ? colorList.split(",").includes(trimmedColor)
+          : colorList === trimmedColor;
+      });
 
     if (filteredProducts.length === 0) {
       throw new Error("Producto no encontrado");

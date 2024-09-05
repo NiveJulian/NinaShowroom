@@ -241,9 +241,12 @@ export const uploadImages = (formData) => async (dispatch) => {
     }
   };
 
-  export const searchProduct = (imput) => async (dispatch) =>{
+  export const searchProduct = (name) => async (dispatch) =>{
     try {
-      dispatch({ type: SEARCH_PRODUCT, payload: imput });
+      
+      dispatch({ type: SEARCH_PRODUCT, payload: name });
+      
+      
     }
     catch (error) {
       console.error("Error searching product:", error);

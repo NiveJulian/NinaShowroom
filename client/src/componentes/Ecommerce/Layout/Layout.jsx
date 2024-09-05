@@ -3,7 +3,7 @@ import FilterCategories from "../Filters/FilterCategories";
 import FilterColor from "../Filters/FilterColor";
 import SearchBar from "../Searchbar/SearchBar";
 import { useSelector, useDispatch } from "react-redux";
-import { renderCondition, setVariable } from "../../../redux/actions/productActions";
+import { clearColor, clearFilteredProducts, renderCondition, setVariable } from "../../../redux/actions/productActions";
 
 
 const Layout = ({ children, items }) => {

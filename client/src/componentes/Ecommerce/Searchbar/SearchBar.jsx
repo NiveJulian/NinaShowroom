@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { renderCondition, searchProduct, cleanSearchProducts } from "../../../redux/actions/productActions";
+import { renderCondition, cleanSearchProducts, searchProduct } from "../../../redux/actions/productActions";
 import toast from "react-hot-toast";
 
 export const SearchBar = () => {
@@ -25,8 +25,12 @@ export const SearchBar = () => {
       return;
     }
     dispatch(searchProduct(name)); // Realiza la acción que busca por nombre
+    
+    
     dispatch(renderCondition("searchedProducts"));
   };
+
+ 
 
   return (
     <div className="w-full max-w-md mx-auto mb-4">
