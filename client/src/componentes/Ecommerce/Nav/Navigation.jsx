@@ -256,7 +256,7 @@ const Navigation = ({ isCart }) => {
                     />
                   </svg>
                   <span>
-                    {!isEmpty(user) ? `Hola ${user?.name}` : "Iniciar sesión"}
+                    {!isEmpty(user) ? `Hola ${user?.name}!` : "Iniciar sesión"}
                   </span>
                 </button>
               </div>

@@ -101,7 +101,7 @@ const UserLogged = ({ user, onClose }) => {
                       />
                     </svg>
 
-                    <span className="text-sm text-slate-400">Dashboard</span>
+                    <span className="text-sm text-slate-400">Panel de control</span>
                   </Link>
                 ) : (
                   ""
