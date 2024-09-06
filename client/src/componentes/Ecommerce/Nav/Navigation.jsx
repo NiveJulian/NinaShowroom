@@ -4,7 +4,12 @@ import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import CartList from "../Cart/CartList";
 import UserLogged from "../User/UserLogged";
-import { clearFilteredProducts, filterByCategory, renderCondition, setVariable } from "../../../redux/actions/productActions";
+import {
+  clearFilteredProducts,
+  filterByCategory,
+  renderCondition,
+  setVariable,
+} from "../../../redux/actions/productActions";
 
 const Navigation = ({ isCart }) => {
   const [showCart, setShowCart] = useState(false);
@@ -57,6 +62,8 @@ const Navigation = ({ isCart }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  console.log(user)
+
   const isEmpty = (obj) => {
     return Object.keys(obj).length === 0;
   };
@@ -91,7 +98,7 @@ const Navigation = ({ isCart }) => {
     if (category !== "Todos") {
       dispatch(filterByCategory(category));
       dispatch(renderCondition("filteredProducts"));
-      dispatch(setVariable(category))
+      dispatch(setVariable(category));
     } else {
       dispatch(renderCondition("allProducts"));
       dispatch(clearFilteredProducts());
@@ -232,7 +239,7 @@ const Navigation = ({ isCart }) => {
               <div className="tooltip">
                 <button
                   onClick={handleShowLogin}
-                  className={`border hover:shadow-lg hover:border-secondary hover:text-secondary rounded-lg w-auto p-2 flex items-center gap-2`}
+                  className="border hover:shadow-lg hover:border-secondary hover:text-secondary rounded-lg w-auto p-2 flex items-center gap-2"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -248,7 +255,9 @@ const Navigation = ({ isCart }) => {
                       d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Z"
                     />
                   </svg>
-                  <span>{user !== null ? `Hola ${user.name}` : "Iniciar sesión"}</span>
+                  <span>
+                    {!isEmpty(user) ? `Hola ${user?.name}` : "Iniciar sesión"}
+                  </span>
                 </button>
               </div>
               <div className="relative mt-4">

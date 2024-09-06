@@ -2,6 +2,7 @@ import React from "react";
 import { doSignOut } from "../../../firebase/auth";
 import { Link } from "react-router-dom";
 const UserLogged = ({ user, onClose }) => {
+  console.log(user);
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-50">
       <div className="relative max-w-md mx-auto md:max-w-2xl min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded-xl mt-16">
@@ -15,18 +16,18 @@ const UserLogged = ({ user, onClose }) => {
           </button>
           <div className="text-center mt-2">
             <h3 className="text-2xl text-slate-700 font-bold leading-normal mb-1">
-              {user.name}
+              {user?.name}
             </h3>
             <div className="text-xs mt-0 mb-2 text-slate-400 font-bold uppercase">
               <i className="fas fa-map-marker-alt mr-2 text-slate-400 opacity-75"></i>
-              {user.provincia}, Argentina
+              {user?.provincia}, Argentina
             </div>
           </div>
           <div className="flex flex-wrap justify-center">
             <div className="w-full text-center mt-20">
               <div className="flex justify-center lg:pt-4 pt-8 pb-0 items-center gap-4">
                 <Link
-                  to={`/userpurchase/${user.uid}`}
+                  to={`/userpurchase/${user?.uid}`}
                   className="p-2 w-full rounded-md shadow-md text-center flex flex-col gap-2 justify-center items-center hover:animate-pulse"
                 >
                   <svg
@@ -80,6 +81,31 @@ const UserLogged = ({ user, onClose }) => {
 
                   <span className="text-sm text-slate-400">Ayuda</span>
                 </Link>
+                {user?.rol === "admin" || user?.rol === "seller" ? (
+                  <Link
+                    to={`/dashboard/dashboard`}
+                    className="p-2 w-full rounded-md shadow-md text-center flex flex-col gap-2 justify-center items-center hover:animate-pulse"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth="1.5"
+                      stroke="currentColor"
+                      className="size-6"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6"
+                      />
+                    </svg>
+
+                    <span className="text-sm text-slate-400">Dashboard</span>
+                  </Link>
+                ) : (
+                  ""
+                )}
               </div>
             </div>
           </div>
