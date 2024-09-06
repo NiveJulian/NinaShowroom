@@ -7,13 +7,13 @@ import { getAuth } from "firebase/auth";
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyAy_3rljL49rC0mg1NRdzeL7VqvnhZpybk",
-  authDomain: "ecommerce-mendoza.firebaseapp.com",
-  projectId: "ecommerce-mendoza",
-  storageBucket: "ecommerce-mendoza.appspot.com",
-  messagingSenderId: "806853421358",
-  appId: "1:806853421358:web:ce9d5c2327c5ff4abeb2bf",
-  measurementId: "G-2DP3YNG948",
+  apiKey: "AIzaSyABhRtN6HAmKcHw1Hx96YaX7P1LCX2bo88",
+  authDomain: "ninashowroom-3dcb7.firebaseapp.com",
+  projectId: "ninashowroom-3dcb7",
+  storageBucket: "ninashowroom-3dcb7.appspot.com",
+  messagingSenderId: "757512827058",
+  appId: "1:757512827058:web:4958e562a14eb36cc359ab",
+  measurementId: "G-1EP5Q6YW4F"
 };
 
 // Initialize Firebase
