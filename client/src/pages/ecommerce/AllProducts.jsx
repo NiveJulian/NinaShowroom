@@ -16,6 +16,10 @@ const AllProducts = () => {
   const condition = useSelector((state) => state.sheets.rCondition);
   const filterColors = useSelector((state) => state.sheets.filterColors);
   const searchedProducts = useSelector((state) => state.sheets.searchedProducts);
+ 
+  
+
+  
 
   useEffect(() => {
     dispatch(fetchSheets());
