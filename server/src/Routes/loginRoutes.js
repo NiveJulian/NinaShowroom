@@ -19,7 +19,7 @@ loginRoutes.post("/third", async (req, res) => {
     // Configura el cliente de autenticación de Google
     const authClient = await authorize();
 
-    let userData = await getUserByEmail(authClient, email);
+    const userData = await getUserByEmail(authClient, email);
 
     // Si el usuario no existe, crea uno nuevo
     if (!userData) {
