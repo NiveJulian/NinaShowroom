@@ -18,7 +18,7 @@ const SheetsData = ({
               <th>Nombre</th>
               <th>Color</th>
               <th>Talle</th>
-              <th>Cantidad</th>
+              <th>Stock</th>
               <th>Precio</th>
               <th>Imagen</th>
               <th>SKU</th>
@@ -47,7 +47,7 @@ const SheetsData = ({
                     <td>{row.nombre}</td>
                     <td>{row.color}</td>
                     <td>{row.talle}</td>
-                    <td>{row.cantidad}</td>
+                    <td>{row.stock}</td>
                     <td>{row.precio}</td>
                     <td className="flex">
                       {imgUrl?.length > 1 ? (
@@ -109,7 +109,7 @@ const SheetsData = ({
                           />
                         </svg>
                       </button>
-                      {row.cantidad !== 0 ? (
+                      {row.stock !== 0 ? (
                         <button
                           title="Publicar en la pagina"
                           className={`${

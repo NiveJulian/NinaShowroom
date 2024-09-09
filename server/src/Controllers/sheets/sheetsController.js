@@ -32,7 +32,7 @@ async function getSheetData(auth) {
       spreadsheetId: process.env.GOOGLE_SHEETS_ID,
       range: "Productos!A2:J",
     });
-    const rows = res.data.values;
+    const rows = res.data.values || []; // Asegúrate de que 'rows' sea un array vacío si no hay datos
 
     let lastId = 0;
     if (rows.length > 0) {
@@ -55,7 +55,9 @@ async function getSheetData(auth) {
 
       // Filtra las propiedades que no están vacías o undefined
       return Object.fromEntries(
-        Object.entries(product).filter(([_, value]) => value !== undefined && value !== "")
+        Object.entries(product).filter(
+          ([_, value]) => value !== undefined && value !== ""
+        )
       );
     });
 
@@ -65,7 +67,6 @@ async function getSheetData(auth) {
     throw new Error(error.message);
   }
 }
-
 
 async function getSheetDataById(id, auth) {
   try {
@@ -124,7 +125,7 @@ async function appendRow(auth, rowData) {
     nombre,
     color,
     tamaño,
-    cantidad,
+    stock,
     precio,
     urlString,
     sku,
