@@ -107,7 +107,7 @@ export const createSale = (data) => async (dispatch) => {
       dispatch(getSales());
 
       await sendEmail(data.cliente.correo, data);
-      await sendEmailOrder("niveyrojulian5@gmail.com", data);
+      await sendEmailOrder("ryc.general@gmail.com", data);
       dispatch({
         type: CREATED_SALE,
         payload: res,
