@@ -4,7 +4,12 @@ import Compressor from "compressorjs";
 import Spinner from "../Spinner/Spinner";
 import validationProductForm from "./validationProductForm";
 import toast from "react-hot-toast";
-import { addSheetRow, clearImages, updateRow, uploadImages } from "../../../redux/actions/productActions";
+import {
+  addSheetRow,
+  clearImages,
+  updateRow,
+  uploadImages,
+} from "../../../redux/actions/productActions";
 
 export default function TabFormCreateProduct({ isOpen, onClose, product }) {
   const dispatch = useDispatch();
@@ -131,9 +136,6 @@ export default function TabFormCreateProduct({ isOpen, onClose, product }) {
           mimeType: "image/webp",
         });
       });
-
-      console.log("Tamaño del archivo comprimido:", compressedFile.size);
-
       const formDataImage = new FormData();
       formDataImage.append("file", compressedFile);
 
