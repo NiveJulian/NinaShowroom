@@ -5,13 +5,13 @@ const mime = require("mime-types");
 const dotenv = require("dotenv");
 dotenv.config();
 
-const bucketName = process.env.AWS_S3_BUCKET;
+const bucketName = process.env.AWS_S3_BUCKET_NINA;
 
 const s3Client = new S3Client({
   region: "us-east-1",
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY,
-    secretAccessKey: process.env.AWS_SECRET_KEY,
+    accessKeyId: process.env.AWS_ACCESS_KEY_NINA,
+    secretAccessKey: process.env.AWS_SECRET_KEY_NINA,
   },
 });
 
