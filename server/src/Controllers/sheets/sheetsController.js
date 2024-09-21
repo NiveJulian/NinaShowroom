@@ -115,7 +115,7 @@ async function appendRow(auth, rowData) {
   const sheets = google.sheets({ version: "v4", auth });
   const { rows, lastId } = await getSheetData(auth);
   const newId = lastId + 1;
-  const { categoria, nombre, color, tamaño, cantidad, precio, url } = rowData;
+  const { categoria, nombre, color, tamaño, stock, precio, url } = rowData;
   const sku = generateSKU(categoria, nombre, color, newId);
   const urlString = Array.isArray(url) ? url.join(", ") : url;
   const publicadoValue = "no"; // Nueva variable para el valor de publicado

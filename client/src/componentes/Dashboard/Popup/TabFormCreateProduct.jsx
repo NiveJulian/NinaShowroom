@@ -18,7 +18,7 @@ export default function TabFormCreateProduct({ isOpen, onClose, product }) {
     nombre: "",
     categoria: "",
     tamaño: "",
-    cantidad: "",
+    stock: "",
     color: "",
     precio: 0,
     url: [],
@@ -42,7 +42,7 @@ export default function TabFormCreateProduct({ isOpen, onClose, product }) {
         nombre: product.nombre || "",
         color: product.color || "",
         tamaño: product.talle || "",
-        cantidad: product.stock || "",
+        stock: product.stock || "",
         precio: product.precio || "",
         url: product.url ? product.url.split(",").map((url) => url.trim()) : [],
       });
@@ -77,7 +77,7 @@ export default function TabFormCreateProduct({ isOpen, onClose, product }) {
           nombre: formData.nombre,
           color: formData.color,
           tamaño: formData.tamaño,
-          cantidad: formData.cantidad,
+          stock: formData.stock,
           precio: formData.precio,
           url: formData.url.join(", "),
         };
@@ -89,7 +89,7 @@ export default function TabFormCreateProduct({ isOpen, onClose, product }) {
             nombre: formData.nombre,
             color: formData.color,
             tamaño: formData.tamaño,
-            cantidad: formData.cantidad,
+            stock: formData.stock,
             precio: formData.precio,
             url: formData.url.join(", "),
           };
@@ -302,17 +302,17 @@ export default function TabFormCreateProduct({ isOpen, onClose, product }) {
             )}
           </div>
           <div className="mt-2 w-1/2">
-            <label htmlFor="cantidad">Cantidad</label>
+            <label htmlFor="stock">stock</label>
             <input
               className={`bg-white w-full p-2 text-center mt-2 rounded-md border ${
                 errors.stock ? "border-red-500" : "border-gray-400"
               }`}
               type="text"
-              id="cantidad"
-              name="cantidad"
-              value={formData.cantidad}
+              id="stock"
+              name="stock"
+              value={formData.stock}
               onChange={handleChange}
-              placeholder="Cantidad"
+              placeholder="stock"
             />
             {errors.stock && (
               <p className="text-red-500 text-xs">{errors.stock}</p>
