@@ -1,25 +1,21 @@
 import React from "react";
-import {
-  LazyLoadComponent,
-  LazyLoadImage,
-} from "react-lazy-load-image-component";
+import { LazyLoadImage } from "react-lazy-load-image-component";
 
 const ImageComponent = ({ imageUrls }) => {
-  // Verificar si hay una o más URLs
-  const urls = imageUrls.includes(",") ? imageUrls.split(",") : [imageUrls];
-
-  // Selecciona la primera URL por ejemplo
-  const selectedUrl = urls[0];
-  console.log(urls);
+  const images = imageUrls.split(","); // Asumiendo que las URLs vienen en formato de cadena separada por comas
 
   return (
-    <LazyLoadComponent>
-      <LazyLoadImage
-        className="w-64 h-64 object-cover"
-        src={selectedUrl}
-        alt="Imagen del producto"
-      />
-    </LazyLoadComponent>
+    <>
+      {images.map((url, index) => (
+        <div key={index}>
+          <LazyLoadImage
+            src={url.trim()}
+            alt={`Producto ${index + 1}`}
+            className="w-64 h-64 object-cover object-center"
+          />
+        </div>
+      ))}
+    </>
   );
 };
 
