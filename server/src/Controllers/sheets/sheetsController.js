@@ -751,9 +751,6 @@ async function getAllCategories(auth) {
 async function getAllColors(auth) {
   try {
     const { products } = await getSheetData(auth);
-
-    console.log(products)
-
     const colors = [
       ...new Set(
         products

@@ -94,7 +94,7 @@ const ProductDetail = () => {
           <div className="w-full">
             <div className="detail-cont flex flex-col justify-center items-center lg:flex-row p-4 my-2">
               <div className="p-2 flex justify-center items-center flex-col-reverse rounded-lg">
-                <div className="flex-col gap-2 border mt-2 border-gray-400 rounded-lg shadow-md w-full p-2">
+                <div className="flex flex-row gap-2 border mt-2 border-gray-400 rounded-lg shadow-md w-full p-2">
                   {imgUrl?.length > 1 ? (
                     imgUrl?.map((image, index) => (
                       <img
@@ -115,9 +115,9 @@ const ProductDetail = () => {
                     />
                   )}
                 </div>
-                <div className="image-container border border-gray-400 rounded-lg p-2 shadow-md">
+                <div className="image-container relative border border-gray-400 rounded-lg p-2 shadow-md">
                   {imgUrl?.length > 1 && (
-                    <button onClick={handlePrevImage}>
+                    <button className="absolute left-0 p-2" onClick={handlePrevImage}>
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
@@ -141,7 +141,7 @@ const ProductDetail = () => {
                     alt={`Product Image ${currentImageIndex + 1}`}
                   />
                   {imgUrl?.length > 1 && (
-                    <button onClick={handleNextImage}>
+                    <button className="absolute right-0 p-2" onClick={handleNextImage}>
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"

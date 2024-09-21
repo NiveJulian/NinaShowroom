@@ -62,7 +62,7 @@ const ProductCard = ({
       toast.custom((t) => (
         <div
           className={`${
-            t.visible ? 'animate-enter' : 'animate-leave'
+            t.visible ? "animate-enter" : "animate-leave"
           } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex ring-1 ring-black ring-opacity-5`}
         >
           <div className="flex-1 w-0 p-4">
@@ -71,9 +71,7 @@ const ProductCard = ({
                 🎨
               </div>
               <div className="ml-3 flex-1">
-                <p className="text-sm font-medium text-gray-900">
-                  Por favor!
-                </p>
+                <p className="text-sm font-medium text-gray-900">Por favor!</p>
                 <p className="mt-1 text-sm text-gray-500">
                   Selecciona un color para poder agregar al carrito
                 </p>
@@ -89,7 +87,7 @@ const ProductCard = ({
             </button>
           </div>
         </div>
-      ))
+      ));
     } else {
       onAddToCart({
         id,
@@ -107,8 +105,8 @@ const ProductCard = ({
     dots: true,
     infinite: true,
     speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
+    slidesToShow: 1, // Mostrar una imagen a la vez
+    slidesToScroll: 1, // Avanzar una imagen por vez
     arrows: true,
     nextArrow: <NextArrow />,
     prevArrow: <PrevArrow />,
@@ -138,15 +136,38 @@ const ProductCard = ({
         <ul style={{ margin: 0, padding: 0, display: "flex" }}>{dots}</ul>
       </div>
     ),
+    responsive: [
+      {
+        breakpoint: 768, // para pantallas móviles
+        settings: {
+          slidesToShow: 1, // Mostrar una sola imagen
+          slidesToScroll: 1,
+        },
+      },
+      {
+        breakpoint: 1024, // para pantallas medianas
+        settings: {
+          slidesToShow: 2, // Mostrar 2 imágenes en pantallas medianas
+          slidesToScroll: 1,
+        },
+      },
+      {
+        breakpoint: 1440, // para pantallas más grandes
+        settings: {
+          slidesToShow: 3, // Mostrar 3 imágenes en pantallas grandes
+          slidesToScroll: 1,
+        },
+      },
+    ],
   };
 
   return (
-    <article className="w-auto h-full rounded-xl bg-white p-2 shadow-lg hover:shadow-xl md:hover:transform md:hover:scale-105 duration-300 md:mb-6 border border-gray-300">
+    <article className="w-full h-full rounded-xl bg-white p-2 shadow-lg hover:shadow-xl md:hover:transform md:hover:scale-105 duration-300 md:mb-6 border border-gray-300">
       <div>
         <div className="relative flex items-end overflow-hidden rounded-xl">
           <Link to={`/product/${id}`}>
             {url.includes(",") ? (
-              <Slider {...settings} className="md:w-64 md:h-64 w-80 h-80">
+              <Slider {...settings} className="md:w-64 md:h-64 w-64 h-64">
                 <ImageComponent imageUrls={url} />
               </Slider>
             ) : (
@@ -157,6 +178,7 @@ const ProductCard = ({
               />
             )}
           </Link>
+
           <div className="absolute bottom-3 left-3 inline-flex items-center rounded-lg bg-white p-2 shadow-md">
             <svg
               xmlns="http://www.w3.org/2000/svg"
