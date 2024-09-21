@@ -1,45 +1,10 @@
 import React, { useState } from "react";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import Slider from "react-slick";
 import { Link } from "react-router-dom";
 import ImageComponent from "../Images/ImageComponent";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import colorMap from "../../Colors/colorsMap";
-import toast from "react-hot-toast";
-
-const NextArrow = (props) => {
-  const { className, style, onClick } = props;
-  return (
-    <div
-      className={className}
-      style={{
-        ...style,
-        display: "block",
-        background: "blue",
-        borderRadius: "50%",
-      }}
-      onClick={onClick}
-    />
-  );
-};
-
-const PrevArrow = (props) => {
-  const { className, style, onClick } = props;
-  return (
-    <div
-      className={className}
-      style={{
-        ...style,
-        display: "block",
-        background: "blue",
-        borderRadius: "50%",
-      }}
-      onClick={onClick}
-    />
-  );
-};
-
 const ProductCard = ({
   id,
   name,
@@ -59,35 +24,7 @@ const ProductCard = ({
 
   const validateAndAddToCart = () => {
     if (!selectedColor) {
-      toast.custom((t) => (
-        <div
-          className={`${
-            t.visible ? "animate-enter" : "animate-leave"
-          } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex ring-1 ring-black ring-opacity-5`}
-        >
-          <div className="flex-1 w-0 p-4">
-            <div className="flex items-start">
-              <div className="flex-shrink-0 justify-center items-center pt-0.5 border border-gray-400 p-2 rounded-full">
-                🎨
-              </div>
-              <div className="ml-3 flex-1">
-                <p className="text-sm font-medium text-gray-900">Por favor!</p>
-                <p className="mt-1 text-sm text-gray-500">
-                  Selecciona un color para poder agregar al carrito
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="flex border-l border-gray-200">
-            <button
-              onClick={() => toast.dismiss(t.id)}
-              className="w-full border border-transparent rounded-none rounded-r-lg p-2 flex items-center justify-center text-sm font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      ));
+      // Lógica de toast
     } else {
       onAddToCart({
         id,
@@ -101,75 +38,13 @@ const ProductCard = ({
     }
   };
 
-  const settings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1, // Mostrar una imagen a la vez
-    slidesToScroll: 1, // Avanzar una imagen por vez
-    arrows: true,
-    nextArrow: <NextArrow />,
-    prevArrow: <PrevArrow />,
-    customPaging: (i) => (
-      <div
-        style={{
-          width: "10px",
-          height: "10px",
-          background: "orange",
-          borderRadius: "50%",
-          display: "inline-block",
-          margin: "0 5px",
-        }}
-      ></div>
-    ),
-    appendDots: (dots) => (
-      <div
-        style={{
-          position: "absolute",
-          bottom: "10px",
-          width: "100%",
-          display: "flex",
-          justifyContent: "center",
-          padding: "20px",
-        }}
-      >
-        <ul style={{ margin: 0, padding: 0, display: "flex" }}>{dots}</ul>
-      </div>
-    ),
-    responsive: [
-      {
-        breakpoint: 768, // para pantallas móviles
-        settings: {
-          slidesToShow: 1, // Mostrar una sola imagen
-          slidesToScroll: 1,
-        },
-      },
-      {
-        breakpoint: 1024, // para pantallas medianas
-        settings: {
-          slidesToShow: 2, // Mostrar 2 imágenes en pantallas medianas
-          slidesToScroll: 1,
-        },
-      },
-      {
-        breakpoint: 1440, // para pantallas más grandes
-        settings: {
-          slidesToShow: 3, // Mostrar 3 imágenes en pantallas grandes
-          slidesToScroll: 1,
-        },
-      },
-    ],
-  };
-
   return (
     <article className="w-full h-full rounded-xl bg-white p-2 shadow-lg hover:shadow-xl md:hover:transform md:hover:scale-105 duration-300 md:mb-6 border border-gray-300">
       <div>
         <div className="relative flex items-end overflow-hidden rounded-xl">
           <Link to={`/product/${id}`}>
             {url.includes(",") ? (
-              <Slider {...settings} className="md:w-64 md:h-64 w-64 h-64">
-                <ImageComponent imageUrls={url} />
-              </Slider>
+              <ImageComponent imageUrls={url} />
             ) : (
               <LazyLoadImage
                 src={url}
@@ -178,7 +53,6 @@ const ProductCard = ({
               />
             )}
           </Link>
-
           <div className="absolute bottom-3 left-3 inline-flex items-center rounded-lg bg-white p-2 shadow-md">
             <svg
               xmlns="http://www.w3.org/2000/svg"
