@@ -147,7 +147,6 @@ async function updateRow(auth, rowData) {
 
   // Obtener los datos actuales de la hoja
   const { products } = await getSheetData(auth);
-
   // Buscar el índice de la fila correspondiente usando el ID
   const rowIndex = products.findIndex((product) => product.id === rowData.id);
 
@@ -168,7 +167,7 @@ async function updateRow(auth, rowData) {
     rowData.nombre,
     rowData.color,
     rowData.tamaño,
-    rowData.cantidad,
+    rowData.stock,
     rowData.precio,
     urlString,
     rowData.sku,
@@ -192,8 +191,15 @@ async function registerSale(auth, data) {
   try {
     const sheets = google.sheets({ version: "v4", auth });
 
-    const { productos, formaPago, tipoEnvio, medio } = data;
-
+    const {
+      productos,
+      formaPago,
+      tipoEnvio,
+      medio,
+      codigoDescuento,
+      isCouponValid,
+      descuento,
+    } = data;
     const { nombre, correo, provincia, direccion, celular, cp } = data.cliente;
 
     // Obtener la última fila para determinar el ID más reciente
@@ -221,38 +227,59 @@ async function registerSale(auth, data) {
     const cliente = user ? user.uid : (nombreCliente = nombre);
     const statePayment = medio === "Casa central" ? "Completada" : "Pendiente";
 
-    const ventaData = productos.map((prod) => [
-      newId,
-      prod.id,
-      cliente,
-      prod.sku,
-      prod.cantidad,
-      prod.talle,
-      prod.color,
-      prod.precio,
-      formaPago,
-      statePayment,
-      prod.cantidad * prod.precio,
-      currentDate,
-      currentTime, // Agregar la hora actual
-      tipoEnvio || "",
-      correo || "",
-      direccion || "",
-      provincia || "",
-      cp || "",
-      celular || "",
-      medio,
-    ]);
+    // Mapear productos y aplicar el descuento a cada producto si el cupón es válido
+    const ventaData = productos.map((prod) => {
+      let precioConDescuento = prod.precio;
 
+      // Aplicar el descuento si el cupón es válido
+      if (isCouponValid) {
+        if (descuento.type === "percentage") {
+          precioConDescuento -= (prod.precio * descuento.value) / 100;
+        } else if (descuento.type === "fijo") {
+          precioConDescuento -= descuento.value / productos.length; // Distribuir el descuento fijo entre los productos
+        }
+      }
+
+      // Asegurarse de que el precio con descuento no sea negativo
+      precioConDescuento = Math.max(precioConDescuento, 0);
+
+      return [
+        newId,
+        prod.id,
+        cliente,
+        prod.sku,
+        prod.cantidad,
+        prod.talle,
+        prod.color,
+        prod.precio, // Precio original
+        formaPago,
+        statePayment,
+        precioConDescuento * prod.cantidad, // Total con descuento aplicado
+        currentDate,
+        currentTime,
+        tipoEnvio || "",
+        correo || "",
+        direccion || "",
+        provincia || "",
+        cp || "",
+        celular || "",
+        medio,
+        codigoDescuento || "", // Registrar el código de descuento
+        isCouponValid ? "Válido" : "Inválido", // Registrar si fue válido o no
+      ];
+    });
+
+    // Guardar la venta en Google Sheets
     const res = await sheets.spreadsheets.values.append({
       spreadsheetId: process.env.GOOGLE_SHEETS_ID,
-      range: "Ventas!A2:T",
+      range: "Ventas!A2:V", // Ajustar el rango según el número de columnas
       valueInputOption: "RAW",
       resource: {
         values: ventaData,
       },
     });
 
+    // Reducir el stock de cada producto vendido
     for (const prod of productos) {
       const amount = parseInt(prod.cantidad);
       if (amount > 0) {
@@ -440,7 +467,6 @@ async function getSaleDataUnitiInfo(auth, id) {
     throw error;
   }
 }
-
 
 async function getSaleData(auth) {
   try {
@@ -687,7 +713,6 @@ async function decreaseStock(auth, productId, amount) {
 
   return res.data;
 }
-
 
 async function getProductsByCategory(auth, category) {
   try {
