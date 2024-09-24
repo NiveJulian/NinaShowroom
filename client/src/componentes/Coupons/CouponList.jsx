@@ -45,17 +45,16 @@ const CouponsList = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-4 h-screen">
-      {activeForm && <CreateCouponForm toggleModal={toggleModal} />}
+      {activeForm && <CreateCouponForm onClose={toggleModal} />}
       <div className="flex justify-between">
         <h2 className="text-2xl mb-4">Lista de Cupones</h2>
         <button
           onClick={() => toggleModal()}
-          className="p-1 border border-secondary bg-secondary text-white rounded-md hover:bg-primary hover:text-white active:translate-y-[2px] shadow-sm hover:shadow-md"
+          className="border p-2 my-2 border-secondary bg-secondary text-white rounded-md hover:bg-primary hover:text-white active:translate-y-[2px] shadow-sm hover:shadow-md"
         >
           Crear cupon
         </button>
       </div>
-
       <div className="overflow-x-auto custom-scroll border border-gray-300 p-2">
         <table className="w-full basic">
           <thead>
