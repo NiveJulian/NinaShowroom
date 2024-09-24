@@ -206,7 +206,7 @@ async function validateCouponAndCalculateTotal(auth, data) {
           // Aplicar descuento según el tipo
           if (tipoDescuento === "percentage") {
             descuentoAplicado = (totalVenta * valorDescuento) / 100;
-          } else if (tipoDescuento === "fijo") {
+          } else if (tipoDescuento === "fixed") {
             descuentoAplicado = valorDescuento;
           }
         } else {

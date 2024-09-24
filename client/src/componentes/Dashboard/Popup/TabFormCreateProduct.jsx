@@ -94,8 +94,6 @@ export default function TabFormCreateProduct({ isOpen, onClose, product }) {
             url: formData.url.join(", "),
           };
 
-          console.log(updatedRows)
-
           dispatch(updateRow(updatedRows));
         } else {
           dispatch(addSheetRow(newRow));

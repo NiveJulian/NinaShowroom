@@ -235,7 +235,7 @@ async function registerSale(auth, data) {
       if (isCouponValid) {
         if (descuento.type === "percentage") {
           precioConDescuento -= (prod.precio * descuento.value) / 100;
-        } else if (descuento.type === "fijo") {
+        } else if (descuento.type === "fixed") {
           precioConDescuento -= descuento.value / productos.length; // Distribuir el descuento fijo entre los productos
         }
       }
