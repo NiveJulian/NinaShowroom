@@ -9,8 +9,14 @@ import StepPayment from "../StepsOrders/StepPayment";
 import ProgressSteps from "../StepsOrders/ProgressSteps";
 import colorMap from "../../Colors/colorsMap";
 import { createSale } from "../../../redux/actions/salesActions";
-import { cleanCart, decrementQuantity, incrementQuantity, removeFromCart } from "../../../redux/actions/cartActions";
+import {
+  cleanCart,
+  decrementQuantity,
+  incrementQuantity,
+  removeFromCart,
+} from "../../../redux/actions/cartActions";
 import { createPayment } from "../../../redux/actions/authActions";
+import instance from "../../../api/axiosConfig";
 
 const processColors = (colors) => {
   return colors
@@ -21,11 +27,16 @@ const processColors = (colors) => {
 const Cart = ({ product, calcularTotal, usuario }) => {
   const [step, setStep] = useState(1);
   const [selectedColors, setSelectedColors] = useState({});
-  const [mpId, setMpId] = useState(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [formaPago, setFormaPago] = useState("");
-
+  const [selectedDeliveryMethod, setSelectedDeliveryMethod] = useState("");
+  const [discountCode, setDiscountCode] = useState(""); // Estado para el código de cupón
+  const [discountAmount, setDiscountAmount] = useState(0); // Estado para el valor de descuento
+  const [isCouponValid, setIsCouponValid] = useState(false); // Estado para verificar si el cupón es válido
+  const [totalVenta, setTotalVenta] = useState(0);
+  const [descuentoType, setDescuentoType] = useState("");
+  const [descuentoValue, setDescuentoValue] = useState(0);
   const [formCliente, setFormCliente] = useState({
     nombre: usuario.name || "",
     correo: usuario.email || "",
@@ -44,7 +55,6 @@ const Cart = ({ product, calcularTotal, usuario }) => {
     });
     setSelectedColors(initialColors);
   }, [product]);
-  
 
   const handleColorSelection = (productId, color) => {
     setSelectedColors((prevState) => ({
@@ -56,8 +66,6 @@ const Cart = ({ product, calcularTotal, usuario }) => {
   const validateColorSelection = () => {
     return product.every((prod) => selectedColors[prod.id]);
   };
-
-  const [selectedDeliveryMethod, setSelectedDeliveryMethod] = useState("");
 
   const handleFormaPagoChange = (forma) => {
     setFormaPago(forma);
@@ -77,6 +85,41 @@ const Cart = ({ product, calcularTotal, usuario }) => {
       ...formCliente,
       [name]: value,
     });
+  };
+
+  const handleCouponChange = (e) => {
+    setDiscountCode(e.target.value);
+  };
+
+  const handleApplyCoupon = async () => {
+    try {
+      const response = await instance.post("/api/coupon/validate-coupon", {
+        productos: product, // Asegúrate de pasar los productos correctos
+        codigoDescuento: discountCode,
+      });
+      console.log(response);
+      const { total, descuento, message, type, value, isValid } = response.data;
+
+      if (isValid) {
+        setDiscountAmount(descuento);
+        setIsCouponValid(true);
+        setDescuentoType(type);
+        setDescuentoValue(value);
+        toast.success(message);
+        setTotalVenta(total);
+      } else {
+        setDiscountAmount(0);
+        setIsCouponValid(false);
+        toast.error("Cupón inválido");
+      }
+    } catch (error) {
+      toast.error("Error al aplicar el cupón");
+    }
+  };
+
+  const calcularTotalConDescuento = () => {
+    const total = calcularTotal();
+    return isCouponValid ? total - discountAmount : total;
   };
 
   const generarMensajeWhatsApp = (venta) => {
@@ -112,11 +155,18 @@ const Cart = ({ product, calcularTotal, usuario }) => {
         precio: prod.precio,
         cantidad: prod.cantidad,
       })),
-      total: calcularTotal(),
+      total: calcularTotalConDescuento(), // Total con descuento aplicado
       formaPago,
       cliente: formCliente,
       tipoEnvio: selectedDeliveryMethod,
-      medio: "Pagina",
+      medio: "Página",
+      descuento: {
+        type: descuentoType,
+        value: descuentoValue,
+      },
+      descuentoAplicado: discountAmount,
+      codigoDescuento: discountCode,
+      isCouponValid: isCouponValid, // Agregar el estado del cupón
     };
 
     if (venta.formaPago === "") {
@@ -159,7 +209,7 @@ const Cart = ({ product, calcularTotal, usuario }) => {
   return (
     <div className="bg-pink-200 border border-gray-300 shadow-lg">
       <div className="flex lg:flex-row flex-col shadow-lg">
-        <div className="lg:w-2/3 bg-gray-50 h-screen m-1 text-center shadow-md p-6 rounded-xl flex flex-col">
+        <div className="lg:w-2/3 bg-gray-50 lg:h-full m-1 text-center shadow-md p-6 rounded-xl flex flex-col">
           <div className="flex justify-between">
             <button
               className="relative flex gap-2 p-2 active:translate-y-[1px]"
@@ -188,9 +238,31 @@ const Cart = ({ product, calcularTotal, usuario }) => {
               />
             </div>
           </div>
-          <div className="my-8">
+          <div className="my-2">
             <ProgressSteps currentStep={step - 1} />
+            <div className="flex flex-col">
+              <input
+                type="text"
+                placeholder="Ingresa el código de descuento"
+                value={discountCode}
+                onChange={handleCouponChange}
+                className="border p-2 rounded-md w-full border-gray-400"
+              />
+              <button
+                onClick={handleApplyCoupon}
+                className="mt-2 bg-secondary text-white px-4 py-2 rounded-md"
+              >
+                Aplicar Cupón
+              </button>
+              {isCouponValid && (
+                <div className="text-green-600 mb-4">
+                  ¡Cupón aplicado! Descuento: ${discountAmount}
+                </div>
+              )}
+            </div>
           </div>
+          {/* Código de cupón */}
+
           {step === 1 && (
             <StepContact
               formCliente={formCliente}
@@ -219,7 +291,7 @@ const Cart = ({ product, calcularTotal, usuario }) => {
             />
           )}
         </div>
-        <div className="lg:w-1/3 bg-gray-50 opacity-95 text-center shadow-md p-6 rounded-xl m-1 h-screen flex flex-col justify-between">
+        <div className="lg:w-1/3 bg-gray-50  lg:h-full opacity-95 text-center shadow-md p-6 rounded-xl m-1 h-screen flex flex-col justify-between">
           <h1 className="text-xl font-bold flex-1">Carrito</h1>
           <div
             className={`border border-gray-400 rounded-md p-2 mt-4 flex h-full flex-col justify-center items-center w-full ${
@@ -232,7 +304,7 @@ const Cart = ({ product, calcularTotal, usuario }) => {
               product?.map((prod, i) => {
                 const imgUrl = prod?.url?.split(",")[0];
                 const colorsArray = processColors(prod?.color);
-              
+
                 return (
                   <div
                     key={i}
@@ -309,7 +381,9 @@ const Cart = ({ product, calcularTotal, usuario }) => {
             )}
           </div>
           <div className="mt-4">
-            <h2 className="text-xl font-bold">Total: ${calcularTotal()}</h2>
+            <h2 className="text-xl font-bold mt-4">
+              Total: ${calcularTotalConDescuento()}
+            </h2>
           </div>
         </div>
       </div>

@@ -42,7 +42,7 @@ export default function TabFormCreateProduct({ isOpen, onClose, product }) {
         nombre: product.nombre || "",
         color: product.color || "",
         tamaño: product.talle || "",
-        stock: product.stock || "",
+        stock: product.stock || 0,
         precio: product.precio || "",
         url: product.url ? product.url.split(",").map((url) => url.trim()) : [],
       });
@@ -93,6 +93,8 @@ export default function TabFormCreateProduct({ isOpen, onClose, product }) {
             precio: formData.precio,
             url: formData.url.join(", "),
           };
+
+          console.log(updatedRows)
 
           dispatch(updateRow(updatedRows));
         } else {

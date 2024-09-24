@@ -25,7 +25,7 @@ import HowCanBuy from "./pages/ecommerce/HowCanBuy";
 import Purchase from "./pages/ecommerce/Purchase";
 import PagePayment from "./pages/dashboard/PagePayment";
 import { getCategories } from "./redux/actions/productActions";
-
+import Coupons from "./pages/dashboard/Coupons";
 
 function App() {
   const dispatch = useDispatch();
@@ -77,6 +77,7 @@ function App() {
             <Route path="/dashboard/users" element={<Users />} />
             <Route path="/dashboard/balance" element={<Balance />} />
             <Route path="/dashboard/support" element={<Support />} />
+            <Route path="/dashboard/coupons" element={<Coupons />} />
             <Route path="/dashboard/pagepayment" element={<PagePayment />} />
           </>
         ) : (
