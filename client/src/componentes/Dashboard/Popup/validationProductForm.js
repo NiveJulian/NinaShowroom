@@ -17,7 +17,7 @@ const validationProductForm = (formData) => {
   }
 
   // Validación de cantidad
-  if (formData.stock && !formData.stock.trim()) {
+  if (formData.stock === 0) {
     errors.stock = "La cantidad es requerida";
   }
 
