@@ -4,7 +4,7 @@ const {
   toggleCouponStatus,
   getAllCoupons,
   validateCouponAndCalculateTotal,
-} = require("../Controllers/coupon/CouponController");
+} = require("../Controllers/coupon/couponController");
 const { authorize } = require("../Controllers/sheets/sheetsController");
 const cuponRoutes = Router();
 
