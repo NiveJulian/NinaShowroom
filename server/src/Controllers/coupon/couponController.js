@@ -1,4 +1,6 @@
 // controllers/couponController.js
+
+const moment = require("moment");
 const { google } = require("googleapis");
 const { v4: uuidv4 } = require("uuid"); // Para generar IDs únicos
 const { authorize } = require("../sheets/sheetsController");
@@ -15,35 +17,16 @@ const createCoupon = async (req, res) => {
       discountValue,
       expirationDate,
       usageLimit,
+      categories, // Recibir las categorías
     } = req.body;
 
-    // Validaciones básicas
-    if (
-      !code ||
-      !name ||
-      !discountType ||
-      !discountValue ||
-      !expirationDate ||
-      !usageLimit
-    ) {
-      return res
-        .status(400)
-        .json({ message: "Todos los campos son requeridos." });
+    if (!code || !name || !discountType || !discountValue || !expirationDate || !usageLimit || !categories) {
+      return res.status(400).json({ message: "Todos los campos son requeridos." });
     }
 
-    // Validar discountType
-    if (!["percentage", "fixed"].includes(discountType)) {
-      return res.status(400).json({
-        message: 'El tipo de descuento debe ser "percentage" o "fixed".',
-      });
-    }
-
-    // Generar un ID único para el cupón
     const id = uuidv4();
-    // Inicializar usageCount en 0
     const usageCount = 0;
 
-    // Preparar los datos para insertar
     const newCoupon = [
       id,
       code,
@@ -51,15 +34,15 @@ const createCoupon = async (req, res) => {
       discountType,
       discountValue,
       expirationDate,
-      "active", // Estado por defecto
+      "active",
       usageLimit,
       usageCount,
+      categories.join(", "), // Almacenar las categorías seleccionadas en una cadena
     ];
 
-    // Agregar el cupón a la hoja de "Coupons"
     const response = await sheets.spreadsheets.values.append({
       spreadsheetId: process.env.GOOGLE_SHEETS_ID,
-      range: "Cupones!A:I", // Asegúrate de que este rango corresponde a las columnas definidas
+      range: "Cupones!A:J",
       valueInputOption: "RAW",
       insertDataOption: "INSERT_ROWS",
       resource: {
@@ -67,14 +50,10 @@ const createCoupon = async (req, res) => {
       },
     });
 
-    return res
-      .status(201)
-      .json({ message: "Cupón creado exitosamente", data: newCoupon });
+    return res.status(201).json({ message: "Cupón creado exitosamente", data: newCoupon });
   } catch (error) {
     console.error("Error creando el cupón:", error.message);
-    return res
-      .status(500)
-      .json({ message: "Error creando el cupón", error: error.message });
+    return res.status(500).json({ message: "Error creando el cupón", error: error.message });
   }
 };
 
@@ -175,62 +154,134 @@ const getAllCoupons = async (req, res) => {
 };
 
 async function validateCouponAndCalculateTotal(auth, data) {
-    try {
-      const sheets = google.sheets({ version: "v4", auth });
-      const { productos, codigoDescuento } = data;
-  
-      // Calcular el total sin descuento
-      let totalVenta = productos.reduce((acc, prod) => acc + prod.cantidad * prod.precio, 0);
-  
-      // Validar el código de descuento
-      let descuentoAplicado = 0;
-      let descuentoType = "";
-      let descuentoValue = 0;
-      if (codigoDescuento) {
-        const responseCoupons = await sheets.spreadsheets.values.get({
-          spreadsheetId: process.env.GOOGLE_SHEETS_ID,
-          range: "Cupones!A:G", // Asegúrate de ajustar el rango a las columnas correctas
-        });
-  
-        const cupones = responseCoupons.data.values || [];
-  
-        // Buscar el cupón que coincida con el código y esté activo
-        const cupon = cupones.find((row) => row[1] === codigoDescuento && row[6] === "active");
-  
-        if (cupon) {
-          const tipoDescuento = cupon[3]; // Ejemplo: "porcentaje" o "fijo"
-          const valorDescuento = parseFloat(cupon[4]);
-          descuentoType = tipoDescuento;
-          descuentoValue = valorDescuento
-  
-          // Aplicar descuento según el tipo
-          if (tipoDescuento === "percentage") {
-            descuentoAplicado = (totalVenta * valorDescuento) / 100;
-          } else if (tipoDescuento === "fixed") {
-            descuentoAplicado = valorDescuento;
-          }
-        } else {
-          return { message: "Cupón inválido o inactivo", total: totalVenta, descuento: 0, isValid: false };
+  try {
+    const sheets = google.sheets({ version: "v4", auth });
+    const { productos, codigoDescuento } = data;
+
+    // Calcular el total sin descuento
+    let totalVenta = productos.reduce((acc, prod) => acc + prod.cantidad * prod.precio, 0);
+
+    // Validar el código de descuento
+    let descuentoAplicado = 0;
+    let descuentoType = "";
+    let descuentoValue = 0;
+
+    if (codigoDescuento) {
+      const responseCoupons = await sheets.spreadsheets.values.get({
+        spreadsheetId: process.env.GOOGLE_SHEETS_ID,
+        range: "Cupones!A:J", // Asegúrate de que esta columna incluya las categorías (columna J en este caso)
+      });
+
+      const cupones = responseCoupons.data.values || [];
+
+      // Buscar el cupón que coincida con el código y esté activo
+      const cupon = cupones.find((row) => row[1] === codigoDescuento && row[6] === "active");
+
+      if (cupon) {
+        const expirationDate = moment(cupon[5], "YYYY-MM-DD HH:mm:ss");
+        const currentDate = moment();
+
+        // Verificar si el cupón ha expirado
+        if (currentDate.isAfter(expirationDate)) {
+          return { message: "El cupón ha expirado", total: totalVenta, descuento: 0, isValid: false };
         }
+
+        // Obtener las categorías asociadas al cupón
+        const categoriasDelCupon = cupon[9]?.split(", ") || [];
+
+        // Verificar si los productos pertenecen a las categorías del cupón
+        const productosValidos = productos.filter((prod) => categoriasDelCupon.includes(prod.categoria));
+
+        if (productosValidos.length === 0) {
+          return { message: "El cupón no aplica a los productos seleccionados", total: totalVenta, descuento: 0, isValid: false };
+        }
+
+        // Calcular el total de productos que aplican para el cupón
+        let totalVentaConCategoriasValidas = productosValidos.reduce((acc, prod) => acc + prod.cantidad * prod.precio, 0);
+
+        const tipoDescuento = cupon[3]; // Ejemplo: "percentage" o "fixed"
+        const valorDescuento = parseFloat(cupon[4]);
+        descuentoType = tipoDescuento;
+        descuentoValue = valorDescuento;
+
+        // Aplicar descuento según el tipo
+        if (tipoDescuento === "percentage") {
+          descuentoAplicado = (totalVentaConCategoriasValidas * valorDescuento) / 100;
+        } else if (tipoDescuento === "fixed") {
+          descuentoAplicado = Math.min(valorDescuento, totalVentaConCategoriasValidas); // Evitar que el descuento fijo sea mayor que el total
+        }
+      } else {
+        return { message: "Cupón inválido o inactivo", total: totalVenta, descuento: 0, isValid: false };
       }
-  
-      // Calcular el total final después del descuento
-      const totalFinal = totalVenta - descuentoAplicado;
-  
-      return {
-        message: descuentoAplicado > 0 ? "Cupón aplicado exitosamente" : "No se aplicó ningún cupón",
-        total: totalFinal,
-        descuento: descuentoAplicado,
-        type: descuentoType,
-        value: descuentoValue,
-        isValid: true
-      };
-    } catch (error) {
-      console.error("Error al validar el cupón:", error.message);
-      throw new Error(`Error al validar el cupón: ${error.message}`);
     }
+
+    // Calcular el total final después del descuento
+    const totalFinal = totalVenta - descuentoAplicado;
+
+    return {
+      message: descuentoAplicado > 0 ? "Cupón aplicado exitosamente" : "No se aplicó ningún cupón",
+      total: totalFinal,
+      descuento: descuentoAplicado,
+      type: descuentoType,
+      value: descuentoValue,
+      isValid: true,
+    };
+  } catch (error) {
+    console.error("Error al validar el cupón:", error.message);
+    throw new Error(`Error al validar el cupón: ${error.message}`);
+  }
 }
-  
+
+
+async function deleteCouponById(auth, id) {
+  const sheets = google.sheets({ version: "v4", auth });
+
+  // Obtener todos los datos de la hoja
+  const getRows = await sheets.spreadsheets.values.get({
+    spreadsheetId: process.env.GOOGLE_SHEETS_ID,
+    range: "Cupones!A:I", // Ajusta el rango según sea necesario
+  });
+
+  const rows = getRows.data.values;
+  let rowIndexToDelete = null;
+
+  // Encontrar la fila con el ID proporcionado
+  for (let i = 0; i < rows.length; i++) {
+    if (rows[i][0] == id) {
+      // Asumiendo que la columna ID es la primera (A)
+      rowIndexToDelete = i;
+      break;
+    }
+  }
+
+  if (rowIndexToDelete === null) {
+    throw new Error("ID not found");
+  }
+
+  // Eliminar la fila encontrada
+  const requests = [
+    {
+      deleteDimension: {
+        range: {
+          sheetId: 0, // Asegúrate de que este sea el ID correcto de la hoja
+          dimension: "ROWS",
+          startIndex: rowIndexToDelete,
+          endIndex: rowIndexToDelete + 1,
+        },
+      },
+    },
+  ];
+
+  const res = await sheets.spreadsheets.batchUpdate({
+    spreadsheetId: process.env.GOOGLE_SHEETS_ID,
+    resource: {
+      requests,
+    },
+  });
+
+  return res.data;
+}
+
 
 module.exports = {
   validateCouponAndCalculateTotal,

@@ -25,15 +25,16 @@ const processColors = (colors) => {
 };
 
 const Cart = ({ product, calcularTotal, usuario }) => {
-  const [step, setStep] = useState(1);
-  const [selectedColors, setSelectedColors] = useState({});
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [showCouponInput, setShowCouponInput] = useState(false);
+  const [step, setStep] = useState(1);
+  const [selectedColors, setSelectedColors] = useState({});
   const [formaPago, setFormaPago] = useState("");
   const [selectedDeliveryMethod, setSelectedDeliveryMethod] = useState("");
-  const [discountCode, setDiscountCode] = useState(""); // Estado para el código de cupón
-  const [discountAmount, setDiscountAmount] = useState(0); // Estado para el valor de descuento
-  const [isCouponValid, setIsCouponValid] = useState(false); // Estado para verificar si el cupón es válido
+  const [discountCode, setDiscountCode] = useState("");
+  const [discountAmount, setDiscountAmount] = useState(0);
+  const [isCouponValid, setIsCouponValid] = useState(false);
   const [totalVenta, setTotalVenta] = useState(0);
   const [descuentoType, setDescuentoType] = useState("");
   const [descuentoValue, setDescuentoValue] = useState(0);
@@ -110,7 +111,7 @@ const Cart = ({ product, calcularTotal, usuario }) => {
       } else {
         setDiscountAmount(0);
         setIsCouponValid(false);
-        toast.error("Cupón inválido");
+        toast.error(message);
       }
     } catch (error) {
       toast.error("Error al aplicar el cupón");
@@ -206,6 +207,10 @@ const Cart = ({ product, calcularTotal, usuario }) => {
     }
   };
 
+  const toggleCouponInput = () => {
+    setShowCouponInput((prev) => !prev);
+  };
+
   return (
     <div className="bg-pink-200 border border-gray-300 shadow-lg">
       <div className="flex lg:flex-row flex-col shadow-lg">
@@ -238,60 +243,89 @@ const Cart = ({ product, calcularTotal, usuario }) => {
               />
             </div>
           </div>
-          <div className="my-2">
+          <div className="mt-2">
             <ProgressSteps currentStep={step - 1} />
-            <div className="flex flex-col">
+            {/* Código de cupón */}
+            <span className="ml-2 text-sm font-medium">
+              {showCouponInput ? "Ocultar" : "¿Ya tenes un cupon?"}
+            </span>
+            <div className="flex justify-center items-center my-4 gap-2">
               <input
-                type="text"
-                placeholder="Ingresa el código de descuento"
-                value={discountCode}
-                onChange={handleCouponChange}
-                className="border p-2 rounded-md w-full border-gray-400"
+                type="checkbox"
+                id="couponToggle"
+                checked={showCouponInput}
+                onChange={toggleCouponInput}
+                className="hidden"
               />
-              <button
-                onClick={handleApplyCoupon}
-                className="mt-2 bg-secondary text-white px-4 py-2 rounded-md"
+              <label
+                htmlFor="couponToggle"
+                className={`cursor-pointer flex items-center rounded-full w-12 h-6 p-1 transition ${showCouponInput ? "bg-gray-200": "bg-gray-50 border border-gray-300"}`}
               >
-                Aplicar Cupón
-              </button>
-              {isCouponValid && (
-                <div className="text-green-600 mb-4">
-                  ¡Cupón aplicado! Descuento: ${discountAmount}
-                </div>
-              )}
+                <span
+                  className={`w-5 h-5 rounded-full shadow-md transform transition ${
+                    showCouponInput
+                      ? "translate-x-6 bg-primary"
+                      : "translate-x-0 bg-secondary"
+                  }`}
+                />
+              </label>
             </div>
-          </div>
-          {/* Código de cupón */}
 
-          {step === 1 && (
-            <StepContact
-              formCliente={formCliente}
-              handleFormClienteChange={handleFormClienteChange}
-              nextStep={nextStep}
-            />
-          )}
-          {step === 2 && (
-            <StepShipping
-              handleFormClienteChange={handleFormClienteChange}
-              formCliente={formCliente}
-              selectedDeliveryMethod={selectedDeliveryMethod}
-              setSelectedDeliveryMethod={setSelectedDeliveryMethod}
-              prevStep={prevStep}
-              nextStep={nextStep}
-            />
-          )}
-          {step === 3 && (
-            <StepPayment
-              formaPago={formaPago}
-              handleFormaPagoChange={handleFormaPagoChange}
-              prevStep={prevStep}
-              handleCreateVenta={handleCreateVenta}
-              product={product}
-              usuario={usuario}
-            />
-          )}
+            {/* Mostrar input de cupón si el switch está activo */}
+            {showCouponInput && (
+              <div className="flex flex-col mt-4 transition duration-100 ease-in">
+                <input
+                  type="text"
+                  placeholder="Ingresa el código de descuento"
+                  value={discountCode}
+                  onChange={handleCouponChange}
+                  className="border p-2 rounded-md w-full border-gray-400"
+                />
+                <button
+                  onClick={handleApplyCoupon}
+                  className="mt-2 bg-secondary text-white px-4 py-2 rounded-md"
+                >
+                  Aplicar Cupón
+                </button>
+                {isCouponValid && (
+                  <div className="text-green-600 mb-4">
+                    ¡Cupón aplicado! Descuento: ${discountAmount}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+          <div className="mt-4">
+            {step === 1 && (
+              <StepContact
+                formCliente={formCliente}
+                handleFormClienteChange={handleFormClienteChange}
+                nextStep={nextStep}
+              />
+            )}
+            {step === 2 && (
+              <StepShipping
+                handleFormClienteChange={handleFormClienteChange}
+                formCliente={formCliente}
+                selectedDeliveryMethod={selectedDeliveryMethod}
+                setSelectedDeliveryMethod={setSelectedDeliveryMethod}
+                prevStep={prevStep}
+                nextStep={nextStep}
+              />
+            )}
+            {step === 3 && (
+              <StepPayment
+                formaPago={formaPago}
+                handleFormaPagoChange={handleFormaPagoChange}
+                prevStep={prevStep}
+                handleCreateVenta={handleCreateVenta}
+                product={product}
+                usuario={usuario}
+              />
+            )}
+          </div>
         </div>
-        <div className="lg:w-1/3 bg-gray-50  lg:h-full opacity-95 text-center shadow-md p-6 rounded-xl m-1 h-screen flex flex-col justify-between">
+        <div className="lg:w-1/3 bg-gray-50 lg:h-full opacity-95 text-center shadow-md p-2 rounded-xl m-1 h-full flex flex-col justify-between">
           <h1 className="text-xl font-bold flex-1">Carrito</h1>
           <div
             className={`border border-gray-400 rounded-md p-2 mt-4 flex h-full flex-col justify-center items-center w-full ${
