@@ -17,7 +17,7 @@ const ProgressSteps = ({ currentStep }) => {
         return (
           <React.Fragment key={index}>
             <div
-              className={`flex flex-col items-center transition-all duration-400 ${
+              className={`flex flex-col justify-center items-center transition-all duration-400 ${
                 isActive ? "text-teal-500" : "text-gray-400"
               }`}
             >

@@ -1,7 +1,7 @@
-// components/CreateCouponForm.jsx
 import React, { useState } from "react";
 import instance from "../../api/axiosConfig";
 import toast from "react-hot-toast";
+import { useSelector } from "react-redux";
 
 const CreateCouponForm = ({ onClose }) => {
   const [code, setCode] = useState("");
@@ -10,13 +10,33 @@ const CreateCouponForm = ({ onClose }) => {
   const [discountValue, setDiscountValue] = useState("");
   const [expirationDate, setExpirationDate] = useState("");
   const [usageLimit, setUsageLimit] = useState("");
+  const [selectedCategories, setSelectedCategories] = useState([]); // Estado para las categorías seleccionadas
+
+  // Obtener las categorías del estado global de Redux
+  const categories = useSelector((state) => state.sheets.categories);
+
+  const handleCategoryChange = (category) => {
+    setSelectedCategories((prevSelected) =>
+      prevSelected.includes(category)
+        ? prevSelected.filter((cat) => cat !== category)
+        : [...prevSelected, category]
+    );
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validar campos
-    if (!code || !name || !discountValue || !expirationDate || !usageLimit) {
-      toast.error("Todos los campos son requeridos.");
+    if (
+      !code ||
+      !name ||
+      !discountValue ||
+      !expirationDate ||
+      !usageLimit ||
+      selectedCategories.length === 0
+    ) {
+      toast.error(
+        "Todos los campos son requeridos, incluyendo las categorías."
+      );
       return;
     }
 
@@ -28,16 +48,22 @@ const CreateCouponForm = ({ onClose }) => {
         discountValue,
         expirationDate,
         usageLimit,
+        categories: selectedCategories, // Enviar las categorías seleccionadas
       });
 
       toast.success("Cupón creado exitosamente.");
-      // Limpiar el formulario
       setCode("");
       setName("");
       setDiscountType("percentage");
       setDiscountValue("");
       setExpirationDate("");
       setUsageLimit("");
+      setSelectedCategories([]);
+      toast.loading("Espera un momento");
+      setTimeout(() => {
+        window.location.reload()
+        onClose();
+      }, 3000);
     } catch (error) {
       console.error("Error creando el cupón:", error.response.data);
       toast.error(error.response.data.message || "Error creando el cupón.");
@@ -78,8 +104,8 @@ const CreateCouponForm = ({ onClose }) => {
           />
         </div>
         <div className="flex justify-center items-center gap-2">
-          <div className="mb-4 w-full">
-            <label className="block mb-1">Tipo de Descuento</label>
+          <div className="mb-4 w-1/2">
+            <label className="flex mb-1">Tipo de Descuento</label>
             <select
               value={discountType}
               onChange={(e) => setDiscountType(e.target.value)}
@@ -89,10 +115,10 @@ const CreateCouponForm = ({ onClose }) => {
               <option value="fixed">Cantidad Fija ($)</option>
             </select>
           </div>
-          <div className="mb-4 w-full">
-            <label className="block mb-1">Fecha de Expiración</label>
+          <div className="mb-4 w-1/2">
+            <label className="block mb-1">Expiración</label>
             <input
-              type="date"
+              type="datetime-local"
               value={expirationDate}
               onChange={(e) => setExpirationDate(e.target.value)}
               className="w-full border border-gray-400 px-3 py-2 rounded"
@@ -122,6 +148,22 @@ const CreateCouponForm = ({ onClose }) => {
               required
               min="1"
             />
+          </div>
+        </div>
+        <div className="mb-4 w-full">
+            <label className="block mb-1">Asignar a Categorías</label>
+          <div className="flex justify-center items-center flex-wrap gap-2 border border-gray-400 p-2">
+            {categories?.map((category, index) => (
+              <div key={index} className="flex justify-center items-center">
+                <input
+                  type="checkbox"
+                  value={category}
+                  checked={selectedCategories.includes(category)}
+                  onChange={() => handleCategoryChange(category)}
+                />
+                <label className="ml-2">{category}</label>
+              </div>
+            ))}
           </div>
         </div>
         <button
