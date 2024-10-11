@@ -13,6 +13,7 @@ export const UPLOAD_IMAGES_FAILURE = "UPLOAD_IMAGES_FAILURE";
 export const CLEAR_IMAGES = "CLEAR_IMAGES";
 export const SET_CONDITION = "SET_CONDITION";
 export const GET_CATEGORIES = "GET_CATEGORIES";
+export const GET_DASHBOARD_CATEGORIES = "GET_DASHBOARD_CATEGORIES";
 export const FILTER_CATEGORY = "FILTER_CATEGOTY";
 export const CLEAR_FILTER = "CLEAR_FILTER";
 export const CLEAR_COLOR = "CLEAR_COLOR";
@@ -200,6 +201,17 @@ export const uploadImages = (formData) => async (dispatch) => {
       dispatch({ type: GET_CATEGORIES, payload: categories });
     } catch (error) {
       console.error("Error fetching categories:", error);
+    }
+  };
+
+  export const getDashboardCategories = () => async (dispatch) => {
+    try {
+      const response = await instance.get("/api/sheets/dashboard/categories");
+      const dashboardCategories = response.data;
+  
+      dispatch({ type: GET_DASHBOARD_CATEGORIES, payload: dashboardCategories });
+    } catch (error) {
+      console.error("Error fetching dashboard categories:", error);
     }
   };
   

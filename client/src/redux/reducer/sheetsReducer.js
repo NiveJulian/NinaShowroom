@@ -19,7 +19,8 @@ import {
   FILTER_COLOR,
   SET_VARIABLE,
   SEARCH_PRODUCT,
-  CLEAN_SEARCH_PRODUCT
+  CLEAN_SEARCH_PRODUCT,
+  GET_DASHBOARD_CATEGORIES
 } from "../actions/productActions";
 
 const initialState = {
@@ -31,6 +32,7 @@ const initialState = {
   images: [],
   filterProducts: [],
   categories: [],
+  dashboardCategories:[],
   cashFlow: [],
   colors: [],
   filterColors: [],
@@ -113,6 +115,12 @@ const sheetsReducer = (state = initialState, action) => {
         ...state,
         categories: action.payload,
       };
+
+      case GET_DASHBOARD_CATEGORIES:
+        return {
+          ...state,
+          dashboardCategories: action.payload
+        };  
 
     case GET_COLORS:
       return {

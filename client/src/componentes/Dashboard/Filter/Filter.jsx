@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { clearFilteredProducts, filterByCategory, renderCondition } from "../../../redux/actions/productActions";
 
 const Filter = () => {
-  const categories = useSelector((state) => state.sheets.categories);
+  const categories = useSelector((state) => state.sheets.dashboardCategories);
   const dispatch = useDispatch();
 
  
