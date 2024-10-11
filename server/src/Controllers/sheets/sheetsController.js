@@ -773,6 +773,29 @@ async function getAllCategories(auth) {
   }
 }
 
+async function getCategoriesDashboard(auth) {
+  try {
+    const { products } = await getSheetData(auth);
+
+    // Extrae todas las categorias de los productos
+    const normalizedCategories = products.map((product) =>
+      product.categoria
+        .trim()
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+    );
+
+    const categories = [...new Set(normalizedCategories)];
+
+    return categories;
+  } catch (error) {
+    console.log({ error: error.message });
+    throw new Error(error.message);
+  }
+}
+
+
 async function getAllColors(auth) {
   try {
     const { products } = await getSheetData(auth);
@@ -1282,6 +1305,7 @@ module.exports = {
   decreaseStock,
   getProductsByCategory,
   getAllCategories,
+  getCategoriesDashboard,
   deleteSalesById,
   getCashFlow,
   addCashFlowEntry,

@@ -23,6 +23,7 @@ const {
   getSaleByUserId,
   registerSaleDashboard,
   putSaleChangeState,
+  getCategoriesDashboard,
 } = require("../Controllers/sheets/sheetsController.js");
 const uploadToS3 = require("../Controllers/sheets/uploadImages.js");
 
@@ -231,6 +232,16 @@ sheetsRouter.get("/categories", async (req, res) => {
   try {
     const auth = await authorize();
     const categories = await getAllCategories(auth);
+    res.json(categories);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+sheetsRouter.get("/dashboard/categories", async (req, res) => {
+  try {
+    const auth = await authorize();
+    const categories = await getCategoriesDashboard(auth);
     res.json(categories);
   } catch (error) {
     res.status(500).send(error.message);
