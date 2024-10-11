@@ -777,14 +777,19 @@ async function getCategoriesDashboard(auth) {
   try {
     const { products } = await getSheetData(auth);
 
-    // Extrae todas las categorias de los productos
-    const normalizedCategories = products.map((product) =>
-      product.categoria
-        .trim()
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-    );
+    // Extrae todas las categorías, asegurándose de que 'categoria' no sea undefined o null
+    const normalizedCategories = products
+      .map((product) => {
+        if (product?.categoria) {
+          return product.categoria
+            .trim()
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "");
+        }
+        return null; // Retorna null si 'categoria' no existe
+      })
+      .filter((category) => category !== null); // Filtra los valores nulos
 
     const categories = [...new Set(normalizedCategories)];
 
@@ -794,6 +799,7 @@ async function getCategoriesDashboard(auth) {
     throw new Error(error.message);
   }
 }
+
 
 
 async function getAllColors(auth) {
