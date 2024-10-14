@@ -755,7 +755,7 @@ async function getAllCategories(auth) {
 
     // Filtra las categorías de los productos que están en publicado = "si"
     const normalizedCategories = products
-      .filter((product) => product.publicado === "si")
+      .filter((product) => product.publicado === "si" && product.categoria) // Verifica que categoria exista
       .map((product) =>
         product.categoria
           .trim()
@@ -772,6 +772,7 @@ async function getAllCategories(auth) {
     throw new Error(error.message);
   }
 }
+
 
 async function getCategoriesDashboard(auth) {
   try {
