@@ -38,11 +38,14 @@ const FloatingProductCard = ({ product, dispatch }) => {
   const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 });
 
   const processColors = (colorString) => {
+    if (!colorString) return []; // Si colorString es undefined o vacío, retorna un array vacío.
+    
     return colorString
       .split(",") // Divide la cadena por comas
       .map((color) => color.trim().toLowerCase()) // Elimina espacios y convierte a minúsculas
       .filter((color) => color); // Elimina entradas vacías
   };
+
   return (
     <div
       ref={ref}
@@ -57,7 +60,7 @@ const FloatingProductCard = ({ product, dispatch }) => {
         sku={product.sku}
         price={product.precio}
         quantity={product.stock}
-        colors={processColors(product.color)}
+        colors={processColors(product.color)} // Llamada a processColors
         onAddToCart={() => handleAddToCart(product, dispatch)}
         isNew={true}
       />
