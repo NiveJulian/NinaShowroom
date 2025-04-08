@@ -7,7 +7,7 @@ function FooterPage() {
         <div className="container mx-auto px-6 flex justify-center items-center flex-col">
           <div className="flex flex-wrap">
             <div className="w-full md:w-1/4">
-              <h5 className="uppercase mb-6 font-bold">NinaShowrrom</h5>
+              <h5 className="uppercase mb-6 font-bold">Nina</h5>
               <p className="mb-4">
                 Tu tienda de confianza para todas tus necesidades.
               </p>

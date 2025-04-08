@@ -15,7 +15,7 @@ const CarrouselHome = () => {
   return (
     <div className="w-full h-[500px]">
       <div className={`w-full h-full ${colors[currentIndex]} flex justify-center items-center transition duration-500`}>
-        <h1 className="text-7xl text-gray-50 italic text-center">Ninashowrrom</h1>
+        <h1 className="text-7xl text-gray-50 italic text-center">Nina</h1>
       </div>
     </div>
   );

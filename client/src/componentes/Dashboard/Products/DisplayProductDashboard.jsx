@@ -203,7 +203,7 @@ const DisplayProductDashboard = ({ products }) => {
                     className="w-12 h-12 rounded-full"
                     alt=""
                   />
-                  NINA Showroom
+                  NINA
                 </div>
                 <span className="text-xs">Location ID#MEND007</span>
               </div>

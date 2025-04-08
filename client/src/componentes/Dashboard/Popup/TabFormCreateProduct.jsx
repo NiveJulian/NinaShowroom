@@ -257,27 +257,22 @@ export default function TabFormCreateProduct({ isOpen, onClose, product }) {
               errors.categoria ? "border-red-500" : "border-gray-400"
             }`}
           >
-            <option value="" disabled>
+             <option value="" disabled>
               Selecciona una categoría
             </option>
-            <option value="tops de noche">Tops de noche</option>
-            <option value="tops de dia">Tops de día</option>
-            <option value="bodys">Bodys</option>
-            <option value="bodys manga larga">Bodys manga larga</option>
-            <option value="remera manga larga salir">
-              Remera manga larga salir
-            </option>
-            <option value="remera manga larga">Remera manga larga</option>
-            <option value="zapatos">Zapatos</option>
-            <option value="camperas">Camperas</option>
-            <option value="sweater">Sweater</option>
-            <option value="vestidos">Vestidos</option>
-            <option value="catsuit">Catsuit</option>
-            <option value="camisas">Camisas</option>
-            <option value="pantalones">Pantalones</option>
-            <option value="faldas">Faldas</option>
-            <option value="perfumes">Perfumes</option>
-            <option value="conjuntos">Conjuntos</option>
+            <option value="zapatos"> Abrigos </option>
+            <option value="camperas">Pantalones</option>
+            <option value="sweater">Tops</option>
+            <option value="vestidos">Bodys</option>
+            <option value="catsuit">Sweaters </option>
+            <option value="camisas">Vestidos</option>
+            <option value="pantalones">Catsuits</option>
+            <option value="faldas">Faldas-shorts</option>
+            <option value="perfumes">Accesorios</option>
+            <option value="conjuntos">Calzados</option>
+            <option value="conjuntos">Vapers</option>
+            <option value="Perfumes"></option>
+            <option value="Bikinis"></option>
           </select>
           {errors.categoria && (
             <p className="text-red-500 text-xs">{errors.categoria}</p>
